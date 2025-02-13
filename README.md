@@ -1,7 +1,7 @@
 # Requirement
 - Node.js
 - npm (Node Package Manager) หรือ yarn หรือ pnpm (ส่วนตัวเราใช้ npm)
-- PostgreSQL
+- PostgreSQL + pgAdmin
 
 # After clone project
 - install dependencies
