@@ -123,7 +123,7 @@ model Service {
 model Coupon {
   id       String   @id @map("c_id") @db.Char(12)
   price    Decimal  @map("c_price") @db.Decimal(8, 2)
-  purchase DateTime @map("c_purches") @db.Timestamp
+  purchase DateTime @map("c_purchase") @db.Timestamp
   status   Int      @map("c_status") @db.SmallInt
 
   // relationship
@@ -149,11 +149,11 @@ model Billing {
   user   User @relation(fields: [userId], references: [id])
   userId Int  @map("u_id")
 
-  coupon   Coupon @relation(fields: [couponId], references: [id])
-  couponId String @unique @map("c_id")
+  coupon   Coupon? @relation(fields: [couponId], references: [id])
+  couponId String? @unique @map("c_id")
 
-  walkingService   WalkingService @relation(fields: [walkingServiceId], references: [id])
-  walkingServiceId Int            @unique @map("ws_id")
+  walkingService   WalkingService? @relation(fields: [walkingServiceId], references: [id])
+  walkingServiceId Int?            @unique @map("ws_id")
 
   @@map("billing")
 }
@@ -168,11 +168,11 @@ model Review {
   user   User @relation(fields: [userId], references: [id])
   userId Int  @map("u_id")
 
-  coupon   Coupon @relation(fields: [couponId], references: [id])
-  couponId String @unique @map("c_id")
+  coupon   Coupon? @relation(fields: [couponId], references: [id])
+  couponId String? @unique @map("c_id")
 
-  walkingService   WalkingService @relation(fields: [walkingServiceId], references: [id])
-  walkingServiceId Int            @unique @map("ws_id")
+  walkingService   WalkingService? @relation(fields: [walkingServiceId], references: [id])
+  walkingServiceId Int?            @unique @map("ws_id")
 
   replyTo   Review? @relation("Replies", fields: [replyToId], references: [id])
   replyToId Int?    @map("replyto")
