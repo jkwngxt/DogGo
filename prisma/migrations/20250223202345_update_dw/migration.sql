@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "dog_walker" ALTER COLUMN "dw_tel" DROP NOT NULL,
+ALTER COLUMN "dw_address" DROP NOT NULL,
+ALTER COLUMN "dw_zone" SET DEFAULT ARRAY[]::TEXT[];

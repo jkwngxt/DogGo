@@ -52,8 +52,8 @@ model DogWalker {
   password String   @map("dw_password")
   email    String   @map("dw_email")
   pic      String   @map("dw_pic")
-  tel      String   @map("dw_tel") @db.VarChar(10)
-  address  String   @map("dw_address")
+  tel      String?  @map("dw_tel") @db.VarChar(10)
+  address  String?  @map("dw_address")
   zone     String[] @map("dw_zone")
 
   // relationship
