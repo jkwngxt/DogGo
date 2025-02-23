@@ -1,12 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 @layer base {
+  
+  @font-face {
+    font-family: 'Auto Font';
+    src: local('Noto Sans Thai');
+    unicode-range: U+0E00-0E7F;
+  }
+
+  
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;
@@ -62,11 +67,14 @@ body {
   }
 }
 
+
+
 @layer base {
   * {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: #FFF8CC;
+    font-family: 'Auto Font', 'Poppins', sans-serif;
   }
 }
