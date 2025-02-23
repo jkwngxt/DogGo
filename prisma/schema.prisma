@@ -174,10 +174,5 @@ model Review {
   walkingService   WalkingService? @relation(fields: [walkingServiceId], references: [id])
   walkingServiceId Int?            @unique @map("ws_id")
 
-  replyTo   Review? @relation("Replies", fields: [replyToId], references: [id])
-  replyToId Int?    @map("replyto")
-
-  replies Review[] @relation("Replies")
-
   @@map("review")
 }
