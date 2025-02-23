@@ -54,7 +54,7 @@ model DogWalker {
   pic      String   @map("dw_pic")
   tel      String?  @map("dw_tel") @db.VarChar(10)
   address  String?  @map("dw_address")
-  zone     String[] @default([]) @map("dw_zone")
+  zone     String[] @map("dw_zone")
 
   // relationship
   services WalkingService[]
