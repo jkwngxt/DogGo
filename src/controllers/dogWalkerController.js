@@ -50,9 +50,6 @@ export class DogWalkerController {
                         password: hashedPassword,
                         email: dogWalkerData.email,
                         pic: '',
-                        tel: dogWalkerData.tel,
-                        address: dogWalkerData.address,
-                        zone: dogWalkerData.zone
                     }
                 });
 
@@ -68,6 +65,15 @@ export class DogWalkerController {
                         });
                     } catch (uploadError) {
                         console.error('Image upload failed:', uploadError);
+
+                        await tx.dogWalker.delete({
+                            where: { id: newDogWalker.id }
+                        });
+
+                        return {
+                            success: false,
+                            message: `Image upload failed: ${uploadError}`
+                        };
                     }
                 }
 
@@ -78,13 +84,22 @@ export class DogWalkerController {
                     plainPassword
                 );
 
+                if (!emailSent) {
+                    await tx.dogWalker.delete({
+                        where: { id: newDogWalker.id }
+                    });
+
+                    return {
+                        success: false,
+                        message: 'Dog walker registered, but email sending failed. Registration has been rolled back.'
+                    };
+                }
+
                 const { password, ...dogWalkerWithoutPassword } = newDogWalker;
 
                 return {
                     success: true,
-                    message: emailSent
-                        ? 'Dog walker registered successfully and welcome email sent'
-                        : 'Dog walker registered successfully but email sending failed',
+                    message: 'Dog walker registered successfully and welcome email sent',
                     dogWalker: dogWalkerWithoutPassword
                 };
 

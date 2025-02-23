@@ -2,29 +2,25 @@ import fs from 'fs/promises';
 import path from 'path';
 
 export class FileUploadService {
-    constructor() {
-        this.uploadPath = path.join(process.cwd(), 'data', 'images', 'dog-walkers');
-    }
+    async uploadImage(imageFile, id) {
+        const bytes = await imageFile.arrayBuffer();
+        const buffer = Buffer.from(bytes);
 
-    static setupStaticFiles(app) {
-        const uploadPath = path.join(process.cwd(), 'data', 'images');
-        app.use('/images', express.static(uploadPath));
-    }
+        const originalExtension = imageFile.name.split('.').pop().toLowerCase();
+        const fileName = `${id}.${originalExtension}`;
 
-    async uploadImage(file, id) {
+        const imagePath = `/dog-walkers/images/${fileName}`;
+
+        const fullPath = path.join(process.cwd(), 'data', 'dog-walkers', 'images', fileName);
+
         try {
-            await fs.mkdir(this.uploadPath, { recursive: true });
+            await fs.mkdir(path.dirname(fullPath), { recursive: true });
 
-            const fileExt = path.extname(file.originalname);
+            await fs.writeFile(fullPath, buffer);
 
-            const fileName = `${id}${fileExt}`;
-            const filePath = path.join(this.uploadPath, fileName);
-
-            await fs.writeFile(filePath, file.buffer);
-
-            return `/images/dog-walkers/${fileName}`;
+            return imagePath;
         } catch (error) {
-            console.error('File upload error:', error);
+            console.error(error);
             throw error;
         }
     }
