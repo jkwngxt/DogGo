@@ -1,12 +1,10 @@
 import bcrypt from 'bcryptjs';
-import {UserController} from '@/controllers/UserController';
+import { UserController } from '@/controllers/UserController';
 
-// Mock PrismaClient
 jest.mock('@prisma/client', () => ({
     PrismaClient: jest.fn()
 }));
 
-// Mock bcrypt
 jest.mock('bcryptjs', () => ({
     hash: jest.fn()
 }));
@@ -14,20 +12,28 @@ jest.mock('bcryptjs', () => ({
 describe('UserController', () => {
     let userController;
     let mockPrismaClient;
+    let mockTransaction;
 
     beforeEach(() => {
-        // Clear all mocks
         jest.clearAllMocks();
 
-        // Create mock Prisma client
-        mockPrismaClient = {
+        // Create mock transaction
+        mockTransaction = {
             user: {
                 findFirst: jest.fn(),
                 create: jest.fn()
             }
         };
 
-        // Initialize controller with mock client
+        // Create mock Prisma client with transaction support
+        mockPrismaClient = {
+            user: {
+                findFirst: jest.fn(),
+                create: jest.fn()
+            },
+            $transaction: jest.fn(callback => callback(mockTransaction))
+        };
+
         userController = new UserController(mockPrismaClient);
     });
 
@@ -39,24 +45,34 @@ describe('UserController', () => {
             email: 'test@example.com',
             tel: '1234567890',
             address: '123 Test St',
-            zone: 'Test Zone'
+            zone: 'Test Zone',
+            dogs: [
+                { name: 'Buddy', breed: 'Golden Retriever' },
+                { name: 'Max', breed: 'Labrador' }
+            ]
         };
 
         const mockHashedPassword = 'hashedPassword123';
 
-        it('should successfully register a new user', async () => {
-            // Mock implementations
-            mockPrismaClient.user.findFirst
-                .mockImplementationOnce(() => Promise.resolve(null))  // username check
-                .mockImplementationOnce(() => Promise.resolve(null)); // email check
+        it('should successfully register a new user with dogs', async () => {
+            mockTransaction.user.findFirst
+                .mockImplementationOnce(() => Promise.resolve(null))
+                .mockImplementationOnce(() => Promise.resolve(null));
 
             bcrypt.hash.mockImplementation(() => Promise.resolve(mockHashedPassword));
 
-            mockPrismaClient.user.create.mockImplementation(() => Promise.resolve({
+            const mockCreatedUser = {
                 id: 1,
                 ...mockUserData,
-                password: mockHashedPassword
-            }));
+                password: mockHashedPassword,
+                dogs: mockUserData.dogs.map((dog, index) => ({
+                    id: index + 1,
+                    ...dog,
+                    ownerId: 1
+                }))
+            };
+
+            mockTransaction.user.create.mockImplementation(() => Promise.resolve(mockCreatedUser));
 
             const result = await userController.register(mockUserData);
 
@@ -69,13 +85,37 @@ describe('UserController', () => {
                 email: mockUserData.email,
                 tel: mockUserData.tel,
                 address: mockUserData.address,
-                zone: mockUserData.zone
+                zone: mockUserData.zone,
+                dogs: mockCreatedUser.dogs
             });
             expect(result.user.password).toBeUndefined();
         });
 
+        it('should handle registration with no dogs', async () => {
+            const userDataWithoutDogs = { ...mockUserData };
+            delete userDataWithoutDogs.dogs;
+
+            mockTransaction.user.findFirst
+                .mockImplementationOnce(() => Promise.resolve(null))
+                .mockImplementationOnce(() => Promise.resolve(null));
+
+            bcrypt.hash.mockImplementation(() => Promise.resolve(mockHashedPassword));
+
+            mockTransaction.user.create.mockImplementation(() => Promise.resolve({
+                id: 1,
+                ...userDataWithoutDogs,
+                password: mockHashedPassword,
+                dogs: []
+            }));
+
+            const result = await userController.register(userDataWithoutDogs);
+
+            expect(result.success).toBe(true);
+            expect(result.user.dogs).toEqual([]);
+        });
+
         it('should fail if username already exists', async () => {
-            mockPrismaClient.user.findFirst.mockImplementation(() => Promise.resolve({
+            mockTransaction.user.findFirst.mockImplementation(() => Promise.resolve({
                 id: 1,
                 ...mockUserData
             }));
@@ -84,11 +124,11 @@ describe('UserController', () => {
 
             expect(result.success).toBe(false);
             expect(result.message).toBe('Username already exists');
-            expect(mockPrismaClient.user.create).not.toHaveBeenCalled();
+            expect(mockTransaction.user.create).not.toHaveBeenCalled();
         });
 
         it('should fail if email already exists', async () => {
-            mockPrismaClient.user.findFirst
+            mockTransaction.user.findFirst
                 .mockImplementationOnce(() => Promise.resolve(null))
                 .mockImplementationOnce(() => Promise.resolve({
                     id: 1,
@@ -99,39 +139,46 @@ describe('UserController', () => {
 
             expect(result.success).toBe(false);
             expect(result.message).toBe('Email already exists');
-            expect(mockPrismaClient.user.create).not.toHaveBeenCalled();
+            expect(mockTransaction.user.create).not.toHaveBeenCalled();
         });
 
         it('should handle internal server errors', async () => {
-            mockPrismaClient.user.findFirst.mockImplementation(() => Promise.reject(new Error('Database error')));
+            mockTransaction.user.findFirst.mockImplementation(() => Promise.reject(new Error('Database error')));
 
             const result = await userController.register(mockUserData);
 
             expect(result.success).toBe(false);
             expect(result.message).toBe('Internal server error');
-            expect(mockPrismaClient.user.create).not.toHaveBeenCalled();
+            expect(mockTransaction.user.create).not.toHaveBeenCalled();
         });
 
         it('should hash the password before saving', async () => {
-            mockPrismaClient.user.findFirst
+            mockTransaction.user.findFirst
                 .mockImplementationOnce(() => Promise.resolve(null))
                 .mockImplementationOnce(() => Promise.resolve(null));
 
             bcrypt.hash.mockImplementation(() => Promise.resolve(mockHashedPassword));
 
-            mockPrismaClient.user.create.mockImplementation(() => Promise.resolve({
+            mockTransaction.user.create.mockImplementation(() => Promise.resolve({
                 id: 1,
                 ...mockUserData,
-                password: mockHashedPassword
+                password: mockHashedPassword,
+                dogs: []
             }));
 
             await userController.register(mockUserData);
 
             expect(bcrypt.hash).toHaveBeenCalledWith(mockUserData.password, 10);
-            expect(mockPrismaClient.user.create).toHaveBeenCalledWith({
+            expect(mockTransaction.user.create).toHaveBeenCalledWith({
                 data: {
                     ...mockUserData,
-                    password: mockHashedPassword
+                    password: mockHashedPassword,
+                    dogs: {
+                        create: mockUserData.dogs
+                    }
+                },
+                include: {
+                    dogs: true
                 }
             });
         });

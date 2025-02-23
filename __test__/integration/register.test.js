@@ -1,12 +1,10 @@
-import {POST} from '@/app/api/user/register/route';
-import {UserController} from '@/controllers/userController';
+import { POST } from '@/app/api/user/register/route';
+import { UserController } from '@/controllers/userController';
 
-// Mock UserController
 jest.mock('@/controllers/userController', () => ({
     UserController: jest.fn()
 }));
 
-// Mock NextResponse
 jest.mock('next/server', () => ({
     NextResponse: {
         json: jest.fn((data, options) => ({
@@ -20,10 +18,8 @@ describe('POST /api/user/register', () => {
     let mockRegister;
 
     beforeEach(() => {
-        // Clear all mocks
         jest.clearAllMocks();
 
-        // Setup mock register method
         mockRegister = jest.fn();
         UserController.mockImplementation(() => ({
             register: mockRegister
@@ -37,18 +33,25 @@ describe('POST /api/user/register', () => {
         email: 'test@example.com',
         tel: '1234567890',
         address: '123 Test St',
-        zone: 'Test Zone'
+        zone: 'Test Zone',
+        dogs: [
+            { name: 'Buddy', breed: 'Golden Retriever' },
+            { name: 'Max', breed: 'Labrador' }
+        ]
     };
 
     it('should successfully register a new user', async () => {
-        // Mock successful registration
         const mockSuccessResponse = {
             success: true,
             message: 'User registered successfully',
             user: {
                 id: 1,
                 ...mockRequestBody,
-                password: undefined
+                password: undefined,
+                dogs: [
+                    { id: 1, name: 'Buddy', breed: 'Golden Retriever', ownerId: 1 },
+                    { id: 2, name: 'Max', breed: 'Labrador', ownerId: 1 }
+                ]
             }
         };
 
@@ -67,7 +70,6 @@ describe('POST /api/user/register', () => {
     });
 
     it('should return 409 when username already exists', async () => {
-        // Mock username conflict
         const mockConflictResponse = {
             success: false,
             message: 'Username already exists'
@@ -87,7 +89,6 @@ describe('POST /api/user/register', () => {
     });
 
     it('should return 409 when email already exists', async () => {
-        // Mock email conflict
         const mockConflictResponse = {
             success: false,
             message: 'Email already exists'
@@ -107,7 +108,6 @@ describe('POST /api/user/register', () => {
     });
 
     it('should return 500 on controller error', async () => {
-        // Mock internal server error
         const mockErrorResponse = {
             success: false,
             message: 'Internal server error'

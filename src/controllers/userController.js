@@ -1,4 +1,4 @@
-import {PrismaClient} from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 export class UserController {
@@ -7,60 +7,72 @@ export class UserController {
     }
 
     async register(userData) {
-        try {
-            // Check if username exists
-            const existingUsername = await this.prisma.user.findFirst({
-                where: {username: userData.username}
-            });
+        return this.prisma.$transaction(async (tx) => {
+            try {
+                // Check if username exists
+                const existingUsername = await tx.user.findFirst({
+                    where: {username: userData.username}
+                });
 
-            if (existingUsername) {
-                return {
-                    success: false,
-                    message: 'Username already exists'
-                };
-            }
-
-            // Check if email exists
-            const existingEmail = await this.prisma.user.findFirst({
-                where: {email: userData.email}
-            });
-
-            if (existingEmail) {
-                return {
-                    success: false,
-                    message: 'Email already exists'
-                };
-            }
-
-            // Hash password
-            const hashedPassword = await bcrypt.hash(userData.password, 10);
-
-            // Create new user
-            const newUser = await this.prisma.user.create({
-                data: {
-                    name: userData.name,
-                    username: userData.username,
-                    password: hashedPassword,
-                    email: userData.email,
-                    tel: userData.tel,
-                    address: userData.address,
-                    zone: userData.zone
+                if (existingUsername) {
+                    return {
+                        success: false,
+                        message: 'Username already exists'
+                    };
                 }
-            });
 
-            const {password, ...userWithoutPassword} = newUser;
+                // Check if email exists
+                const existingEmail = await tx.user.findFirst({
+                    where: {email: userData.email}
+                });
 
-            return {
-                success: true,
-                message: 'User registered successfully',
-                user: userWithoutPassword
-            };
+                if (existingEmail) {
+                    return {
+                        success: false,
+                        message: 'Email already exists'
+                    };
+                }
 
-        } catch (error) {
-            return {
-                success: false,
-                message: 'Internal server error'
-            };
-        }
+                // Hash password
+                const hashedPassword = await bcrypt.hash(userData.password, 10);
+
+                // Create new user with dogs
+                const newUser = await tx.user.create({
+                    data: {
+                        name: userData.name,
+                        username: userData.username,
+                        password: hashedPassword,
+                        email: userData.email,
+                        tel: userData.tel,
+                        address: userData.address,
+                        zone: userData.zone,
+                        dogs: {
+                            create: userData.dogs?.map(dog => ({
+                                name: dog.name,
+                                breed: dog.breed
+                            })) || []
+                        }
+                    },
+                    include: {
+                        dogs: true // Include dogs in the response
+                    }
+                });
+
+                const {password, ...userWithoutPassword} = newUser;
+
+                return {
+                    success: true,
+                    message: 'User registered successfully',
+                    user: userWithoutPassword
+                };
+
+            } catch (error) {
+                // The transaction will automatically roll back on error
+                return {
+                    success: false,
+                    message: 'Internal server error'
+                };
+            }
+        });
     }
 }
