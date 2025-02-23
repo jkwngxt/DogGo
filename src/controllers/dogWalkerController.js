@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { generatePassword } from '@/utils/passwordGenerator.js';
 import { EmailService } from '@/utils/emailService.js';
-import {FileUploadService} from "@/utils/fileUpload";
+import {FileUploadService} from "@/utils/imageUpload";
 
 export class DogWalkerController {
     constructor(prismaClient = new PrismaClient()) {

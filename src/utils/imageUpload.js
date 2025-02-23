@@ -20,7 +20,6 @@ export class FileUploadService {
 
             return imagePath;
         } catch (error) {
-            console.error(error);
             throw error;
         }
     }
