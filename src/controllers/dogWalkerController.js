@@ -15,7 +15,7 @@ export class DogWalkerController {
         return this.prisma.$transaction(async (tx) => {
             try {
                 // Check if username exists
-                const existingUsername = await tx.dogWalker.findFirst({
+                const existingUsername = await tx.dogWalker.findUnique({
                     where: { username: dogWalkerData.username }
                 });
 
@@ -27,7 +27,7 @@ export class DogWalkerController {
                 }
 
                 // Check if email exists
-                const existingEmail = await tx.dogWalker.findFirst({
+                const existingEmail = await tx.dogWalker.findUnique({
                     where: { email: dogWalkerData.email }
                 });
 

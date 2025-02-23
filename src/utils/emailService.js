@@ -59,7 +59,7 @@ export class EmailService {
                     <p><strong>Password:</strong> ${password}</p>
                     <p>Please change your password after your first login.</p>
                     <p>Best regards,<br>DogGo Team</p>
-                    <a href="https://doggo.com/login" class="button">Login Now</a>
+                    <a href="http://localhost:3000/" class="button">Login Now</a>
                     <div class="footer">
                         <p>If you didn't create an account, please ignore this email.</p>
                     </div>

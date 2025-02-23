@@ -10,7 +10,7 @@ export class UserController {
         return this.prisma.$transaction(async (tx) => {
             try {
                 // Check if username exists
-                const existingUsername = await tx.user.findFirst({
+                const existingUsername = await tx.user.findUnique({
                     where: {username: userData.username}
                 });
 
@@ -22,7 +22,7 @@ export class UserController {
                 }
 
                 // Check if email exists
-                const existingEmail = await tx.user.findFirst({
+                const existingEmail = await tx.user.findUnique({
                     where: {email: userData.email}
                 });
 
