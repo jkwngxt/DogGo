@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { UserController } from '@/controllers/UserController';
+import { UserController } from '@/controllers/userController';
 
 jest.mock('@prisma/client', () => ({
     PrismaClient: jest.fn()

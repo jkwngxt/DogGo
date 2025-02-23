@@ -78,7 +78,6 @@ export class EmailService {
             await fs.writeFile(fullPath, emailContent);
             return emailPath;
         } catch (error) {
-            console.error(error);
             throw error;
         }
     }
