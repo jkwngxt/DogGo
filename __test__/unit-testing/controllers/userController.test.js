@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { UserController } from '@/controllers/UserController';
+import { UserController } from '@/controllers/userController';
 
 jest.mock('@prisma/client', () => ({
     PrismaClient: jest.fn()
@@ -20,7 +20,7 @@ describe('UserController', () => {
         // Create mock transaction
         mockTransaction = {
             user: {
-                findFirst: jest.fn(),
+                findUnique: jest.fn(),
                 create: jest.fn()
             }
         };
@@ -28,7 +28,7 @@ describe('UserController', () => {
         // Create mock Prisma client with transaction support
         mockPrismaClient = {
             user: {
-                findFirst: jest.fn(),
+                findUnique: jest.fn(),
                 create: jest.fn()
             },
             $transaction: jest.fn(callback => callback(mockTransaction))
@@ -55,7 +55,7 @@ describe('UserController', () => {
         const mockHashedPassword = 'hashedPassword123';
 
         it('should successfully register a new user with dogs', async () => {
-            mockTransaction.user.findFirst
+            mockTransaction.user.findUnique
                 .mockImplementationOnce(() => Promise.resolve(null))
                 .mockImplementationOnce(() => Promise.resolve(null));
 
@@ -95,7 +95,7 @@ describe('UserController', () => {
             const userDataWithoutDogs = { ...mockUserData };
             delete userDataWithoutDogs.dogs;
 
-            mockTransaction.user.findFirst
+            mockTransaction.user.findUnique
                 .mockImplementationOnce(() => Promise.resolve(null))
                 .mockImplementationOnce(() => Promise.resolve(null));
 
@@ -115,7 +115,7 @@ describe('UserController', () => {
         });
 
         it('should fail if username already exists', async () => {
-            mockTransaction.user.findFirst.mockImplementation(() => Promise.resolve({
+            mockTransaction.user.findUnique.mockImplementation(() => Promise.resolve({
                 id: 1,
                 ...mockUserData
             }));
@@ -128,7 +128,7 @@ describe('UserController', () => {
         });
 
         it('should fail if email already exists', async () => {
-            mockTransaction.user.findFirst
+            mockTransaction.user.findUnique
                 .mockImplementationOnce(() => Promise.resolve(null))
                 .mockImplementationOnce(() => Promise.resolve({
                     id: 1,
@@ -143,7 +143,7 @@ describe('UserController', () => {
         });
 
         it('should handle internal server errors', async () => {
-            mockTransaction.user.findFirst.mockImplementation(() => Promise.reject(new Error('Database error')));
+            mockTransaction.user.findUnique.mockImplementation(() => Promise.reject(new Error('Database error')));
 
             const result = await userController.register(mockUserData);
 
@@ -153,7 +153,7 @@ describe('UserController', () => {
         });
 
         it('should hash the password before saving', async () => {
-            mockTransaction.user.findFirst
+            mockTransaction.user.findUnique
                 .mockImplementationOnce(() => Promise.resolve(null))
                 .mockImplementationOnce(() => Promise.resolve(null));
 
