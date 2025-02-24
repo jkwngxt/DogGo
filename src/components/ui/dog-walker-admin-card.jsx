@@ -19,7 +19,7 @@ return (
       onClick={handleClick}
     >
     <Card className="max-w-full mx px-4">
-      <CardHeader className="flex flex flex-row justify-between items-center ">
+      <CardHeader className="flex flex-row justify-between items-center ">
         <img
           src={userImage}
           alt="User profile"

@@ -18,9 +18,6 @@ const SignUpPage = () => {
     <div className="flex flex-col min-h-screen items-center justify-center bg-[#FFF8D6]">
         <Label className="text-center text-xl font-bold mb-2 mt-3">Sign Up - ข้อมูลส่วนตัว</Label>
         <Card className="w-full max-w-screen-md bg-white p-6 shadow-lg">
-        {/* <CardHeader>
-          <CardTitle className="text-center text-xl font-bold">Sign Up - ข้อมูลส่วนตัว</CardTitle>
-        </CardHeader> */}
         <CardContent>
           <div className="space-y-4">
             <div>

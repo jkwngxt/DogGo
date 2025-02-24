@@ -1,7 +1,6 @@
 import Image from "next/image";
-import logoSVG from "/public/images/dogGo.svg"; 
+import logoSVG from "/public/image/logo.svg"; 
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 
 export default function LoginPage() {
     return (
@@ -13,7 +12,7 @@ export default function LoginPage() {
           </div>
           
           {/* Login Form */}
-          <Label className="text-5xl font-semibold text-white mb-9 mt-4">Login</Label>          
+          <Label className="text-5xl font-semibold text-white mb-9 mt-4">Login</Label>     
           <input
             type="username"
             placeholder="Username"
