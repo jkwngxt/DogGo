@@ -26,7 +26,7 @@ describe('POST api/dog-walker/register', () => {
         // Arrange
         const mockFormData = new Map();
         mockFormData.set('name', 'John Doe');
-        mockFormData.set('username', 'johndoe');
+        mockFormData.set('username', 'dw-johndoe');
         mockFormData.set('email', 'john@example.com');
         mockFormData.set('pic', 'mock-image-file');
 
@@ -47,7 +47,7 @@ describe('POST api/dog-walker/register', () => {
     test('should return status 409 when data already exists', async () => {
         const mockFormData = new Map();
         mockFormData.set('name', 'John Doe');
-        mockFormData.set('username', 'johndoe');
+        mockFormData.set('username', 'dw-johndoe');
         mockFormData.set('email', 'john@example.com');
         mockFormData.set('pic', 'mock-image-file');
 
@@ -80,7 +80,7 @@ describe('POST api/dog-walker/register', () => {
         // Arrange
         const mockFormData = new Map();
         mockFormData.set('name', 'John Doe');
-        mockFormData.set('username', 'johndoe');
+        mockFormData.set('username', 'dw-johndoe');
         mockFormData.set('email', 'john@example.com');
         mockFormData.set('pic', 'mock-image-file');
 
