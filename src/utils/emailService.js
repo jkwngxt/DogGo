@@ -26,7 +26,7 @@ export class EmailService {
                         margin: 0 auto;
                     }
                     h1 {
-                        color: #4CAF50;
+                        color: #2668E3;
                         text-align: center;
                     }
                     p {
@@ -41,7 +41,7 @@ export class EmailService {
                     }
                     .button {
                         display: inline-block;
-                        background-color: #4CAF50;
+                        background-color: #2668E3;
                         color: white;
                         padding: 10px 20px;
                         text-decoration: none;
