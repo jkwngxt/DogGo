@@ -9,6 +9,7 @@ describe('EmailService', () => {
     });
 
     it('should generate and save a welcome email', async () => {
+        const id = 1;
         const email = 'test@example.com';
         const username = 'testUser';
         const password = 'testPassword123';
@@ -16,9 +17,9 @@ describe('EmailService', () => {
         jest.spyOn(fs, 'mkdir').mockResolvedValue();
         jest.spyOn(fs, 'writeFile').mockResolvedValue();
 
-        const result = await emailService.sendWelcomeEmail(email, username, password);
+        const result = await emailService.sendWelcomeEmail(id, email, username, password);
 
-        expect(result).toMatch(/\/dog-walkers\/emails\/welcome-testuser-\d+\.html/);
+        expect(result).toMatch(/\/dog-walkers\/welcome-emails\/1-testuser\.html/);
         expect(fs.mkdir).toHaveBeenCalledWith(expect.any(String), { recursive: true });
         expect(fs.writeFile).toHaveBeenCalledWith(expect.any(String), expect.any(String));
     });

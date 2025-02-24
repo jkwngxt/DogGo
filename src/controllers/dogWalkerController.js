@@ -78,6 +78,7 @@ export class DogWalkerController {
 
                 // Send welcome email with credentials
                 const emailSent = await this.emailService.sendWelcomeEmail(
+                    dogWalkerData.id,
                     dogWalkerData.email,
                     dogWalkerData.username,
                     plainPassword

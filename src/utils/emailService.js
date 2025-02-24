@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 export class EmailService {
-    async sendWelcomeEmail(email, username, password) {
+    async sendWelcomeEmail(id, email, username, password) {
         const emailContent = `
             <!DOCTYPE html>
             <html lang="en">
@@ -69,9 +69,9 @@ export class EmailService {
         `;
 
         const sanitizedUsername = username.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        const fileName = `welcome-${sanitizedUsername}-${Date.now()}.html`;
-        const emailPath = `/dog-walkers/emails/${fileName}`;
-        const fullPath = path.join(process.cwd(), 'data', 'dog-walkers', 'emails', fileName);
+        const fileName = `${id}-${sanitizedUsername}.html`;
+        const emailPath = `/dog-walkers/welcome-emails/${fileName}`;
+        const fullPath = path.join(process.cwd(), 'data', 'dog-walkers', 'welcome-emails', fileName);
 
         try {
             await fs.mkdir(path.dirname(fullPath), { recursive: true });
