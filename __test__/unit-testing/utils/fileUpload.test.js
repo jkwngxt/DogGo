@@ -1,4 +1,4 @@
-import { FileUploadService } from '@/utils/imageUpload.js';
+import { FileUploadService } from '@/utils/fileUpload.js';
 import fs from 'fs/promises';
 
 describe('ImageUploadService', () => {
@@ -15,7 +15,6 @@ describe('ImageUploadService', () => {
         };
         const id = '123';
 
-        // จำลองการทำงานของ fs.mkdir และ fs.writeFile
         jest.spyOn(fs, 'mkdir').mockResolvedValue();
         jest.spyOn(fs, 'writeFile').mockResolvedValue();
 
@@ -33,7 +32,6 @@ describe('ImageUploadService', () => {
         };
         const id = '123';
 
-        // จำลองการเกิดข้อผิดพลาด
         jest.spyOn(fs, 'mkdir').mockRejectedValue(new Error('Failed to create directory'));
 
         await expect(fileUploadService.uploadImage(imageFile, id)).rejects.toThrow('Failed to create directory');

@@ -2,13 +2,13 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { generatePassword } from '@/utils/passwordGenerator.js';
 import { EmailService } from '@/utils/emailService.js';
-import {FileUploadService} from "@/utils/imageUpload";
+import {FileUploadService} from "@/utils/fileUpload";
 
 export class DogWalkerController {
-    constructor(prismaClient = new PrismaClient()) {
+    constructor(prismaClient = new PrismaClient(), emailService = new EmailService(), fileUploadService = new FileUploadService()) {
         this.prisma = prismaClient;
-        this.emailService = new EmailService();
-        this.fileUploadService = new FileUploadService();
+        this.emailService = emailService; // รับจากภายนอก
+        this.fileUploadService = fileUploadService; // รับจากภายนอก
     }
 
     async register(dogWalkerData, imageFile) {
@@ -64,7 +64,6 @@ export class DogWalkerController {
                             data: { pic: imagePath }
                         });
                     } catch (uploadError) {
-                        console.error('Image upload failed:', uploadError);
 
                         await tx.dogWalker.delete({
                             where: { id: newDogWalker.id }
@@ -104,7 +103,6 @@ export class DogWalkerController {
                 };
 
             } catch (error) {
-                console.error('Registration error:', error);
                 return {
                     success: false,
                     message: 'Internal server error'
