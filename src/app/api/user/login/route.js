@@ -1,4 +1,5 @@
 import { AuthController } from "@/controllers/authController";
+import { NextResponse } from "next/server";
 
 const authcontroller = new AuthController();
 
@@ -7,15 +8,9 @@ export async function POST(request) {
         const body = await request.json();
         const response = await authcontroller.login(body);
 
-        return new Response(JSON.stringify(response.body), {
-            status: response.status,
-            headers: { "Content-Type": "application/json" }
-        });
+        return NextResponse.json(response.body, { status: response.status });
     } catch (error) {
         console.error("Login error:", error);
-        return new Response(JSON.stringify( { message: "Internal server error." }), {
-            status: 500,
-            headers: { "Content-Type": "application/json" }
-        });
+        return NextResponse.json({ message: "Internal server error." }, { status: 500 });
     }
 }
