@@ -5,7 +5,7 @@ const PetOwnerLayout = ({ children }) => {
   return (
     <div>
       <PetOwnerNav
-        userImage="/images/user-placeholder.jpg"
+        userImage="/image/user-placeholder.jpg"
         userName="Pet Owner"
       />
       <main>{children}</main>
