@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { AuthController } from "@controllers/AuthController.js";
+import { AuthController } from "@/controllers/AuthController.js";
 
 const authcontroller = new AuthController();
 
