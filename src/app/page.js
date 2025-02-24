@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,11 +28,17 @@ import DogWalkerNav from "@/components/ui/nav-dog-walker";
 import WorkDescription from "@/components/ui/work-description";
 import ServiceProviderNav from "@/components/ui/nav-service-provider";
 import AdminNav from "@/components/ui/ืnav-admin";
-
+import HomeDogWalker from "@/components/ui/home-dog-walker";
 
 export default function Home() {
   return (
     <div>
+      <div className="flex flex-row">
+        <Link href="/pet-owner">Pet Owner</Link>
+        <Button>Dog Walker</Button>
+        <Button>Admin</Button>
+        <Button>Service</Button>
+      </div>
       <div className="flex flex-row">
         <Button>Primary Button</Button>
         <Button variant="secondary">Secondary Button</Button>
@@ -96,10 +103,7 @@ export default function Home() {
         userName="Service Provider"
       />
 
-      <AdminNav
-        userImage="/images/user-placeholder.jpg"
-        userName="Admin"
-      />
+      <AdminNav userImage="/images/user-placeholder.jpg" userName="Admin" />
 
       <WorkDescription
         userName="John Doe"
@@ -115,6 +119,14 @@ export default function Home() {
         startTime="10:00"
         endTime="12:00"
         status={0}
+      />
+
+      <HomeDogWalker
+        userImage="/images/user-placeholder.jpg"
+        userName="John Doe"
+        location="New York, NY"
+        phoneNumber="(555) 123-4567"
+        reviewScore="4.8"
       />
     </div>
   );

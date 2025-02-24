@@ -54,7 +54,7 @@ const AdminNav = ({ userImage, userName}) => {
             <NavigationMenuItem>
               <NavigationMenuTrigger>Services</NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid gap-3 p-2 md:w-[50px] lg:w-[100px] ]">
+                <ul className="grid gap-3 p-2 md:w-[50px] lg:w-[150px] ]">
                   <ListItem href="/doc" title="Customer"/>
                   <ListItem href="/docs/installation" title="Dog Walker"/>
                   <ListItem
