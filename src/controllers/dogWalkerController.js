@@ -63,6 +63,7 @@ export class DogWalkerController {
                             where: { id: newDogWalker.id },
                             data: { pic: imagePath }
                         });
+                        newDogWalker.pic = imagePath;
                     } catch (uploadError) {
 
                         await tx.dogWalker.delete({
@@ -78,9 +79,9 @@ export class DogWalkerController {
 
                 // Send welcome email with credentials
                 const emailSent = await this.emailService.sendWelcomeEmail(
-                    dogWalkerData.id,
-                    dogWalkerData.email,
-                    dogWalkerData.username,
+                    newDogWalker.id,
+                    newDogWalker.email,
+                    newDogWalker.username,
                     plainPassword
                 );
 
@@ -95,13 +96,14 @@ export class DogWalkerController {
                     };
                 }
 
-                const { password, ...dogWalkerWithoutPassword } = newDogWalker;
+                const { id, username, email, pic } = newDogWalker;
+
 
                 return {
                     success: true,
                     message: 'Dog walker registered successfully and welcome email sent',
-                    dogWalker: dogWalkerWithoutPassword
-                };
+                    dogWalker: { id, username, email, pic}
+                    };
 
             } catch (error) {
                 return {
