@@ -3,24 +3,24 @@ import HomeDogWalker from '@/components/ui/home-dog-walker'
 import DateTimeRangePicker from "@/components/ui/select-datetime";
 
 
-export default function page() {
+export default function WalkingService() {
     const dogWalkers = [
         {
-          userImage: "/images/user-placeholder.jpg",
+          userImage: "/image/user-placeholder.jpg",
           userName: "John Doe",
           location: "New York, NY",
           phoneNumber: "(555) 123-4567",
           reviewScore: "4.8",
         },
         {
-          userImage: "/images/user-placeholder.jpg",
+          userImage: "/image/user-placeholder.jpg",
           userName: "Jane Smith",
           location: "Los Angeles, CA",
           phoneNumber: "(555) 987-6543",
           reviewScore: "4.9",
         },
         {
-          userImage: "/images/user-placeholder.jpg",
+          userImage: "/image/user-placeholder.jpg",
           userName: "Jake Wilson",
           location: "Chicago, IL",
           phoneNumber: "(555) 111-2222",

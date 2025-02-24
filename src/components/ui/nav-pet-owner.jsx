@@ -41,7 +41,7 @@ ListItem.displayName = "ListItem";
 const PetOwnerNav = ({ userImage, userName}) => {
   return (
     <div className="flex px-10 bg-[#2668E3] justify-between">
-      <img className="w-20 h-20" src="/logo.svg" alt="dog go logo" />
+      <img className="w-20 h-20" src="/image/logo.svg" alt="dog go logo" />
       <div className="flex flex-row space-x-4 items-center">
         <img
           src={userImage}

@@ -27,7 +27,7 @@ import PetOwnerNav from "@/components/ui/nav-pet-owner";
 import DogWalkerNav from "@/components/ui/nav-dog-walker";
 import WorkDescription from "@/components/ui/work-description";
 import ServiceProviderNav from "@/components/ui/nav-service-provider";
-import AdminNav from "@/components/ui/ืnav-admin";
+import AdminNav from "@/components/ui/nav-admin";
 import HomeDogWalker from "@/components/ui/home-dog-walker";
 
 export default function Home() {
@@ -81,7 +81,7 @@ export default function Home() {
       </Select>
 
       <DogWalkerAdminCard
-        userImage="/images/user-placeholder.jpg"
+        userImage="/image/user-placeholder.jpg"
         userName="John Doe"
         location="New York, NY"
         phoneNumber="(555) 123-4567"
@@ -89,21 +89,21 @@ export default function Home() {
       />
 
       <PetOwnerNav
-        userImage="/images/user-placeholder.jpg"
+        userImage="/image/user-placeholder.jpg"
         userName="Pet Owner"
       />
 
       <DogWalkerNav
-        userImage="/images/user-placeholder.jpg"
+        userImage="/image/user-placeholder.jpg"
         userName="Dog Walker"
       />
 
       <ServiceProviderNav
-        userImage="/images/user-placeholder.jpg"
+        userImage="/image/user-placeholder.jpg"
         userName="Service Provider"
       />
 
-      <AdminNav userImage="/images/user-placeholder.jpg" userName="Admin" />
+      <AdminNav userImage="/image/user-placeholder.jpg" userName="Admin" />
 
       <WorkDescription
         userName="John Doe"
@@ -122,7 +122,7 @@ export default function Home() {
       />
 
       <HomeDogWalker
-        userImage="/images/user-placeholder.jpg"
+        userImage="/image/user-placeholder.jpg"
         userName="John Doe"
         location="New York, NY"
         phoneNumber="(555) 123-4567"
