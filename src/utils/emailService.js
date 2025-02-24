@@ -56,6 +56,7 @@ export class EmailService {
                     <p>Your account has been created successfully.</p>
                     <p>Here are your login credentials:</p>
                     <p><strong>Username:</strong> ${username}</p>
+                    <p><strong>Email:</strong> ${email}</p>
                     <p><strong>Password:</strong> ${password}</p>
                     <p>Please change your password after your first login.</p>
                     <p>Best regards,<br>DogGo Team</p>
