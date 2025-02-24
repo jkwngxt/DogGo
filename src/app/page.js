@@ -21,18 +21,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export function ButtonDemo() {
-  return <Button>Button</Button>;
-}
+import DogWalkerAdminCard from "@/components/ui/dog-walker-admin-card";
+import PetOwnerNav from "@/components/ui/nav-pet-owner";
+import DogWalkerNav from "@/components/ui/nav-dog-walker";
+import WorkDescription from "@/components/ui/work-description";
+import ServiceProviderNav from "@/components/ui/nav-service-provider";
+import AdminNav from "@/components/ui/ืnav-admin";
+
 
 export default function Home() {
   return (
     <div>
-      <p>This is English and นี่คือภาษาไทย mixed together</p>
       <div className="flex flex-row">
         <Button>Primary Button</Button>
         <Button variant="secondary">Secondary Button</Button>
         <Button variant="destructive">Destructive Button</Button>
+        <Button variant="outline">Outline Button</Button>
       </div>
 
       <div className="grid w-full max-w-sm items-center gap-1.5">
@@ -68,6 +72,50 @@ export default function Home() {
           </SelectGroup>
         </SelectContent>
       </Select>
+
+      <DogWalkerAdminCard
+        userImage="/images/user-placeholder.jpg"
+        userName="John Doe"
+        location="New York, NY"
+        phoneNumber="(555) 123-4567"
+        reviewScore="4.8"
+      />
+
+      <PetOwnerNav
+        userImage="/images/user-placeholder.jpg"
+        userName="Pet Owner"
+      />
+
+      <DogWalkerNav
+        userImage="/images/user-placeholder.jpg"
+        userName="Dog Walker"
+      />
+
+      <ServiceProviderNav
+        userImage="/images/user-placeholder.jpg"
+        userName="Service Provider"
+      />
+
+      <AdminNav
+        userImage="/images/user-placeholder.jpg"
+        userName="Admin"
+      />
+
+      <WorkDescription
+        userName="John Doe"
+        phoneNumber="(555) 123-4567"
+        startTime="10:00"
+        endTime="12:00"
+        status={1}
+      />
+
+      <WorkDescription
+        userName="John Doe"
+        phoneNumber="(555) 123-4567"
+        startTime="10:00"
+        endTime="12:00"
+        status={0}
+      />
     </div>
   );
 }
