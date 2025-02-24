@@ -55,6 +55,7 @@ model DogWalker {
   tel      String?  @map("dw_tel") @db.VarChar(10)
   address  String?  @map("dw_address")
   zone     String[] @map("dw_zone")
+  status   Int      @default(0) @map("dw_status") @db.SmallInt
 
   // relationship
   services WalkingService[]
@@ -96,6 +97,7 @@ model ServiceProvider {
   tel      String @map("sp_tel") @db.VarChar(10)
   address  String @map("sp_address")
   zone     String @map("sp_zone")
+  status   Int    @default(0) @map("sp_status") @db.SmallInt
 
   // relationship
   services Service[]
