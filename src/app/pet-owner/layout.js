@@ -1,5 +1,5 @@
 import React from "react";
-import PetOwnerNav from "@/components/ui/nav-pet-owner";
+import PetOwnerNav from "@/components/nav-bar/nav-pet-owner";
 
 const PetOwnerLayout = ({ children }) => {
   return (

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Card, CardHeader } from "@/components/ui/card";
-import { Button } from "./button";
+import { Button } from "./ui/button";
 
 const WorkDescription = ({ userName, startTime,endTime, phoneNumber,status }) => {
   const handleClick = () => {

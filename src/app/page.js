@@ -22,13 +22,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import DogWalkerAdminCard from "@/components/ui/dog-walker-admin-card";
-import PetOwnerNav from "@/components/ui/nav-pet-owner";
-import DogWalkerNav from "@/components/ui/nav-dog-walker";
-import WorkDescription from "@/components/ui/work-description";
-import ServiceProviderNav from "@/components/ui/nav-service-provider";
-import AdminNav from "@/components/ui/nav-admin";
-import HomeDogWalker from "@/components/ui/home-dog-walker";
+import DogWalkerAdminCard from "@/components/dog-walker-admin-card";
+import PetOwnerNav from "@/components/nav-bar/nav-pet-owner";
+import DogWalkerNav from "@/components/nav-bar/nav-dog-walker";
+import WorkDescription from "@/components/work-description";
+import ServiceProviderNav from "@/components/nav-bar/nav-service-provider";
+import AdminNav from "@/components/nav-bar/nav-admin";
+import HomeDogWalker from "@/components/home-dog-walker";
 
 export default function Home() {
   return (

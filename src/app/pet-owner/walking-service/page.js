@@ -1,6 +1,6 @@
 import * as React from "react"
-import HomeDogWalker from '@/components/ui/home-dog-walker'
-import DateTimeRangePicker from "@/components/ui/select-datetime";
+import HomeDogWalker from '@/components/home-dog-walker'
+import DateTimeRangePicker from "@/components/select-datetime";
 
 
 export default function WalkingService() {

@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
-import Reviews from "@/components/ui/review";
+import Reviews from "@/components/review";
 import React from "react";
 
 export default function DogWalker() {
