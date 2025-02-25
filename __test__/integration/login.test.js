@@ -1,5 +1,5 @@
 import { POST } from '@/app/api/user/login/route';
-import { AuthController } from '@/controllers/LoginController';
+import { LoginController } from '@/controllers/LoginController';
 import { NextResponse } from 'next/server';
 
 // suppress error logs during tests
@@ -7,7 +7,7 @@ beforeAll(() => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
   
-jest.mock('@/controllers/AuthController');
+jest.mock('@/controllers/LoginController');
 
 jest.mock('next/server', () => ({
     NextResponse: {
@@ -43,14 +43,14 @@ describe('POST /api/user/login', () => {
         };
 
         mockRequest.json.mockResolvedValue(loginData);
-        AuthController.prototype.login.mockResolvedValue(mockAuthResponse);
+        LoginController.prototype.login.mockResolvedValue(mockAuthResponse);
 
         const response = await POST(mockRequest);
         const responseData = await response.json();
 
         expect(response.status).toBe(200);
         expect(responseData).toEqual(mockAuthResponse.body);
-        expect(AuthController.prototype.login).toHaveBeenCalledWith(loginData);
+        expect(LoginController.prototype.login).toHaveBeenCalledWith(loginData);
         expect(NextResponse.json).toHaveBeenCalledWith(
             mockAuthResponse.body,
             { status: mockAuthResponse.status },
@@ -64,7 +64,7 @@ describe('POST /api/user/login', () => {
         };
 
         mockRequest.json.mockResolvedValue(loginData);
-        AuthController.prototype.login.mockRejectedValue(new Error('Invalid credentials'));
+        LoginController.prototype.login.mockRejectedValue(new Error('Invalid credentials'));
 
         const response = await POST(mockRequest);
         const responseData = await response.json();
@@ -86,14 +86,14 @@ describe('POST /api/user/login', () => {
         };
 
         mockRequest.json.mockResolvedValue(loginData);
-        AuthController.prototype.login.mockResolvedValue(mockAuthResponse);
+        LoginController.prototype.login.mockResolvedValue(mockAuthResponse);
 
         const response = await POST(mockRequest);
         const responseData = await response.json();
 
         expect(response.status).toBe(400);
         expect(responseData).toEqual({ message: 'Invalid input' });
-        expect(AuthController.prototype.login).toHaveBeenCalledWith(loginData);
+        expect(LoginController.prototype.login).toHaveBeenCalledWith(loginData);
         expect(NextResponse.json).toHaveBeenCalledWith(
             { message: 'Invalid input' },
             { status: 400 },
@@ -112,14 +112,14 @@ describe('POST /api/user/login', () => {
         };
 
         mockRequest.json.mockResolvedValue(loginData);
-        AuthController.prototype.login.mockResolvedValue(mockAuthResponse);
+        LoginController.prototype.login.mockResolvedValue(mockAuthResponse);
 
         const response = await POST(mockRequest);
         const responseData = await response.json();
 
         expect(response.status).toBe(401);
         expect(responseData).toEqual({ message: 'Could not find your username.' });
-        expect(AuthController.prototype.login).toHaveBeenCalledWith(loginData);
+        expect(LoginController.prototype.login).toHaveBeenCalledWith(loginData);
         expect(NextResponse.json).toHaveBeenCalledWith(
             { message: 'Could not find your username.' },
             { status: 401 },
@@ -138,14 +138,14 @@ describe('POST /api/user/login', () => {
         };
 
         mockRequest.json.mockResolvedValue(loginData);
-        AuthController.prototype.login.mockResolvedValue(mockAuthResponse);
+        LoginController.prototype.login.mockResolvedValue(mockAuthResponse);
 
         const response = await POST(mockRequest);
         const responseData = await response.json();
 
         expect(response.status).toBe(401);
         expect(responseData).toEqual({ message: 'Your password is incorrect.' });
-        expect(AuthController.prototype.login).toHaveBeenCalledWith(loginData);
+        expect(LoginController.prototype.login).toHaveBeenCalledWith(loginData);
         expect(NextResponse.json).toHaveBeenCalledWith(
             { message: 'Your password is incorrect.' },
             { status: 401 },
@@ -159,7 +159,7 @@ describe('POST /api/user/login', () => {
         };
 
         mockRequest.json.mockResolvedValue(loginData);
-        AuthController.prototype.login.mockRejectedValue(new Error('Database connection failed'));
+        LoginController.prototype.login.mockRejectedValue(new Error('Database connection failed'));
 
         const response = await POST(mockRequest);
         const responseData = await response.json();
