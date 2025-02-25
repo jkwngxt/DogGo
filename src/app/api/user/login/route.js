@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { AuthController } from "@/controllers/LoginController";
+import { LoginController } from "@/controllers/LoginController";
 
-const authcontroller = new AuthController();
+const loginController = new LoginController();
 
 export async function POST(request) {
     try {
         const body = await request.json();
-        const response = await authcontroller.login(body);
+        const response = await LoginController.login(body);
 
         return NextResponse.json(response.body, { status: response.status });
     } catch (error) {
