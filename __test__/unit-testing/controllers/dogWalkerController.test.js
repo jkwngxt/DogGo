@@ -1,4 +1,4 @@
-import { DogWalkerController } from '@/controllers/DogWalkerController.js';
+import { DogWalkerRegisterController } from '@/controllers/DogWalkerRegisterController.js';
 import { PrismaClient } from '@prisma/client';
 import { FileUploadService } from '@/utils/fileUpload.js';
 import {EmailService} from "@/utils/emailService";
@@ -47,7 +47,7 @@ describe('DogWalkerController', () => {
         prisma = new PrismaClient();
         emailService = new EmailService();
         fileUploadService = new FileUploadService();
-        dogWalkerController = new DogWalkerController(prisma, emailService, fileUploadService); // ส่ง mock objects เข้าไป
+        dogWalkerController = new DogWalkerRegisterController(prisma, emailService, fileUploadService); // ส่ง mock objects เข้าไป
     });
 
     afterEach(() => {

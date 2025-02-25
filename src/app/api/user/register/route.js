@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { UserController } from '@/controllers/UserController';
+import { UserRegisterController } from '@/controllers/UserRegisterController';
 
 export async function POST(request) {
     try {
         const body = await request.json();
-        const userController = new UserController();
+        const userController = new UserRegisterController();
         const result = await userController.register(body);
 
         if (!result.success) {

@@ -1,10 +1,10 @@
-import {DogWalkerController} from '@/controllers/DogWalkerController.js';
+import {DogWalkerRegisterController} from '@/controllers/DogWalkerRegisterController.js';
 import {NextResponse} from "next/server";
 
 
 export async function POST(request) {
     try {
-        const dogWalkerController = new DogWalkerController();
+        const dogWalkerController = new DogWalkerRegisterController();
         const formData = await request.formData();
         const name = formData.get('name');
         const imageFile = formData.get('pic');

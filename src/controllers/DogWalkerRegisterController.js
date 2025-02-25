@@ -4,7 +4,7 @@ import { generatePassword } from '@/utils/passwordGenerator.js';
 import { EmailService } from '@/utils/emailService.js';
 import {FileUploadService} from "@/utils/fileUpload";
 
-export class DogWalkerController {
+export class DogWalkerRegisterController {
     constructor(prismaClient = new PrismaClient(), emailService = new EmailService(), fileUploadService = new FileUploadService()) {
         this.prisma = prismaClient;
         this.emailService = emailService; // รับจากภายนอก

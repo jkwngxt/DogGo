@@ -1,7 +1,7 @@
 import { POST } from '@/app/api/user/register/route';
-import { UserController } from '@/controllers/userController';
+import { UserRegisterController } from '@/controllers/UserRegisterController';
 
-jest.mock('@/controllers/userController', () => ({
+jest.mock('@/controllers/UserRegisterController', () => ({
     UserController: jest.fn()
 }));
 
@@ -21,7 +21,7 @@ describe('POST /api/user/register', () => {
         jest.clearAllMocks();
 
         mockRegister = jest.fn();
-        UserController.mockImplementation(() => ({
+        UserRegisterController.mockImplementation(() => ({
             register: mockRegister
         }));
     });

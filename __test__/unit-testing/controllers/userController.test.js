@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { UserController } from '@/controllers/userController';
+import { UserRegisterController } from '@/controllers/UserRegisterController';
 
 jest.mock('@prisma/client', () => ({
     PrismaClient: jest.fn()
@@ -34,7 +34,7 @@ describe('UserController', () => {
             $transaction: jest.fn(callback => callback(mockTransaction))
         };
 
-        userController = new UserController(mockPrismaClient);
+        userController = new UserRegisterController(mockPrismaClient);
     });
 
     describe('register', () => {
