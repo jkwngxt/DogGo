@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
-} from "@/components/dialog";
+} from "@/components/ui/dialog";
 
 const ClientDogSelector = ({ breeds, onSelect, open, onClose }) => {
   const [selectedBreeds, setSelectedBreeds] = useState({});

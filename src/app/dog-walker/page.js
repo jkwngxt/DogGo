@@ -8,25 +8,25 @@ import React from "react";
 export default function DogWalker() {
   const info = {
     userImage: "/image/user-placeholder.jpg",
-    userName: "John Doe",
-    location: "New York, NY",
-    phoneNumber: "(555) 123-4567",
-    reviewScore: "4.8",
+    dw_username: "John Doe",
+    dw_zone: "New York, NY",
+    dw_tel: "(555) 123-4567",
+    rating: "4.8",
   };
 
   const myReviewData = [
     {
-      id: 1,
-      username: 'jajabenjaporn',
+      r_id: 1,
+      u_username: 'jajabenjaporn',
       rating: 5,
-      comment: 'พนักงานดูแลน้องดีมากลืมบ้านน้องรู้สึงสุดๆ',
+      r_text: 'พนักงานดูแลน้องดีมากลืมบ้านน้องรู้สึงสุดๆ',
       avatar: '/image/user-placeholder.jpg' 
     },
     {
-      id: 2,
-      username: 'user2',
+      r_id: 2,
+      u_username: 'user2',
       rating: 4,
-      comment: 'Great service!',
+      r_text: 'Great service!',
       avatar: '/image/user-placeholder.jpg'  
     }
   ];
@@ -49,20 +49,20 @@ export default function DogWalker() {
                 icon={faStar}
                 className="h-5 w-5 text-yellow-400"
               />
-              {info.reviewScore}
+              {info.rating}
             </div>
             <div className="flex flex-col space-y-2">
               <div className="flex flex-row space-x-2">
                 <span className="font-bold">ชื่อพนักงาน:</span>
-                <span>{info.userName}</span>
+                <span>{info.dw_username}</span>
               </div>
               <div className="flex flex-row space-x-2">
                 <span className="font-bold">เบอร์โทรติดต่อ:</span>
-                <span>{info.phoneNumber}</span>
+                <span>{info.dw_tel}</span>
               </div>
               <div className="flex flex-row space-x-2">
                 <span className="font-bold">เขตที่ดูแล:</span>
-                <span>{info.location}</span>
+                <span>{info.dw_zone}</span>
               </div>
             </div>
             <Reviews reviewData={myReviewData}/>

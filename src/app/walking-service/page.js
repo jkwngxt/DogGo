@@ -7,24 +7,24 @@ export default function WalkingService() {
     const dogWalkers = [
         {
           userImage: "/image/user-placeholder.jpg",
-          userName: "John Doe",
-          location: "New York, NY",
-          phoneNumber: "(555) 123-4567",
-          reviewScore: "4.8",
+          dw_username: "John Doe",
+          dw_zone: "New York, NY",
+          dw_tel: "(555) 123-4567",
+          rating: "4.8",
         },
         {
           userImage: "/image/user-placeholder.jpg",
-          userName: "Jane Smith",
-          location: "Los Angeles, CA",
-          phoneNumber: "(555) 987-6543",
-          reviewScore: "4.9",
+          dw_username: "Jane Smith",
+          dw_zone: "Los Angeles, CA",
+          dw_tel: "(555) 987-6543",
+          rating: "4.9",
         },
         {
           userImage: "/image/user-placeholder.jpg",
-          userName: "Jake Wilson",
-          location: "Chicago, IL",
-          phoneNumber: "(555) 111-2222",
-          reviewScore: "4.7",
+          dw_username: "Jake Wilson",
+          dw_zone: "Chicago, IL",
+          dw_tel: "(555) 111-2222",
+          rating: "4.7",
         },
  
       ];
@@ -39,10 +39,10 @@ export default function WalkingService() {
           <HomeDogWalker
             key={index}
             userImage={walker.userImage}
-            userName={walker.userName}
-            location={walker.location}
-            phoneNumber={walker.phoneNumber}
-            reviewScore={walker.reviewScore}
+            dw_username={walker.dw_username}
+            dw_zone={walker.dw_zone}
+            dw_tel={walker.dw_tel}
+            rating={walker.rating}
           />
         ))}
     </div>
