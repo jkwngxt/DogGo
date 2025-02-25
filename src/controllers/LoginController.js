@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 
-export class AuthController {
+export class LoginController {
     constructor(prismaInstance = new PrismaClient()) {
         this.prisma = prismaInstance;
     }
