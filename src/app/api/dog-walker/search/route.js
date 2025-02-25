@@ -1,6 +1,15 @@
 import { NextResponse } from 'next/server';
 import {SearchDWController} from "@/controllers/SearchDWController";
 
+function serializeBigInt(obj) {
+    return JSON.parse(JSON.stringify(obj, (key, value) => {
+        if (typeof value === 'bigint') {
+            return Number(value);
+        }
+        return value;
+    }));
+}
+
 export async function POST(request) {
     try {
         const body = await request.json();
@@ -23,13 +32,8 @@ export async function POST(request) {
 
         const searchDWController = new SearchDWController();
         const result = await searchDWController.searchDogWalkers(date, timeSlots, userZone);
-        const serializedResult = {
-            ...result,
-            dogWalkers: result.dogWalkers.map(dw => ({
-                ...dw,
-                ratingCount: typeof dw.ratingCount === 'bigint' ? Number(dw.ratingCount) : dw.ratingCount
-            }))
-        };
+
+        const serializedResult = serializeBigInt(result);
 
         return NextResponse.json(serializedResult);
 
@@ -41,4 +45,3 @@ export async function POST(request) {
         );
     }
 }
-
