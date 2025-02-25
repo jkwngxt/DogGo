@@ -33,6 +33,16 @@ export class SetZoneController {
             const updatedDogWalker = await prisma.dogWalker.update({
                 where: { id: parseInt(id) },
                 data: updateData,
+                select: {
+                    id: true,
+                    name: true,
+                    username: true,
+                    email: true,
+                    tel: true,
+                    address: true,
+                    zone: true,
+                    status: true
+                }
             });
 
             return { success: true, message: "Update set service area data successful.", dogWalker: updatedDogWalker };
