@@ -1,5 +1,5 @@
 import { POST } from '@/app/api/user/login/route';
-import { AuthController } from '@/controllers/AuthController';
+import { AuthController } from '@/controllers/LoginController';
 import { NextResponse } from 'next/server';
 
 // suppress error logs during tests

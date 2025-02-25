@@ -13,14 +13,6 @@ export class AuthController {
         try {
             const { username, password } = userData
 
-            /* not sure if gonna put this in front or back
-            if (!username || !password) {
-                return {
-                    status: 400,
-                    body: { message: "Username and password are required."}
-                };
-            } */
-
             let role = "customer";
             if (username.startsWith("dw-")) {
                 role = "dogWalker";

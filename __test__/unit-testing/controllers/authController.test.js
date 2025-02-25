@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
-import { AuthController } from "@/controllers/AuthController";
+import { AuthController } from "@/controllers/LoginController";
 
 // mock prisma client
 jest.mock("@prisma/client", () => ({
