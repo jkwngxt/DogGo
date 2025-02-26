@@ -2,7 +2,7 @@ import { POST } from '@/app/api/user/register/route';
 import { UserRegisterController } from '@/controllers/UserRegisterController';
 
 jest.mock('@/controllers/UserRegisterController', () => ({
-    UserController: jest.fn()
+    UserRegisterController: jest.fn()
 }));
 
 jest.mock('next/server', () => ({
