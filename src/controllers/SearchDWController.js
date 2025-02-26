@@ -1,11 +1,9 @@
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
-import { generatePassword } from '@/utils/passwordGenerator.js';
 import { EmailService } from '@/utils/emailService.js';
 import { FileUploadService } from "@/utils/fileUpload";
 
 export class SearchDWController {
-    constructor(prismaClient = new PrismaClient(), emailService = new EmailService(), fileUploadService = new FileUploadService()) {
+    constructor(prismaClient = new PrismaClient()) {
         this.prisma = prismaClient;
     }
 
