@@ -15,8 +15,9 @@ export function generateBookingEmail(bookingDetails, translations) {
     } = bookingDetails;
 
     const START_TIME = 9;
+    // e.g. [1,2,3] = 9.00 - 12.00
     let startHour = START_TIME + startSlot - 1;
-    let endHour = START_TIME + endSlot - 1;
+    let endHour = START_TIME + endSlot;
 
     let startTime = startHour.toString().padStart(2, '0') + ':00';
     let endTime = endHour.toString().padStart(2, '0') + ':00';
