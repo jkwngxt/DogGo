@@ -6,7 +6,7 @@ const loginController = new LoginController();
 export async function POST(request) {
     try {
         const body = await request.json();
-        const response = await LoginController.login(body);
+        const response = await loginController.login(body);
 
         return NextResponse.json(response.body, { status: response.status });
     } catch (error) {

@@ -23,13 +23,13 @@ jest.mock("jsonwebtoken", () => ({
 }));
 
 describe("LoginController", () => {
-    let LoginController;
+    let loginController;
     let prismaClient;
 
     beforeEach(() => {
         jest.clearAllMocks();
         prismaClient = new PrismaClient();
-        LoginController = new LoginController(prismaClient);
+        loginController = new LoginController(prismaClient);
     });
 
     it("should successfully log in as customer", async () => {
@@ -48,7 +48,7 @@ describe("LoginController", () => {
         bcrypt.compare.mockResolvedValue(true);
         jwt.sign.mockReturnValue("mocked_jwt_token");
 
-        const response = await LoginController.login({ username: "testCustomer", password: "password123" });
+        const response = await loginController.login({ username: "testCustomer", password: "password123" });
 
         // expect result
         expect(prismaClient.user.findUnique).toHaveBeenCalledWith({ where: { username: "testCustomer" } });
@@ -84,7 +84,7 @@ describe("LoginController", () => {
         bcrypt.compare.mockResolvedValue(true);
         jwt.sign.mockReturnValue("mocked_jwt_token");
 
-        const response = await LoginController.login({ username: "dw-dogWalker", password: "password123" });
+        const response = await loginController.login({ username: "dw-dogWalker", password: "password123" });
 
         // expect result
         expect(prismaClient.dogWalker.findUnique).toHaveBeenCalledWith({ where: { username: "dw-dogWalker" } }); 
@@ -111,7 +111,7 @@ describe("LoginController", () => {
         bcrypt.compare.mockResolvedValue(true);
         jwt.sign.mockReturnValue("mocked_jwt_token");
 
-        const response = await LoginController.login({ username: "sp-testServiceProvider", password: "password123" });
+        const response = await loginController.login({ username: "sp-testServiceProvider", password: "password123" });
 
         // expect result
         expect(prismaClient.serviceProvider.findUnique).toHaveBeenCalledWith({ where: { username: "sp-testServiceProvider" } }); // ✅ FIXED
@@ -126,7 +126,7 @@ describe("LoginController", () => {
         prismaClient.dogWalker.findUnique.mockResolvedValue(null);
         prismaClient.serviceProvider.findUnique.mockResolvedValue(null);
 
-        const response = await LoginController.login({ username: "not-found", password: "password123" });
+        const response = await loginController.login({ username: "not-found", password: "password123" });
 
         expect(response.status).toBe(401);
         expect(response.body.message).toBe("Couldn't find your username.");
@@ -143,7 +143,7 @@ describe("LoginController", () => {
         prismaClient.user.findUnique.mockResolvedValue(mockUser);
         bcrypt.compare.mockResolvedValue(false); // false - password mismatch
 
-        const response = await LoginController.login({ username: "testCustomer", password: "wrongPassword" });
+        const response = await loginController.login({ username: "testCustomer", password: "wrongPassword" });
 
         expect(response.status).toBe(401);
         expect(response.body.message).toBe("Your password is incorrect.");
