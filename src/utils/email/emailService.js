@@ -3,6 +3,8 @@ import path from 'path';
 import { translations } from '@/utils/email/translations';
 import { generateWelcomeEmail } from '@/utils/email/templates/welcomeEmail';
 import { generateBookingEmail } from '@/utils/email/templates/bookingEmail';
+import {generateAcceptanceEmail} from "@/utils/email/templates/acceptEmail";
+import {generateRejectionEmail} from "@/utils/email/templates/rejectEmail";
 
 export class EmailService {
     async sendWelcomeEmail(id, email, username, password) {
@@ -23,6 +25,28 @@ export class EmailService {
         const emailPath = path.join(process.cwd(), 'data', 'walking-service', 'booking-emails', fileName);
 
         const emailContent = generateBookingEmail(bookingDetails, translations);
+        await this.#saveEmail(emailPath, emailContent);
+
+        return emailPath;
+    }
+
+    async sendAcceptanceNotification(walkingServiceId, userEmail, acceptanceDetails) {
+        const sanitizedEmail = userEmail.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        const fileName = `${walkingServiceId}-${sanitizedEmail}-acceptance.html`;
+        const emailPath = path.join(process.cwd(), 'data', 'walking-service', 'acceptance-emails', fileName);
+
+        const emailContent = generateAcceptanceEmail(acceptanceDetails, translations);
+        await this.#saveEmail(emailPath, emailContent);
+
+        return emailPath;
+    }
+
+    async sendRejectionNotification(walkingServiceId, userEmail, rejectionDetails) {
+        const sanitizedEmail = userEmail.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        const fileName = `${walkingServiceId}-${sanitizedEmail}-rejection.html`;
+        const emailPath = path.join(process.cwd(), 'data', 'walking-service', 'rejection-emails', fileName);
+
+        const emailContent = generateRejectionEmail(rejectionDetails, translations);
         await this.#saveEmail(emailPath, emailContent);
 
         return emailPath;

@@ -1,6 +1,38 @@
-export function generateWelcomeEmail(email, username, password, translations) {
-    const enText = translations.en.welcome;
-    const thText = translations.th.welcome;
+export function generateWelcomeEmail(email, username, password) {
+    const translations = {
+        en: {
+                title: 'Welcome to DogGo!',
+                accountCreated: 'Your account has been successfully created.',
+                loginCredentials: 'Here are your login details:',
+                username: 'Username:',
+                email: 'Email:',
+                password: 'Password:',
+                changePassword: 'For security reasons, please change your password upon first login.',
+                regards: 'Best regards,',
+                team: 'The DogGo Team',
+                loginButton: 'Log In Now',
+                disclaimer: 'If you did not sign up for this account, please disregard this email.',
+                switchLanguage: 'ภาษาไทย'
+        },
+        th: {
+                title: 'ยินดีต้อนรับสู่ DogGo!',
+                accountCreated: 'บัญชีของคุณถูกลงทะเบียนเรียบร้อยแล้ว',
+                loginCredentials: 'นี่คือรายละเอียดสำหรับการเข้าสู่ระบบของคุณ:',
+                username: 'ชื่อผู้ใช้:',
+                email: 'อีเมล:',
+                password: 'รหัสผ่าน:',
+                changePassword: 'เพื่อความปลอดภัย กรุณาเปลี่ยนรหัสผ่านของคุณหลังจากเข้าสู่ระบบครั้งแรก',
+                regards: 'ขอแสดงความนับถือ,',
+                team: 'ทีม DogGo',
+                loginButton: 'เข้าสู่ระบบตอนนี้',
+                disclaimer: 'หากคุณไม่ได้สมัครบัญชีนี้ กรุณาเพิกเฉยต่ออีเมลฉบับนี้',
+                switchLanguage: 'English'
+            }
+    }
+
+
+    const enText = translations.en;
+    const thText = translations.th;
 
     return `
         <!DOCTYPE html>

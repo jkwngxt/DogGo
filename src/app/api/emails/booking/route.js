@@ -44,6 +44,7 @@ export async function POST(request) {
         const endSlot = Math.max(...walkingService.time);
 
         // สร้าง booking notification email
+// สร้าง booking notification email
         const bookingDetails = {
             userName: walkingService.user.name,
             userEmail: walkingService.user.email,
@@ -53,7 +54,13 @@ export async function POST(request) {
             serviceDate: walkingService.date.toISOString().split('T')[0],
             startSlot,
             endSlot,
-            totalPrice: walkingService.price.toString()
+            totalPrice: walkingService.price.toString(),
+            // เพิ่มข้อมูล dog walker
+            dogWalkerName: walkingService.dogWalker.name,
+            dogWalkerEmail: walkingService.dogWalker.email,
+            dogWalkerTel: walkingService.dogWalker.tel || '-',
+            dogWalkerZone: walkingService.dogWalker.zone,
+            userZone: walkingService.user.zone
         };
 
         console.log(walkingService.dogWalker.username)

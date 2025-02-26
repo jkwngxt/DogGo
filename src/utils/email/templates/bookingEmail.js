@@ -1,6 +1,66 @@
-export function generateBookingEmail(bookingDetails, translations) {
-    const enText = translations.en.booking;
-    const thText = translations.th.booking;
+export function generateBookingEmail(bookingDetails) {
+    const translations = {
+        en: {
+            title: 'New Booking Request 🐕',
+            hello: 'Hello Dog Walker,',
+            newBooking: 'You have received a new booking request from',
+            details: 'Booking details:',
+            serviceDetails: '📅 Service Information',
+            date: 'Date:',
+            time: 'Time:',
+            totalPrice: 'Total Price:',
+            userInfo: '👤 Customer Information',
+            name: 'Name:',
+            email: 'Email:',
+            phone: 'Phone:',
+            address: 'Address:',
+            dogInfo: '🐶 Dog Information',
+            numDogs: 'Number of Dogs:',
+            breed: 'Breed:',
+            dogWalkerInfo: '🚶🏻‍♂️ Dog Walker Information',
+            dogWalkerName: 'Name:',
+            dogWalkerEmail: 'Email:',
+            dogWalkerPhone: 'Phone:',
+            confirmDetails: 'Please review the booking details and contact the customer if necessary.',
+            regards: 'Best regards,',
+            team: 'The DogGo Team',
+            questions: 'If you have any questions, feel free to reach out to us at',
+            switchLanguage: 'ภาษาไทย',
+            dogWalkerZone: "Service Zone:",
+            userZone: 'Zone:',
+        },
+        th: {
+            title: 'คำขอจองบริการใหม่ 🐕',
+            hello: 'สวัสดี Dog Walker,',
+            newBooking: 'คุณได้รับคำขอใหม่เพื่อจองบริการจาก',
+            details: 'รายละเอียดการจองดังนี้',
+            serviceDetails: '📅 ข้อมูลบริการ',
+            date: 'วันที่:',
+            time: 'เวลา:',
+            totalPrice: 'ราคารวม:',
+            userInfo: '👤 ข้อมูลลูกค้า',
+            name: 'ชื่อ:',
+            email: 'อีเมล:',
+            phone: 'เบอร์โทร:',
+            address: 'ที่อยู่:',
+            dogInfo: '🐶 ข้อมูลสุนัข',
+            numDogs: 'จำนวนสุนัข:',
+            breed: 'สายพันธุ์:',
+            dogWalkerInfo: '🚶🏻‍♂️ ข้อมูลคนเดินสุนัข',
+            dogWalkerName: 'ชื่อ:',
+            dogWalkerEmail: 'อีเมล:',
+            dogWalkerPhone: 'เบอร์โทร:',
+            confirmDetails: 'โปรดตรวจสอบรายละเอียดการจอง และติดต่อผู้ใช้หากจำเป็น',
+            regards: 'ขอแสดงความนับถือ,',
+            team: 'ทีม DogGo',
+            questions: 'หากมีข้อสงสัย โปรดติดต่อเราที่',
+            switchLanguage: 'English',
+            dogWalkerZone: "เขตที่ให้บริการ:",
+            userZone: 'เขตที่อยู่:',
+        }
+    };
+    const enText = translations.en;
+    const thText = translations.th;
 
     const {
         userName,
@@ -11,7 +71,12 @@ export function generateBookingEmail(bookingDetails, translations) {
         serviceDate,
         startSlot,
         endSlot,
-        totalPrice
+        totalPrice,
+        dogWalkerName,
+        dogWalkerEmail,
+        dogWalkerTel,
+        dogWalkerZone,
+        userZone
     } = bookingDetails;
 
     const START_TIME = 9;
@@ -84,13 +149,18 @@ export function generateBookingEmail(bookingDetails, translations) {
                 text-decoration: underline;
                 cursor: pointer;
             }
-            /* Languages */
+            /* Languages - Both Thai and English have identical styling */
             .th-lang, .en-lang {
-                display: none;
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
             }
-            /* Show English by default */
+            /* Show English by default, hide Thai */
             .en-lang {
                 display: block;
+            }
+            .th-lang {
+                display: none;
             }
         </style>
     </head>
@@ -124,9 +194,23 @@ export function generateBookingEmail(bookingDetails, translations) {
                         <strong>${enText.name}</strong> ${userName}<br>
                         <strong>${enText.email}</strong> ${userEmail}<br>
                         <strong>${enText.phone}</strong> ${userTel}<br>
-                        <strong>${enText.address}</strong> ${userAddress}
+                        <strong>${enText.address}</strong> ${userAddress}<br>
+                        <strong>${thText.userZone}</strong> ${userZone}
                     </p>
                 </div>
+
+                ${dogWalkerName ? `
+                <div class="details">
+                    <h2>${enText.dogWalkerInfo}</h2>
+                    <p>
+                        <strong>${enText.dogWalkerName}</strong> ${dogWalkerName}<br>
+                        <strong>${enText.dogWalkerEmail}</strong> ${dogWalkerEmail || '-'}<br>
+                        <strong>${enText.dogWalkerPhone}</strong> ${dogWalkerTel || '-'}<br>
+                        <strong>${enText.dogWalkerZone}</strong> ${dogWalkerZone && dogWalkerZone.length > 0 ? dogWalkerZone.join(', ') : '-'}                 
+                    </p>
+                </div>
+                ` : ''}
+
 
                 <div class="details">
                     <h2>${enText.dogInfo}</h2>
@@ -170,9 +254,22 @@ export function generateBookingEmail(bookingDetails, translations) {
                         <strong>${thText.name}</strong> ${userName}<br>
                         <strong>${thText.email}</strong> ${userEmail}<br>
                         <strong>${thText.phone}</strong> ${userTel}<br>
-                        <strong>${thText.address}</strong> ${userAddress}
+                        <strong>${thText.address}</strong> ${userAddress}<br>
+                        <strong>${thText.userZone}</strong> ${userZone}
                     </p>
                 </div>
+
+                ${dogWalkerName ? `
+                <div class="details">
+                    <h2>${thText.dogWalkerInfo}</h2>
+                    <p>
+                        <strong>${thText.dogWalkerName}</strong> ${dogWalkerName}<br>
+                        <strong>${thText.dogWalkerEmail}</strong> ${dogWalkerEmail || '-'}<br>
+                        <strong>${thText.dogWalkerPhone}</strong> ${dogWalkerTel || '-'}<br>
+                        <strong>${thText.dogWalkerZone}</strong> ${dogWalkerZone && dogWalkerZone.length > 0 ? dogWalkerZone.join(', ') : '-'}                 
+                    </p>
+                </div>
+                ` : ''}
 
                 <div class="details">
                     <h2>${thText.dogInfo}</h2>
