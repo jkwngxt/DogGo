@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { FetchReviewDW } from "@/controllers/FetchReviewDW";
+import { FetchReviewDWController } from "@/controllers/FetchReviewDWController";
 
 function serializeBigInt(obj) {
     return JSON.parse(JSON.stringify(obj, (key, value) => {
@@ -15,7 +15,7 @@ export async function POST(request) {
         const body = await request.json();
         const { userId, dwId } = body;
 
-        const fetchReviewDW = new FetchReviewDW();
+        const fetchReviewDW = new FetchReviewDWController();
         const result = await fetchReviewDW.getReviewByDwId(userId, dwId);
 
         if (!result.success) {
