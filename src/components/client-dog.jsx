@@ -1,97 +1,77 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
+import { redirect } from "next/navigation";
 
-const ClientDogSelector = ({ breeds, onSelect, open, onClose }) => {
-  const [selectedBreeds, setSelectedBreeds] = useState({});
+const ClientDogSelector = ({ dogs }) => {
+  const [selectedDogs, setSelectedDogs] = useState({});
 
-  // Initialize selectedBreeds when the component mounts or breeds change
+  // Initialize selectedDogs when the component mounts or dogs change
   useEffect(() => {
-    if (breeds && breeds.length > 0) {
-      setSelectedBreeds({
-        [breeds[0]]: true,
-        ...breeds.slice(1).reduce((acc, breed) => ({ ...acc, [breed]: false }), {})
-      });
+    if (dogs && dogs.length > 0) {
+      setSelectedDogs(
+        dogs.reduce((acc, dog) => ({ ...acc, [dog]: false }), {})
+      );
     }
-  }, [breeds]);
+  }, [dogs]);
 
-  const handleBreedChange = (breed) => {
-    setSelectedBreeds({
-      ...selectedBreeds,
-      [breed]: !selectedBreeds[breed]
+  const handleDogChange = (dog) => {
+    setSelectedDogs({
+      ...selectedDogs,
+      [dog]: !selectedDogs[dog],
     });
   };
 
-  const handleConfirm = () => {
-    const selected = Object.entries(selectedBreeds)
-      .filter(([_, isSelected]) => isSelected)
-      .map(([breed]) => breed);
-    
-    if (onSelect) {
-      onSelect(selected);
-    }
-    
-    onClose();
-  };
-
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="p-0 border-0 max-w-md">
-        <Card className="w-full border-0 shadow-none">
-          <CardHeader className="pb-3 border-b">
-            <CardTitle className="text-xl font-bold text-center">เลือกสุนัขที่ต้องการ</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4">
-            <div className="space-y-2">
-              {breeds && breeds.map((breed) => (
-                <div key={breed} className="flex items-center justify-between p-2 border rounded">
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>เลือก</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader className="flex items-center">
+          <DialogTitle>เลือกสุนัขที่ต้องการ</DialogTitle>
+        </DialogHeader>
+        <div className="flex items-center space-x-2">
+          <div className="grid flex-1 gap-2">
+          {dogs && dogs.map((dog) => (
+                <div key={dog} className="flex items-center justify-between p-2 border rounded">
                   <Label 
-                    htmlFor={breed} 
+                    htmlFor={dog} 
                     className="flex-grow cursor-pointer py-2"
-                    onClick={() => handleBreedChange(breed)}
+                    onClick={() => handleDogChange(dog)}
                   >
-                    {breed}
+                    {dog}
                   </Label>
                   <Checkbox 
-                    id={breed} 
-                    checked={selectedBreeds[breed] || false} 
-                    onCheckedChange={() => handleBreedChange(breed)}
+                    id={dog} 
+                    checked={selectedDogs[dog] || false} 
+                    onCheckedChange={() => handleDogChange(dog)}
                     className="h-5 w-5"
                   />
                 </div>
               ))}
-            </div>
-
-            <div className="flex gap-4 mt-6 justify-center">
-              <Button 
-                onClick={handleConfirm} 
-                className="bg-blue-500 hover:bg-blue-600 text-white px-6"
-              >
-                ยืนยัน
-              </Button>
-              <Button 
-                onClick={onClose} 
-                variant="destructive" 
-                className="bg-red-500 hover:bg-red-600 text-white px-6"
-              >
-                ยกเลิก
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+        <DialogFooter className="sm:justify-center">
+          <Button
+           onClick={()=>redirect('/pet-owner/billing')}
+          >ยืนยัน</Button>
+          <DialogClose asChild>
+            <Button variant="destructive">ยกเลิก</Button>
+          </DialogClose>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

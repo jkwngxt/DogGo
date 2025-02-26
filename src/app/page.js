@@ -34,7 +34,7 @@ export default function Home() {
   return (
     <div>
       <div className="flex flex-row">
-        <Link href="/pet-owner">Pet Owner</Link>
+        <Link href="/pet-owner/homepage">Pet Owner</Link>
         <Button>Dog Walker</Button>
         <Button>Admin</Button>
         <Button>Service</Button>

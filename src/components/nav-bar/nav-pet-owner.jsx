@@ -55,10 +55,10 @@ const PetOwnerNav = ({ userImage, userName}) => {
               <NavigationMenuTrigger>Services</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-2 md:w-[50px] lg:w-[150px] ]">
-                  <ListItem href="/pet-owner" title="หน้าหลัก"/>
-                  <ListItem href="/walking-service" title="บริการจูงสุนัข"/>
+                  <ListItem href="/pet-owner/homepage" title="หน้าหลัก"/>
+                  <ListItem href="/pet-owner/walking-service" title="บริการจูงสุนัข"/>
                   <ListItem
-                    href="/other-service"
+                    href="/pet-owner/other-service"
                     title="บริการอื่นๆ"
                   />
                 </ul>

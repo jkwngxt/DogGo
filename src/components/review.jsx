@@ -61,7 +61,7 @@ const Reviews = ({ reviewData }) => {
 
         {filteredReviews.length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            No reviews found for {selectedRating} stars
+            ไม่มีรีวิว {selectedRating} ดาว
           </div>
         )}
       </div>
