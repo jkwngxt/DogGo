@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import {EmailService} from "@/utils/email/emailService";
+import { EmailService } from "@/utils/email/emailService";
 
 const prisma = new PrismaClient();
-const emailService = new EmailService(); // สร้างอินสแตนซ์ของ EmailService
+const emailService = new EmailService();
 
 export class ChangeWSStatusController {
     /*
@@ -97,7 +97,7 @@ export class ChangeWSStatusController {
                     await prisma.billing.update({
                         where: {walkingServiceId: walkingService.id},
                         data: {
-                            status: 120,
+                            status: 120, //pending refund
                         }
                     })
 
@@ -135,7 +135,45 @@ export class ChangeWSStatusController {
                     break;
 
                 case 204: // completed
-                    // Logic for completed service
+                    await prisma.billing.update({
+                        where: {walkingServiceId: walkingService.id},
+                        data: {
+                            status: 102, //pending clearance
+                        }
+                    });
+
+                    // ดึงข้อมูลสุนัขที่เกี่ยวข้อง
+                    const dogsForCompletion = await prisma.dog.findMany({
+                        where: {
+                            id: {
+                                in: walkingService.dogs
+                            }
+                        }
+                    });
+
+                    // ส่งอีเมลแจ้งการเสร็จสิ้นบริการและการชำระเงิน
+                    const completionDetails = {
+                        dogWalkerName: walkingService.dogWalker.name,
+                        dogWalkerEmail: walkingService.dogWalker.email,
+                        dogWalkerTel: walkingService.dogWalker.tel || '-',
+                        dogWalkerZone: walkingService.dogWalker.zone,
+                        userName: walkingService.user.name,
+                        userEmail: walkingService.user.email,
+                        userTel: walkingService.user.tel,
+                        userAddress: walkingService.user.address,
+                        userZone: walkingService.user.zone,
+                        dogs: dogsForCompletion,
+                        serviceDate: walkingService.date.toISOString().split('T')[0],
+                        startSlot: Math.min(...walkingService.time),
+                        endSlot: Math.max(...walkingService.time),
+                        totalPrice: walkingService.price.toString()
+                    };
+
+                    await emailService.sendCompletionNotification(
+                        walkingService.id,
+                        walkingService.dogWalker.email,
+                        completionDetails
+                    );
                     break;
 
                 case 210: // cancelled

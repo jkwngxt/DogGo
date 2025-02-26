@@ -1,23 +1,22 @@
-export function generateAcceptanceEmail(acceptanceDetails) {
+export function generateCompletionEmail(completionDetails) {
     const enText = {
-        title: 'Walking Service Request Accepted! 🎉',
+        title: 'Walking Service Completed! 🎉',
         hello: 'Hello',
-        accepted: 'Great news! Your walking service request has been accepted by the dog walker. Please check our website for more details and updates.',
-        details: 'Here are the details of your confirmed booking:',
+        completed: 'Great job! The walking service has been marked as completed. Your payment is being processed and will be transferred to your account soon.',
+        details: 'Here are the details of the completed service:',
         serviceDetails: 'Service Information',
         date: 'Date:',
         time: 'Time:',
-        totalPrice: 'Total Price:',
-        dogWalker: 'Dog Walker:',
-        contactInfo: 'Contact Information:',
-        dogWalkerInfo: 'Dog Walker Information',
-        dogWalkerEmail: 'Email:',
-        dogWalkerPhone: 'Phone:',
-        userInfo: 'Your Information',
-        name: 'Name:',
-        email: 'Email:',
-        phone: 'Phone:',
-        address: 'Address:',
+        totalPayment: 'Total Payment:',
+        owner: 'Pet Owner:',
+        ownerInfo: 'Pet Owner Information',
+        ownerEmail: 'Email:',
+        ownerPhone: 'Phone:',
+        ownerAddress: 'Address:',
+        ownerZone: 'Zone:',
+        paymentInfo: 'Payment Information',
+        paymentStatus: 'Payment Status:',
+        paymentExpected: 'Expected Payment Date:',
         dogInfo: 'Dog Information',
         numDogs: 'Number of Dogs:',
         breed: 'Breed:',
@@ -25,34 +24,31 @@ export function generateAcceptanceEmail(acceptanceDetails) {
         team: 'The DogGo Team',
         questions: 'If you have any questions, feel free to reach out to us at',
         switchLanguage: 'ภาษาไทย',
-        confirmed: '✓ Your dog walking service is confirmed',
+        confirmed: '✓ Walking service completed successfully',
         greeting: 'Hello',
-        greatNews: 'Great news! Your dog walking request has been accepted by one of our professional walkers. Here are the details of your booking:',
-        walkerContact: 'Your dog walker will get in touch shortly before your scheduled appointment. Please be ready for a smooth experience.',
+        greatNews: 'Congratulations! The walking service you provided has been marked as completed. Your payment is now being processed.',
+        paymentNote: 'Payment will be transferred to your account within 3-5 business days.',
         needHelp: 'Need help? Contact us at',
-        dogWalkerZone: "Service Zone:",
-        userZone: 'Zone:',
     };
 
     const thText = {
-        title: 'คำขอบริการเดินสุนัขได้รับการยอมรับแล้ว! 🎉',
+        title: 'บริการพาสุนัขเดินเล่นเสร็จสิ้นแล้ว! 🎉',
         hello: 'สวัสดีคุณ',
-        accepted: 'ข่าวดี! คำขอบริการเดินสุนัขของคุณได้รับการยอมรับจากผู้เดินสุนัขแล้ว กรุณาตรวจสอบรายละเอียดและอัพเดทเพิ่มเติมที่เว็บไซต์ของเรา',
-        details: 'นี่คือรายละเอียดการจองที่ยืนยันแล้ว:',
+        completed: 'ยอดเยี่ยม! บริการพาสุนัขเดินเล่นได้รับการทำเครื่องหมายว่าเสร็จสิ้นแล้ว การชำระเงินของคุณกำลังได้รับการประมวลผลและจะถูกโอนเข้าบัญชีของคุณเร็วๆ นี้',
+        details: 'นี่คือรายละเอียดของบริการที่เสร็จสิ้น:',
         serviceDetails: 'ข้อมูลบริการ',
         date: 'วันที่:',
         time: 'เวลา:',
-        totalPrice: 'ราคารวม:',
-        dogWalker: 'ผู้เดินสุนัข:',
-        contactInfo: 'ข้อมูลติดต่อ:',
-        dogWalkerInfo: 'ข้อมูลผู้เดินสุนัข',
-        dogWalkerEmail: 'อีเมล:',
-        dogWalkerPhone: 'เบอร์โทร:',
-        userInfo: 'ข้อมูลของคุณ',
-        name: 'ชื่อ:',
-        email: 'อีเมล:',
-        phone: 'เบอร์โทร:',
-        address: 'ที่อยู่:',
+        totalPayment: 'การชำระเงินทั้งหมด:',
+        owner: 'เจ้าของสัตว์เลี้ยง:',
+        ownerInfo: 'ข้อมูลเจ้าของสัตว์เลี้ยง',
+        ownerEmail: 'อีเมล:',
+        ownerPhone: 'เบอร์โทร:',
+        ownerAddress: 'ที่อยู่:',
+        ownerZone: 'เขต:',
+        paymentInfo: 'ข้อมูลการชำระเงิน',
+        paymentStatus: 'สถานะการชำระเงิน:',
+        paymentExpected: 'วันที่คาดว่าจะได้รับการชำระเงิน:',
         dogInfo: 'ข้อมูลสุนัข',
         numDogs: 'จำนวนสุนัข:',
         breed: 'สายพันธุ์:',
@@ -60,31 +56,26 @@ export function generateAcceptanceEmail(acceptanceDetails) {
         team: 'ทีม DogGo',
         questions: 'หากมีข้อสงสัย โปรดติดต่อเราที่',
         switchLanguage: 'English',
-        confirmed: '✓ บริการพาสุนัขเดินเล่นของคุณได้รับการยืนยันแล้ว',
+        confirmed: '✓ บริการพาสุนัขเดินเล่นเสร็จสิ้นเรียบร้อยแล้ว',
         greeting: 'สวัสดี',
-        greatNews: 'ข่าวดี! คำขอพาสุนัขเดินเล่นของคุณได้รับการยอมรับจาก Dog Walker ที่เป็นมืออาชีพของเรา นี่คือรายละเอียดการจองของคุณ:',
-        walkerContact: 'ผู้ดูแลสุนัขจะติดต่อคุณก่อนถึงเวลานัดหมายเล็กน้อย โปรดเตรียมตัวให้พร้อมเพื่อความสะดวกสบายของคุณ',
+        greatNews: 'ขอแสดงความยินดี! บริการพาสุนัขเดินเล่นที่คุณให้บริการได้รับการทำเครื่องหมายว่าเสร็จสิ้นแล้ว การชำระเงินของคุณกำลังได้รับการประมวลผล',
+        paymentNote: 'การชำระเงินจะถูกโอนเข้าบัญชีของคุณภายใน 3-5 วันทำการ',
         needHelp: 'ต้องการความช่วยเหลือ? ติดต่อเราที่',
-        dogWalkerZone: "เขตที่ให้บริการ:",
-        userZone: 'เขตที่อยู่:',
-
     };
 
     const {
+        dogWalkerName,
         userName,
+        userEmail,
         userTel,
         userAddress,
+        userZone,
         dogs,
         serviceDate,
         startSlot,
         endSlot,
-        totalPrice,
-        dogWalkerName,
-        dogWalkerTel,
-        dogWalkerEmail,
-        dogWalkerZone,
-        userZone
-    } = acceptanceDetails;
+        totalPrice
+    } = completionDetails;
 
     const START_TIME = 9;
     // e.g. [1,2,3] = 9.00 - 12.00
@@ -94,13 +85,19 @@ export function generateAcceptanceEmail(acceptanceDetails) {
     let startTime = startHour.toString().padStart(2, '0') + ':00';
     let endTime = endHour.toString().padStart(2, '0') + ':00';
 
+    // Calculate expected payment date (3-5 business days from now)
+    const currentDate = new Date();
+    const paymentDate = new Date(currentDate);
+    paymentDate.setDate(currentDate.getDate() + 5); // Using maximum (5 days)
+    const formattedPaymentDate = paymentDate.toISOString().split('T')[0];
+
     return `
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Accepted / การจองได้รับการยอมรับ</title>
+    <title>Service Completed / บริการเสร็จสิ้น</title>
     <style>
         body {
             font-family: 'Segoe UI', Roboto, Arial, sans-serif;
@@ -127,7 +124,7 @@ export function generateAcceptanceEmail(acceptanceDetails) {
             width: 120px;
             height: 120px;
             margin: 0 auto 20px;
-            background-color: #6498FA;
+            background-color: #1cba8a;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -135,7 +132,7 @@ export function generateAcceptanceEmail(acceptanceDetails) {
             font-size: 60px;
         }
         h1 {
-            color: #1e3a8a;
+            color: #056347;
             text-align: center;
             font-size: 28px;
             margin-top: 0;
@@ -155,11 +152,11 @@ export function generateAcceptanceEmail(acceptanceDetails) {
             padding: 25px;
             border-radius: 12px;
             margin-bottom: 25px;
-            border-left: 4px solid #2668E3;
+            border-left: 4px solid #059669;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
         }
         .details h2 {
-            color: #2668E3;
+            color: #059669;
             border-bottom: 2px solid #e5e7eb;
             padding-bottom: 10px;
             margin-top: 0;
@@ -194,13 +191,12 @@ export function generateAcceptanceEmail(acceptanceDetails) {
             border-top: 1px solid #e5e7eb;
         }
         .footer a {
-            color: #2668E3;
+            color: #059669;
             text-decoration: none;
         }
         .footer a:hover {
             text-decoration: underline;
         }
-
         .language-switch {
             text-align: right;
             margin-bottom: 10px;
@@ -215,19 +211,27 @@ export function generateAcceptanceEmail(acceptanceDetails) {
         .th-lang, .en-lang {
             display: none;
         }
-            
         /* Status Banner */
         .status-banner {
-            background: linear-gradient(135deg, #6498FA 0%, #2668E3 100%);
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
             color: white;
             padding: 12px;
             border-radius: 10px;
             text-align: center;
             margin-bottom: 25px;
             font-weight: 600;
-            box-shadow: 0 4px 6px rgba(52, 211, 153, 0.2);
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
         }
-        
+        /* Payment Info Banner */
+        .payment-banner {
+            background-color: #FEF3C7;
+            border-left: 4px solid #F59E0B;
+            color: #92400E;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 25px 0;
+            font-weight: 500;
+        }
         /* Thai Language Styles */
         .th-lang, .en-lang {
             display: none;
@@ -236,15 +240,12 @@ export function generateAcceptanceEmail(acceptanceDetails) {
         .en-lang {
             display: block;
         }
-        
         ul {
             padding-left: 20px;
         }
-        
         li {
             margin-bottom: 10px;
         }
-        
         @media (max-width: 768px) {
             .container {
                 padding: 25px 20px;
@@ -290,11 +291,16 @@ export function generateAcceptanceEmail(acceptanceDetails) {
             <span class="th-lang">${thText.confirmed}</span>
         </div>
         
-        <p class="greeting en-lang">${enText.greeting} ${userName},</p>
-        <p class="greeting th-lang">${thText.greeting} ${userName},</p>
+        <p class="greeting en-lang">${enText.greeting} ${dogWalkerName},</p>
+        <p class="greeting th-lang">${thText.greeting} ${dogWalkerName},</p>
         
         <p class="en-lang">${enText.greatNews}</p>
         <p class="th-lang">${thText.greatNews}</p>
+        
+        <div class="payment-banner">
+            <span class="en-lang">💰 ${enText.paymentNote}</span>
+            <span class="th-lang">💰 ${thText.paymentNote}</span>
+        </div>
         
         <div class="details">
             <h2><span class="icon-space">📅</span><span class="en-lang">${enText.serviceDetails}</span><span class="th-lang">${thText.serviceDetails}</span></h2>
@@ -312,65 +318,60 @@ export function generateAcceptanceEmail(acceptanceDetails) {
             </div>
             
             <div class="detail-row">
-                <div class="detail-label en-lang">${enText.totalPrice}</div>
-                <div class="detail-label th-lang">${thText.totalPrice}</div>
+                <div class="detail-label en-lang">${enText.totalPayment}</div>
+                <div class="detail-label th-lang">${thText.totalPayment}</div>
                 <div class="detail-value">${totalPrice} THB</div>
             </div>
         </div>
         
         <div class="details">
-            <h2><span class="icon-space">🚶🏻‍♂️</span><span class="en-lang">${enText.dogWalkerInfo}</span><span class="th-lang">${thText.dogWalkerInfo}</span></h2>
+            <h2><span class="icon-space">💳</span><span class="en-lang">${enText.paymentInfo}</span><span class="th-lang">${thText.paymentInfo}</span></h2>
             
             <div class="detail-row">
-                <div class="detail-label en-lang">${enText.name}</div>
-                <div class="detail-label th-lang">${thText.name}</div>
-                <div class="detail-value">${dogWalkerName}</div>
+                <div class="detail-label en-lang">${enText.paymentStatus}</div>
+                <div class="detail-label th-lang">${thText.paymentStatus}</div>
+                <div class="detail-value th-lang">รอการดำเนินการ</div>
+                <div class="detail-value en-lang">Pending Clearance</div>
             </div>
             
             <div class="detail-row">
-                <div class="detail-label en-lang">${enText.dogWalkerEmail}</div>
-                <div class="detail-label th-lang">${thText.dogWalkerEmail}</div>
-                <div class="detail-value">${dogWalkerEmail || '-'}</div>
+                <div class="detail-label en-lang">${enText.paymentExpected}</div>
+                <div class="detail-label th-lang">${thText.paymentExpected}</div>
+                <div class="detail-value">${formattedPaymentDate}</div>
             </div>
-            
-            <div class="detail-row">
-                <div class="detail-label en-lang">${enText.dogWalkerPhone}</div>
-                <div class="detail-label th-lang">${thText.dogWalkerPhone}</div>
-                <div class="detail-value">${dogWalkerTel || '-'}</div>
-            </div>
-            
-             <div class="detail-row">
-                <div class="detail-label en-lang">${enText.dogWalkerZone}</div>
-                <div class="detail-label th-lang">${thText.dogWalkerZone}</div>
-                <div class="detail-value">${dogWalkerZone && dogWalkerZone.length > 0 ? dogWalkerZone.join(', ') : '-'}</div>                   
-             </div>
         </div>
         
         <div class="details">
-            <h2><span class="icon-space">👤</span><span class="en-lang">${enText.userInfo}</span><span class="th-lang">${thText.userInfo}</span></h2>
+            <h2><span class="icon-space">👤</span><span class="en-lang">${enText.ownerInfo}</span><span class="th-lang">${thText.ownerInfo}</span></h2>
             
             <div class="detail-row">
-                <div class="detail-label en-lang">${enText.name}</div>
-                <div class="detail-label th-lang">${thText.name}</div>
+                <div class="detail-label en-lang">${enText.owner}</div>
+                <div class="detail-label th-lang">${thText.owner}</div>
                 <div class="detail-value">${userName}</div>
             </div>
             
             <div class="detail-row">
-                <div class="detail-label en-lang">${enText.phone}</div>
-                <div class="detail-label th-lang">${thText.phone}</div>
+                <div class="detail-label en-lang">${enText.ownerEmail}</div>
+                <div class="detail-label th-lang">${thText.ownerEmail}</div>
+                <div class="detail-value">${userEmail}</div>
+            </div>
+            
+            <div class="detail-row">
+                <div class="detail-label en-lang">${enText.ownerPhone}</div>
+                <div class="detail-label th-lang">${thText.ownerPhone}</div>
                 <div class="detail-value">${userTel}</div>
             </div>
             
             <div class="detail-row">
-                <div class="detail-label en-lang">${enText.address}</div>
-                <div class="detail-label th-lang">${thText.address}</div>
+                <div class="detail-label en-lang">${enText.ownerAddress}</div>
+                <div class="detail-label th-lang">${thText.ownerAddress}</div>
                 <div class="detail-value">${userAddress}</div>
             </div>
             
             <div class="detail-row">
-                    <div class="detail-label en-lang">${enText.userZone}</div>
-                    <div class="detail-label th-lang">${thText.userZone}</div>
-                    <div class="detail-value">${userZone}</div>
+                <div class="detail-label en-lang">${enText.ownerZone}</div>
+                <div class="detail-label th-lang">${thText.ownerZone}</div>
+                <div class="detail-value">${userZone}</div>
             </div>
         </div>
         
@@ -395,9 +396,6 @@ export function generateAcceptanceEmail(acceptanceDetails) {
                 `).join('')}
             </ul>
         </div>
-            
-        <p class="en-lang">${enText.walkerContact}</p>
-        <p class="th-lang">${thText.walkerContact}</p>
         
         <p class="en-lang">${enText.regards}<br><strong>${enText.team}</strong></p>
         <p class="th-lang">${thText.regards}<br><strong>${thText.team}</strong></p>

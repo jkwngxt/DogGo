@@ -1,9 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { generateWelcomeEmail } from '@/utils/email/templates/welcomeEmail';
-import { generateBookingEmail } from '@/utils/email/templates/bookingEmail';
-import {generateAcceptanceEmail} from "@/utils/email/templates/acceptEmail";
-import {generateRejectionEmail} from "@/utils/email/templates/rejectEmail";
+import { generateWelcomeEmail } from '@/utils/email/ws-templates/welcomeEmail';
+import { generateBookingEmail } from '@/utils/email/ws-templates/bookingEmail';
+import {generateAcceptanceEmail} from "@/utils/email/ws-templates/acceptEmail";
+import {generateRejectionEmail} from "@/utils/email/ws-templates/rejectEmail";
+import {generateCompletionEmail} from "@/utils/email/ws-templates/completionEmail";
 
 export class EmailService {
     async sendWelcomeEmail(id, email, username, password) {
@@ -46,6 +47,17 @@ export class EmailService {
         const emailPath = path.join(process.cwd(), 'data', 'walking-service', 'rejection-emails', fileName);
 
         const emailContent = generateRejectionEmail(rejectionDetails);
+        await this.#saveEmail(emailPath, emailContent);
+
+        return emailPath;
+    }
+
+    async sendCompletionNotification(walkingServiceId, dogWalkerEmail, completionDetails) {
+        const sanitizedEmail = dogWalkerEmail.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        const fileName = `${walkingServiceId}-${sanitizedEmail}-completion.html`;
+        const emailPath = path.join(process.cwd(), 'data', 'walking-service', 'completion-emails', fileName);
+
+        const emailContent = generateCompletionEmail(completionDetails);
         await this.#saveEmail(emailPath, emailContent);
 
         return emailPath;

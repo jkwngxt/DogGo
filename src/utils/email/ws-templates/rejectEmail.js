@@ -34,9 +34,9 @@ export function generateRejectionEmail(rejectionDetails) {
     };
 
     const thText = {
-        title: 'คำขอบริการเดินสุนัขถูกปฏิเสธ',
+        title: 'คำขอบริการพาสุนัขเดินเล่นถูกปฏิเสธ',
         hello: 'สวัสดีคุณ',
-        rejected: 'เราต้องขออภัยที่แจ้งให้ทราบว่าคำขอบริการเดินสุนัขของคุณถูกปฏิเสธโดย dog walker',
+        rejected: 'เราต้องขออภัยที่แจ้งให้ทราบว่าคำขอบริการพาสุนัขเดินเล่นของคุณถูกปฏิเสธโดย dog walker',
         details: 'นี่คือรายละเอียดการจองที่ถูกปฏิเสธ:',
         serviceDetails: 'ข้อมูลบริการ',
         date: 'วันที่:',
@@ -96,7 +96,7 @@ export function generateRejectionEmail(rejectionDetails) {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Service Rejection / คำขอบริการถูกปฏิเสธ</title>
+        <title>Service Request / คำขอบริการถูกปฏิเสธ</title>
         <style>
             body {
                 font-family: 'Segoe UI', Roboto, Arial, sans-serif;

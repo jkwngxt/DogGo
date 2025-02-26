@@ -63,7 +63,6 @@ export async function POST(request) {
             userZone: walkingService.user.zone
         };
 
-        console.log(walkingService.dogWalker.username)
         const emailPath = await emailService.sendBookingNotification(
             walkingServiceId,
             walkingService.dogWalker.username,
