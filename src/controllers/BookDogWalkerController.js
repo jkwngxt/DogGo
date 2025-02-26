@@ -39,7 +39,6 @@ export class BookDogWalkerController {
                 }
             });
 
-            // ✅ Return success response
             return {
                 message: "Booking successful",
                 billingId: billing.id,
@@ -47,8 +46,8 @@ export class BookDogWalkerController {
             };
 
         } catch (error) {
-            console.error("⚠️ Prisma error:", error);
-            return { error: "Internal Server Error." };
+            console.error("Prisma errorr", error);
+            return { error: "Internal server error" };
         }
     }
 }
