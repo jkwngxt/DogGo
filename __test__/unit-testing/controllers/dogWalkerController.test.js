@@ -1,7 +1,7 @@
 import { DogWalkerRegisterController } from '@/controllers/DogWalkerRegisterController.js';
 import { PrismaClient } from '@prisma/client';
 import { FileUploadService } from '@/utils/fileUpload.js';
-import {EmailService} from "@/utils/emailService";
+import {EmailService} from "@/utils/email/emailService";
 
 // จำลอง Prisma Client
 jest.mock('@prisma/client', () => {
@@ -25,7 +25,7 @@ jest.mock('@prisma/client', () => {
     };
 });
 
-jest.mock('@/utils/emailService.js', () => ({
+jest.mock('@/utils/email/emailService.js', () => ({
     EmailService: jest.fn(() => ({
         sendWelcomeEmail: jest.fn(),
     })),

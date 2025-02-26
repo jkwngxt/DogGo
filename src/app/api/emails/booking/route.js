@@ -1,4 +1,4 @@
-import { EmailService } from '@/utils/emailService';
+import { EmailService } from '@/utils/email/emailService';
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 

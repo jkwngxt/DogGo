@@ -1,4 +1,4 @@
-import { EmailService } from '@/utils/emailService.js';
+import { EmailService } from '@/utils/email/emailService.js';
 import fs from 'fs/promises';
 
 describe('EmailService', () => {
