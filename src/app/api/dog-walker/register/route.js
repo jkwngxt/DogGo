@@ -1,5 +1,5 @@
-import {DogWalkerRegisterController} from '@/controllers/DogWalkerRegisterController.js';
-import {NextResponse} from "next/server";
+import { DogWalkerRegisterController } from '@/controllers/DogWalkerRegisterController.js';
+import { NextResponse } from "next/server";
 
 
 export async function POST(request) {

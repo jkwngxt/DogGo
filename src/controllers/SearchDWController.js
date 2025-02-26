@@ -1,6 +1,4 @@
 import { PrismaClient } from '@prisma/client';
-import { EmailService } from '@/utils/emailService.js';
-import { FileUploadService } from "@/utils/fileUpload";
 
 export class SearchDWController {
     constructor(prismaClient = new PrismaClient()) {

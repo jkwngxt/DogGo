@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import {SearchDWController} from "@/controllers/SearchDWController";
+import { SearchDWController } from "@/controllers/SearchDWController";
 
 function serializeBigInt(obj) {
     return JSON.parse(JSON.stringify(obj, (key, value) => {
