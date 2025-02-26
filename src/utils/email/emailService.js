@@ -1,6 +1,5 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { translations } from '@/utils/email/translations';
 import { generateWelcomeEmail } from '@/utils/email/templates/welcomeEmail';
 import { generateBookingEmail } from '@/utils/email/templates/bookingEmail';
 import {generateAcceptanceEmail} from "@/utils/email/templates/acceptEmail";
@@ -13,7 +12,7 @@ export class EmailService {
         const emailPath = `/dog-walkers/welcome-emails/${fileName}`;
         const fullPath = path.join(process.cwd(), 'data', 'dog-walkers', 'welcome-emails', fileName);
 
-        const emailContent = generateWelcomeEmail(email, username, password, translations);
+        const emailContent = generateWelcomeEmail(email, username, password);
         await this.#saveEmail(fullPath, emailContent);
 
         return emailPath;
@@ -24,7 +23,7 @@ export class EmailService {
         const fileName = `${walkingServiceId}-${sanitizedUsername}-booking.html`;
         const emailPath = path.join(process.cwd(), 'data', 'walking-service', 'booking-emails', fileName);
 
-        const emailContent = generateBookingEmail(bookingDetails, translations);
+        const emailContent = generateBookingEmail(bookingDetails);
         await this.#saveEmail(emailPath, emailContent);
 
         return emailPath;
@@ -35,7 +34,7 @@ export class EmailService {
         const fileName = `${walkingServiceId}-${sanitizedEmail}-acceptance.html`;
         const emailPath = path.join(process.cwd(), 'data', 'walking-service', 'acceptance-emails', fileName);
 
-        const emailContent = generateAcceptanceEmail(acceptanceDetails, translations);
+        const emailContent = generateAcceptanceEmail(acceptanceDetails);
         await this.#saveEmail(emailPath, emailContent);
 
         return emailPath;
@@ -46,7 +45,7 @@ export class EmailService {
         const fileName = `${walkingServiceId}-${sanitizedEmail}-rejection.html`;
         const emailPath = path.join(process.cwd(), 'data', 'walking-service', 'rejection-emails', fileName);
 
-        const emailContent = generateRejectionEmail(rejectionDetails, translations);
+        const emailContent = generateRejectionEmail(rejectionDetails);
         await this.#saveEmail(emailPath, emailContent);
 
         return emailPath;

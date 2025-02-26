@@ -9,8 +9,6 @@ export async function PUT(request) {
         const body = await request.json();
         const { status, id } = body;
 
-        console.log(status, id);
-
         // ตรวจสอบว่ามีข้อมูลที่จำเป็นครบถ้วนหรือไม่
         if (status === undefined || id === undefined) {
             return NextResponse.json(

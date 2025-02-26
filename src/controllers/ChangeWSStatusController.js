@@ -55,7 +55,6 @@ export class ChangeWSStatusController {
             // For certain status changes, additional actions may be needed
             switch (status) {
                 case 203: // accepted
-                    console.log(`Updated walking service with ID ${id}`);
                     // Set accept timestamp to current time
                     await prisma.walkingService.update({
                         where: { id: parseInt(id) },
@@ -95,6 +94,13 @@ export class ChangeWSStatusController {
                     break;
 
                 case 220: // rejected
+                    await prisma.billing.update({
+                        where: {walkingServiceId: walkingService.id},
+                        data: {
+                            status: 120,
+                        }
+                    })
+
                     // ดึงข้อมูลสุนัขที่เกี่ยวข้อง
                     const dogsForRejection = await prisma.dog.findMany({
                         where: {

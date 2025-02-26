@@ -1,5 +1,5 @@
-export function generateAcceptanceEmail(acceptanceDetails, translations) {
-    const enText = translations.en.acceptance || {
+export function generateAcceptanceEmail(acceptanceDetails) {
+    const enText = {
         title: 'Walking Service Request Accepted! 🎉',
         hello: 'Hello',
         accepted: 'Great news! Your walking service request has been accepted by the dog walker. Please check our website for more details and updates.',
@@ -34,7 +34,7 @@ export function generateAcceptanceEmail(acceptanceDetails, translations) {
         userZone: 'Zone:',
     };
 
-    const thText = translations.th.acceptance || {
+    const thText = {
         title: 'คำขอบริการเดินสุนัขได้รับการยอมรับแล้ว! 🎉',
         hello: 'สวัสดีคุณ',
         accepted: 'ข่าวดี! คำขอบริการเดินสุนัขของคุณได้รับการยอมรับจากผู้เดินสุนัขแล้ว กรุณาตรวจสอบรายละเอียดและอัพเดทเพิ่มเติมที่เว็บไซต์ของเรา',

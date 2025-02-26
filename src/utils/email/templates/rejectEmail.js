@@ -1,5 +1,5 @@
-export function generateRejectionEmail(rejectionDetails, translations) {
-    const enText = translations.en.rejection || {
+export function generateRejectionEmail(rejectionDetails) {
+    const enText = {
         title: 'Walking Service Request Rejected',
         hello: 'Hello',
         rejected: 'We regret to inform you that your walking service request has been rejected by the dog walker.',
@@ -33,7 +33,7 @@ export function generateRejectionEmail(rejectionDetails, translations) {
 
     };
 
-    const thText = translations.th.rejection || {
+    const thText = {
         title: 'คำขอบริการเดินสุนัขถูกปฏิเสธ',
         hello: 'สวัสดีคุณ',
         rejected: 'เราต้องขออภัยที่แจ้งให้ทราบว่าคำขอบริการเดินสุนัขของคุณถูกปฏิเสธโดย dog walker',
