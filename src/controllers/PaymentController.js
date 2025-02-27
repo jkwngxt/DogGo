@@ -86,8 +86,7 @@ export class PaymentController {
 
             return {
                 status: "success",
-                message: "Payment successful. Booking is awaiting confirmation",
-                emailPath
+                message: "Payment successful. Booking is awaiting confirmation"
             };
         } catch (error) {
             console.error("Payment controller error:", error);
