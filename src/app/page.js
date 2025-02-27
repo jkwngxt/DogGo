@@ -29,10 +29,12 @@ import WorkDescription from "@/components/work-description";
 import ServiceProviderNav from "@/components/nav-bar/nav-service-provider";
 import AdminNav from "@/components/nav-bar/nav-admin";
 import HomeDogWalker from "@/components/home-dog-walker";
+import SelectDateTime from "@/components/select-datetime";
 
 export default function Home() {
   return (
     <div>
+      <SelectDateTime/>
       <div className="flex flex-row">
         <Link href="/pet-owner/homepage">Pet Owner</Link>
         <Button>Dog Walker</Button>

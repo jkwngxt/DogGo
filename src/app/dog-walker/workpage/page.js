@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import WorkDescription from "@/components/work-description";
 import { Label } from "@/components/ui/label";
 
-const workHistory = [
+const allWork = [
   {
     dw_username: "Pet Owner 1",
     startTime: "10:00",
@@ -23,14 +23,14 @@ const workHistory = [
     startTime: "11:00",
     endTime: "13:00",
     dw_tel: "093-456-7890",
-    ws_status: 1,
+    ws_status: 0,
   },
   {
     dw_username: "Pet Owner 4",
     startTime: "11:00",
     endTime: "13:00",
     dw_tel: "094-567-8901",
-    ws_status: 1,
+    ws_status: 0,
   },
 ];
 
@@ -38,10 +38,10 @@ const DogWalkerWorkPage = () => {
   return (
     <div className="min-h-screen bg-yellow-100 p-6">
       <div className="max-w-3xl mx-auto mt-4">
-        <Label className="text-3xl font-semibold">ประวัติการรับงาน</Label>
+        <Label className="text-3xl font-semibold">งานของฉัน</Label>
         {/* Work List using WorkDescription */}
         <div className="mt-4 space-y-2 font-semibold">
-          {workHistory.map((work, index) => (
+          {allWork.map((work, index) => (
             <WorkDescription
               key={index}
               dw_username={work.dw_username}

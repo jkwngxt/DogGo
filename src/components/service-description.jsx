@@ -6,13 +6,13 @@ import { Button } from "@/components/ui/button";
 
 const WorkDescription = ({ service, detail, price, status }) => {
   return (
-    <Card className="max-w-full mx px-4">
-      <CardHeader className="grid grid-cols-5 gap-4 justify-center items-center">
+    <Card className="max-w-full px-4">
+      <CardHeader className="grid grid-cols-5 gap-4 justify-center items-center w-[50rem]">
         <div className="font-semibold pt-1">{service}</div>
         <div>{detail}</div>
         <div>{price}</div>
         <div>{status}</div>
-        <Button variant="secondary">
+        <Button variant="secondary" className="w-20">
           แก้ไข
         </Button>
         </CardHeader>
