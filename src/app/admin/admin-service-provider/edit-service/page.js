@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import ServiceDescription from "@/components/ui/service-description";
+import ServiceDescription from "@/components/service-description";
 
 const AddService = () => {
   const [inputRows, setInputRows] = useState([{ id: 1 }]);
@@ -40,10 +40,25 @@ const AddService = () => {
             <Label className="font-semibold text-lg">รายการบริการของร้าน</Label>
         </div>
 
+        <div className="grid grid-cols-5 mt-4">
+          <div className="ml-20">
+            <Label className="font-semibold">ชื่อบริการ</Label>
+          </div>
+          <div className="ml-2">
+            <Label className="font-semibold">ประเภทบริการ</Label>
+          </div>
+          <div className="ml-3">
+            <Label className="font-semibold">ราคาบริการ</Label>
+          </div>
+          <div className="-ml-2">
+            <Label className="font-semibold">การมองเห็น</Label>
+          </div>
+        </div>
+
         <ServiceDescription
           service="อาบน้ำตัดขนแบบพิเศษ"
           detail="ตัดขน"
-          price="500"
+          price="500 บาท"
           status="มองเห็น"
         />
 

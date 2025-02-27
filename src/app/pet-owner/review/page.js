@@ -1,14 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import React from "react";
-import PetOwnerNav from "@/components/nav-bar/nav-pet-owner";
 import { Textarea } from "@/components/ui/textarea";
 import Rating from "@/components/rating";
 
 export default function Review() {
   return (
     <>
-      <PetOwnerNav />
       <div className="p-4 space-y-4">
         <div className="flex flex-col px-10 items-center">
           <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4">

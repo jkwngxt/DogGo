@@ -7,10 +7,10 @@ import { Button } from "@/components/ui/button";
 const WorkDescription = ({ service, detail, price, status }) => {
   return (
     <Card className="max-w-full mx px-4">
-      <CardHeader className="grid grid-cols-5 gap-4 items-center">
-        <div>{service}</div>
+      <CardHeader className="grid grid-cols-5 gap-4 justify-center items-center">
+        <div className="font-semibold pt-1">{service}</div>
         <div>{detail}</div>
-        <div>{price} บาท</div>
+        <div>{price}</div>
         <div>{status}</div>
         <Button variant="secondary">
           แก้ไข

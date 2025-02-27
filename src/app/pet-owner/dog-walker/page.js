@@ -4,7 +4,6 @@ import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "@/components/ui/button";
 import Reviews from "@/components/review";
 import React from "react";
-import PetOwnerNav from "@/components/nav-bar/nav-pet-owner";
 import ClientDogSelector from "@/components/client-dog";
 
 export default function DogWalker() {
@@ -37,7 +36,6 @@ export default function DogWalker() {
 
   return (
     <>
-      <PetOwnerNav />
       <div className="p-4 space-y-4">
         <div className="flex flex-col px-10 items-center">
           <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4">

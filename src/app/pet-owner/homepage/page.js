@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Card } from "@/components/ui/card";
-import PetOwnerNav from "@/components/nav-bar/nav-pet-owner";
 import HistoryDogWalker from "@/components/history-dog-walker";
 
 export default function page() {
@@ -53,7 +52,6 @@ export default function page() {
   ];
   return (
     <div>
-      <PetOwnerNav />
       <div className="flex p-6 space-y-4 items-center justify-center">
         <Card className="w-9/12 p-6 h-auto space-y-4">
           <h1 className="text-3xl font-bold text-gray-900 ">

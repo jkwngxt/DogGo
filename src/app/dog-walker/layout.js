@@ -3,9 +3,8 @@
 import { useState, useEffect } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Noto_Sans_Thai } from "next/font/google";
-import AdminNav from "@/components/ui/nav-admin";
-
-// import "../globals.css";
+import DogWalkerNav from "@/components/nav-bar/nav-dog-walker";
+import "../globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,9 +34,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${notoSansThai.variable} font-auto antialiased`}
       >
-        <AdminNav/>
+        <DogWalkerNav/>
         {children}
       </body>
     </html>
