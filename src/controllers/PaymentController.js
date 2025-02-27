@@ -1,8 +1,10 @@
 import { PrismaClient } from "@prisma/client";
+import { EmailService } from '@/utils/email/emailService';
 
 export class PaymentController {
-    constructor(prismaInstance = new PrismaClient()) {
+    constructor(prismaInstance = new PrismaClient(), emailServiceInstance = new EmailService()) {
         this.prisma = prismaInstance;
+        this.emailService = emailServiceInstance;
     }
 
     async processPayment(paymentData) {
@@ -17,44 +19,75 @@ export class PaymentController {
                 };
             }
 
-            // update billing status to paid
-            await this.prisma.billing.update({
-                where: { id: billingId },
-                data: { status: 101 } // paid
-            });
-
-            // fetch walking service associated with the billing
+            // fetch billing related with walking service
             const billing = await this.prisma.billing.findUnique({
                 where: { id: billingId },
-                include: { walkingService: true }
+                include: { walkingService: { include: { dogWalker: true, user: true } } }
             });
 
-            if (!billing || !billing.walkingService) {
-                throw new Error("WalkingService not found for this billing");
+            if (!billing || !billing.walkingService || !billing.walkingService.dogWalker) {
+                return {
+                    status: "failed",
+                    message: "Billing or related walking service not found"
+                };
             }
 
-            const walkingServiceId = billing.walkingService.id;
+            const walkingService = billing.walkingService;
+            const dogWalker = walkingService.dogWalker;
+            const user = walkingService.user;
 
-            // update walking service to awaiting response
-            await this.prisma.walkingService.update({
-                where: { id: walkingServiceId },
-                data: { status: 202 }
+            // use transcation to ensure atomic updates (if one fails, all fail)
+            await this.prisma.$transaction([
+                this.prisma.billing.update({
+                    where: { id: billingId },
+                    data: { status: 101 } // paid
+                }),
+                this.prisma.walkingService.update({
+                    where: { id: walkingService.id },
+                    data: { status: 202 } // awaiting response
+                })
+            ])
+
+             // ดึงข้อมูลสุนัข
+            const dogs = await prisma.dog.findMany({
+                where: {
+                    id: { in: walkingService.dogs }
+                }
             });
 
-            // send email using api
-            const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/emails/booking`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ walkingServiceId })
-            });
+            // สร้าง time slots จาก array ของเวลา
+            const startSlot = Math.min(...walkingService.time);
+            const endSlot = Math.max(...walkingService.time);
 
-            if (!emailResponse.ok) {
-                throw new Error("Failed to send email notification")
-            }
+            // prepare booking details for email
+            const bookingDetails = {
+                userName: user.name,
+                userEmail: user.email,
+                userTel: user.tel,
+                userAddress: user.address,
+                dogs: dogs,
+                serviceDate: walkingService.date.toISOString().split('T')[0],
+                startSlot,
+                endSlot,
+                totalPrice: walkingService.price.toString(),
+                // เพิ่มข้อมูล dog walker
+                dogWalkerName: dogWalker.name,
+                dogWalkerEmail: dogWalker.email,
+                dogWalkerTel: dogWalker.tel || '-',
+                dogWalkerZone: dogWalker.zone,
+                userZone: user.zone
+            };
+
+            const emailPath = await emailService.sendBookingNotification(
+                walkingService.id,
+                dogWalker.username,
+                bookingDetails
+            );
 
             return {
                 status: "success",
-                message: "Payment successful. Booking is awaiting confirmation"
+                message: "Payment successful. Booking is awaiting confirmation",
+                emailPath
             };
         } catch (error) {
             console.error("Payment controller error:", error);
