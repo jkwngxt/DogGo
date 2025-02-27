@@ -132,6 +132,7 @@ const RegisterPage = () => {
 
             // แสดง success dialog และล้างข้อมูลฟอร์ม
             clearAllData();
+            setShowDogErrors(false);
             setShowSuccessDialog(true);
 
         } catch (error) {
