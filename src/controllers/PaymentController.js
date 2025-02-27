@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import sendBookingEmail from "@/app/api/emails/booking/route"
 
 export class PaymentController {
     constructor(prismaInstance = new PrismaClient()) {
@@ -8,7 +7,7 @@ export class PaymentController {
 
     async processPayment(paymentData) {
         try {
-            const { userId, billingId, amount, confirmed } = paymentData
+            const { userId, billingId, amount, confirmed } = paymentData;
 
             if (!confirmed) {
                 return {
@@ -43,7 +42,15 @@ export class PaymentController {
             });
 
             // send email using api
-            await sendBookingEmail({ walkingServiceId });
+            const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/emails/booking`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ walkingServiceId })
+            });
+
+            if (!emailResponse.ok) {
+                throw new Error("Failed to send email notification")
+            }
 
             return {
                 status: "success",
@@ -53,7 +60,7 @@ export class PaymentController {
             console.error("Payment controller error:", error);
             return {
                 status: "failed",
-                message: "Payment faile. Please try again"
+                message: "Payment failed. Please try again"
             };
         }
     }
