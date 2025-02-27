@@ -37,7 +37,7 @@ export class UserRegisterController {
                 const hashedPassword = await bcrypt.hash(userData.password, 10);
 
                 // Create new user with dogs
-                const newUser = await tx.user.create({
+                await tx.user.create({
                     data: {
                         name: userData.name,
                         username: userData.username,
@@ -57,13 +57,9 @@ export class UserRegisterController {
                         dogs: true // Include dogs in the response
                     }
                 });
-
-                const {password, ...userWithoutPassword} = newUser;
-
                 return {
                     success: true,
                     message: 'User registered successfully',
-                    user: userWithoutPassword
                 };
 
             } catch (error) {
