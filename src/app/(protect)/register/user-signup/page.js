@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Form } from "react-hook-form";
 import {
     Select,
     SelectContent,
@@ -12,12 +13,13 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select";
+import Link from "next/link";
 
 const SignUpPage = () => {
   return (
     <div className="flex flex-col min-h-screen items-center justify-center bg-[#FFF8D6]">
-        <Label className="text-center text-xl font-bold mb-2 mt-3">Sign Up - ข้อมูลส่วนตัว</Label>
-        <Card className="w-full max-w-screen-md bg-white p-6 shadow-lg">
+        <Label className="text-center text-3xl font-bold mb-2 mt-3">Sign Up - ข้อมูลส่วนตัว</Label>
+        <Card className="w-9/12 max-w-screen-md bg-white p-6 shadow-lg">
         <CardContent>
           <div className="space-y-4">
             <div>
@@ -47,7 +49,7 @@ const SignUpPage = () => {
             <div>
               <Label htmlFor="district">เขตที่อยู่ปัจจุบัน</Label>
               <Select>
-                <SelectTrigger className="flex h-9 w-full rounded-xl bg-[#C6C6C6]">
+                <SelectTrigger className="flex h-9 w-full rounded-xl bg-[#C6C6C6] text-white placeholder:text-white">
                 <SelectValue placeholder="เขตที่อยู่ปัจจุบัน" className="placeholder:text-white text-white" />
                 </SelectTrigger>
                 <SelectContent>
@@ -101,6 +103,7 @@ const SignUpPage = () => {
           </div>
         </CardContent>
         <CardFooter className="flex justify-center space-x-4">
+          <Link href="/"></Link>
           <Button variant="default">ถัดไป</Button>
           <Button variant="destructive">ยกเลิก</Button>
         </CardFooter>
