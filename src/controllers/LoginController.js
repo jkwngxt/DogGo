@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 
-export class AuthController {
+export class LoginController {
     constructor(prismaInstance = new PrismaClient()) {
         this.prisma = prismaInstance;
     }
@@ -12,14 +12,6 @@ export class AuthController {
     async login(userData) {
         try {
             const { username, password } = userData
-
-            /* not sure if gonna put this in front or back
-            if (!username || !password) {
-                return {
-                    status: 400,
-                    body: { message: "Username and password are required."}
-                };
-            } */
 
             let role = "customer";
             if (username.startsWith("dw-")) {

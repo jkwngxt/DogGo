@@ -64,13 +64,13 @@ model DogWalker {
 }
 
 model WalkingService {
-  id      Int      @id @default(autoincrement()) @map("ws_id")
-  request DateTime @map("ws_request") @db.Timestamp
-  accept  DateTime @map("ws_accept") @db.Timestamp
-  date    DateTime @map("ws_date") @db.Date
-  time    Int[]    @map("ws_time") @db.SmallInt
-  price   Decimal  @map("ws_price") @db.Decimal(8, 2)
-  status  Int      @map("ws_status") @db.SmallInt
+  id      Int       @id @default(autoincrement()) @map("ws_id")
+  request DateTime  @map("ws_request") @db.Timestamp
+  accept  DateTime? @map("ws_accept") @db.Timestamp
+  date    DateTime  @map("ws_date") @db.Date
+  time    Int[]     @map("ws_time") @db.SmallInt
+  price   Decimal   @map("ws_price") @db.Decimal(8, 2)
+  status  Int       @map("ws_status") @db.SmallInt
 
   // relationship
   dogWalker   DogWalker @relation(fields: [dogWalkerId], references: [id])

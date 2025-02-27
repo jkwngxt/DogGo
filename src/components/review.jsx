@@ -35,15 +35,15 @@ const Reviews = ({ reviewData }) => {
       {/* Reviews List */}
       <div className="space-y-4">
         {filteredReviews.map((review) => (
-          <div key={review.id} className="flex gap-4 p-4 bg-white rounded-lg border border-gray-200">
+          <div key={review.r_id} className="flex gap-4 p-4 bg-white rounded-lg border border-gray-200">
             <img
               src={review.avatar || '/api/placeholder/40/40'}
-              alt={review.username}
+              alt={review.u_username}
               className="w-10 h-10 rounded-full"
             />
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="font-medium">{review.username}</span>
+                <span className="font-medium">{review.u_username}</span>
                 <div className="flex">
                   {Array.from({ length: review.rating }).map((_, i) => (
                     <Star
@@ -54,14 +54,14 @@ const Reviews = ({ reviewData }) => {
                   ))}
                 </div>
               </div>
-              <p className="text-gray-600">{review.comment}</p>
+              <p className="text-gray-600">{review.r_text}</p>
             </div>
           </div>
         ))}
 
         {filteredReviews.length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            No reviews found for {selectedRating} stars
+            ไม่มีรีวิว {selectedRating} ดาว
           </div>
         )}
       </div>

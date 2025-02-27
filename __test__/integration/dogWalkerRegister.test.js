@@ -1,7 +1,7 @@
 import { POST } from '@/app/api/dog-walker/register/route';
-import { DogWalkerController } from '@/controllers/DogWalkerController';
+import { DogWalkerRegisterController } from '@/controllers/DogWalkerRegisterController';
 
-jest.mock('@/controllers/DogWalkerController');
+jest.mock('@/controllers/DogWalkerRegisterController');
 jest.mock('next/server', () => ({
     NextResponse: {
         json: jest.fn((data, options) => ({
@@ -32,7 +32,7 @@ describe('POST api/dog-walker/register', () => {
 
         mockRequest.formData.mockResolvedValue(mockFormData);
 
-        DogWalkerController.prototype.register.mockResolvedValue({
+        DogWalkerRegisterController.prototype.register.mockResolvedValue({
             success: true,
             message: 'Dog Walker created successfully'
         });
@@ -53,7 +53,7 @@ describe('POST api/dog-walker/register', () => {
 
         mockRequest.formData.mockResolvedValue(mockFormData);
 
-        DogWalkerController.prototype.register.mockResolvedValue({
+        DogWalkerRegisterController.prototype.register.mockResolvedValue({
             success: false,
             message: 'Email already exists'
         });
@@ -86,7 +86,7 @@ describe('POST api/dog-walker/register', () => {
 
         mockRequest.formData.mockResolvedValue(mockFormData);
 
-        DogWalkerController.prototype.register.mockResolvedValue({
+        DogWalkerRegisterController.prototype.register.mockResolvedValue({
             success: false,
             message: 'Failed to save data'
         });

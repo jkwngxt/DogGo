@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+// Validation schema
 const FormSchema = z.object({
   startDate: z.date({
     required_error: "กรุณาใส่วันที่",
@@ -40,31 +41,25 @@ const FormSchema = z.object({
     required_error: "กรุณาใส่เวลาสิ้นสุด",
   }),
 }).refine((data) => {
-  const startDateTime = new Date(
-    data.startDate.setHours(
-      parseInt(data.startTime.split(':')[0]),
-      parseInt(data.startTime.split(':')[1])
-    )
-  );
-  const endDateTime = new Date(
-    data.startDate.setHours(
-      parseInt(data.endTime.split(':')[0]),
-      parseInt(data.endTime.split(':')[1])
-    )
-  );
-  return endDateTime > startDateTime;
+  const [startHour, startMinute] = data.startTime.split(':').map(Number);
+  const [endHour, endMinute] = data.endTime.split(':').map(Number);
+  
+  // Convert time to minutes for easier comparison
+  const startTotalMinutes = startHour * 60 + startMinute;
+  const endTotalMinutes = endHour * 60 + endMinute;
+
+  return endTotalMinutes > startTotalMinutes;
 }, {
-  message: "End date/time must be after start date/time",
-  path: ["endDate"]
+  message: "เวลาสิ้นสุดต้องอยู่หลังเวลาเริ่มต้น",
+  path: ["endTime"]
 });
 
+// Time Picker Component
 const TimePickerSelect = ({ value, onChange }) => {
   const timeOptions = [];
-  for (let hour = 0; hour < 24; hour++) {
-    for (let minute = 0; minute < 60; minute += 30) {
-      const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-      timeOptions.push(timeString);
-    }
+  for (let hour = 9; hour < 19; hour++) {
+    const timeString = `${hour.toString().padStart(2, '0')}:00`;
+    timeOptions.push(timeString);
   }
 
   return (
@@ -83,6 +78,7 @@ const TimePickerSelect = ({ value, onChange }) => {
   );
 };
 
+// Main Component
 const DateTimeRangePicker = () => {
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -93,13 +89,12 @@ const DateTimeRangePicker = () => {
   });
 
   function onSubmit(data) {
-    console.log(data);
-    // Handle your submit logic here
+    console.log("Form submitted:", data);
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-end gap-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-start gap-4">
         <div className="flex gap-2">
           <FormField
             control={form.control}
@@ -152,7 +147,7 @@ const DateTimeRangePicker = () => {
             )}
           />
         </div>
-        <h1>ถึง</h1>
+        <h1 className='py-2'>ถึง</h1>
         <div className="flex gap-2">
           <FormField
             control={form.control}

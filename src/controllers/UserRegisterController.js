@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
-export class UserController {
+export class UserRegisterController {
     constructor(prismaClient = new PrismaClient()) {
         this.prisma = prismaClient;
     }

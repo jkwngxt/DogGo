@@ -1,5 +1,8 @@
+
+
 import { Geist, Geist_Mono } from "next/font/google";
 import { Noto_Sans_Thai } from "next/font/google";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,14 +26,15 @@ export const metadata = {
   description: "A web application for providing a dog walking service",
 };
 
-export default function RootLayout({children}) {
-    return (
-        <html lang="en">
-        <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${notoSansThai.variable} font-auto antialiased`}
+      >
         {children}
-        </body>
-        </html>
-    );
+      </body>
+    </html>
+  );
 }
+

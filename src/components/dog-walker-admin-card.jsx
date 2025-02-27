@@ -8,7 +8,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar} from '@fortawesome/free-solid-svg-icons';
 
-const DogWalkerAdminCard = ({ userImage, userName, location, phoneNumber, reviewScore}) => {
+const DogWalkerAdminCard = ({ userImage, dw_username, dw_zone, dw_tel, rating}) => {
 const handleClick = () => {
     console.log("Card is clicked!")
   
@@ -25,12 +25,12 @@ return (
           alt="User profile"
           className="w-16 h-16 rounded-full object-cover"
         />
-        <div>{userName}</div>
-        <div>{location}</div>
-        <div>{phoneNumber}</div>
+        <div>{dw_username}</div>
+        <div>{dw_zone}</div>
+        <div>{dw_tel}</div>
         <div className="flex flex-row">
         <FontAwesomeIcon icon={faStar} className="h-5 w-5 text-yellow-400"/>
-        {reviewScore}
+        {rating}
         </div>
       </CardHeader>
     </Card>
