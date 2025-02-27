@@ -11,18 +11,18 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { redirect } from "next/navigation";
-const WalkConfirmation = ({  }) => {
+const CouponConfirmation = ({  }) => {
   return (
     <div>
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="secondary">ได้รับบริการ</Button>
+          <Button variant="secondary">ใช้</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader className="flex items-center">
-            <DialogTitle>ยืนยันการได้รับบริการ</DialogTitle>
+            <DialogTitle>ยืนยันการใช้คูปอง</DialogTitle>
             <DialogDescription className="text-md text-black">
-              โปรดยืนยันการได้รับบริการของท่านอีกครั้ง
+              โปรดยืนยันการใช้คูปองของท่านอีกครั้ง
             </DialogDescription>
           </DialogHeader>
           <div className="flex items-center space-x-2">
@@ -42,4 +42,4 @@ const WalkConfirmation = ({  }) => {
   );
 };
 
-export default WalkConfirmation;
+export default CouponConfirmation;

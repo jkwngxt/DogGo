@@ -65,8 +65,9 @@ const PaymentTimer = ({total,}) => {
           {formatTime(timeLeft)} นาที
         </div>
         <DialogFooter className="sm:justify-center">
+        <Button>เสร็จสิ้น</Button>
           <DialogClose asChild>
-            <Button variant="destructive">ปิด</Button>
+            <Button variant="destructive">ยกเลิก</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

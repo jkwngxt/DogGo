@@ -55,10 +55,10 @@ const DogWalkerNav = ({ userImage, userName}) => {
               <NavigationMenuTrigger>Services</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-2 md:w-[50px] lg:w-[150px] ]">
-                  <ListItem href="/doc" title="รับงาน"/>
-                  <ListItem href="/docs/installation" title="ประวัติการรับงาน"/>
+                  <ListItem href="/dog-walker/" title="รับงาน"/>
+                  <ListItem href="/dog-walker/homepage" title="ประวัติการรับงาน"/>
                   <ListItem
-                    href="/docs/primitives/typography"
+                    href="/dog-walker/feedback"
                     title="Feedback"
                   />
                 </ul>
