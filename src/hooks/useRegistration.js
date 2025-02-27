@@ -86,18 +86,13 @@ export const useRegistration = () => {
         if (!userData.username) {
             newErrors.username = "กรุณากรอก Username";
             isValid = false;
-        } else if (userData.username.length < 4) {
-            newErrors.username = "Username ต้องมีอย่างน้อย 4 ตัวอักษร";
-            isValid = false;
-        }
-        // เพิ่มการตรวจสอบ prefix ต้องห้าม
-        else if (
+        } else if (
             userData.username.startsWith('dw-') ||
             userData.username.startsWith('sp-')
         ) {
             newErrors.username = "Username ต้องไม่ขึ้นต้นด้วย dw- หรือ sp-";
             isValid = false;
-        } else {
+        }  else {
             newErrors.username = "";
         }
 
