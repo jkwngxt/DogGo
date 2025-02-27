@@ -49,7 +49,7 @@ export class PaymentController {
             ])
 
              // ดึงข้อมูลสุนัข
-            const dogs = await prisma.dog.findMany({
+            const dogs = await this.prisma.dog.findMany({
                 where: {
                     id: { in: walkingService.dogs }
                 }
@@ -78,7 +78,7 @@ export class PaymentController {
                 userZone: user.zone
             };
 
-            const emailPath = await emailService.sendBookingNotification(
+            const emailPath = await this.emailService.sendBookingNotification(
                 walkingService.id,
                 dogWalker.username,
                 bookingDetails
