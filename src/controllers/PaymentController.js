@@ -20,7 +20,7 @@ export class PaymentController {
             // update billing status to paid
             await this.prisma.billing.update({
                 where: { id: billingId },
-                data: { status: 1 } // paid
+                data: { status: 101 } // paid
             });
 
             // fetch walking service associated with the billing
@@ -38,7 +38,7 @@ export class PaymentController {
             // update walking service to awaiting response
             await this.prisma.walkingService.update({
                 where: { id: walkingServiceId },
-                data: { status: 1 }
+                data: { status: 202 }
             });
 
             // send email using api

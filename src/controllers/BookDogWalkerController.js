@@ -25,7 +25,7 @@ export class BookDogWalkerController {
                     date: new Date(date), 
                     time, // time slots
                     price,
-                    status: 0 // awaiting payment
+                    status: 201 // awaiting payment
                 }
             });
 
@@ -33,7 +33,7 @@ export class BookDogWalkerController {
             const billing = await prisma.billing.create({
                 data: {
                     userId,
-                    status: 0, // awaiting payment
+                    status: 100, // awaiting payment
                     total: price,
                     walkingServiceId: walkingService.id 
                 }
