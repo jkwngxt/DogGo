@@ -1,8 +1,8 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
-import DogTable from "@/components/dog-table";
 import WalkerWalkConfirmation from "@/components/walker-walk-confirmation";
-export default function WalkDescription() {
+
+export default function DogWalkDescription() {
   const info = {
     pet_owner: "Pet Owner 1",
     dw_zone: "บางรัก",
@@ -13,23 +13,8 @@ export default function WalkDescription() {
     startTime: "10:00",
     endTime: "12:00",
     dw_tel: "5551234567",
-    dogs: [
-      {
-        d_id: 1,
-        d_name: "มะลิ",
-        d_breed: "บางแก้ว",
-      },
-      {
-        d_id: 2,
-        d_name: "ลัคกี้",
-        d_breed: "ชิวาวา",
-      },
-      {
-        d_id: 3,
-        d_name: "บ๊อบ",
-        d_breed: "โกลเด้นรีทรีฟเวอร์",
-      },
-    ],
+    total: 500,
+    dogs: ["มะลิ", "ชบา"],
   };
 
   const formatDate = (dateString) => {
@@ -44,7 +29,7 @@ export default function WalkDescription() {
         <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4">
           รายละเอียดงาน
         </h1>
-        <Card className="w-[100%] sm:w-[60%] md:w-[60%] lg:w-[80%] p-6 h-auto flex flex-col justify-between">
+        <Card className="w-[100%] sm:w-[60%] md:w-[60%] lg:w-[80%] p-6 h-[70vh] flex flex-col justify-between">
           {/* Content Section */}
           <div className="flex-grow flex flex-col space-y-4 items-center">
             <div className="space-y-4 w-[60%] text-left">

@@ -5,7 +5,7 @@ import { Card, CardHeader } from "@/components/ui/card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "./ui/button";
-import WalkConfirmation from "./walk-confirmation";
+import OwnerWalkConfirmation from "./owner-walk-confirmation";
 import { redirect } from "next/navigation";
 
 const HistoryDogWalker = ({
@@ -43,7 +43,7 @@ const HistoryDogWalker = ({
     if (ws_status === "การบริการเสร็จสิ้น") {
       return <p className="font-bold text-[#6498FA]">การบริการเสร็จสิ้น</p>;
     }
-    return <WalkConfirmation ws_status={ws_status} />;
+    return <OwnerWalkConfirmation/>;
   };
 
   return (
