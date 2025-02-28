@@ -1,11 +1,16 @@
 import { ReviewSPController } from "@/controllers/ReviewSPController";
 import { NextResponse } from "next/server";
+import { authenticateRequest } from "@/utils/jwt";
 
 const reviewSPController = new ReviewSPController();
 
 // get redeemed coupons for review
 export async function GET(request) {
     try {
+        // only login account can see this
+        const { user, response } = await authenticateRequest(request);
+        if (response) return response;
+
         const { searchParams } = new URL(request.url);
         const userId = parseInt(searchParams.get("userId"));
 
@@ -16,8 +21,9 @@ export async function GET(request) {
             );
         }
 
-        const response = await reviewSPController.getRedeemableCoupons(userId);
-        return NextResponse.json(response, { status: response.status === "success" ? 200 : 400});
+        const responseData = await reviewSPController.getRedeemableCoupons(userId);
+        return NextResponse.json(responseData, { status: responseData.status === "success" ? 200 : 400});
+
     } catch (error) {
         console.error("API error (get coupons)");
         return NextResponse.json(
@@ -30,10 +36,14 @@ export async function GET(request) {
 // post to submit a new review
 export async function POST(request) {
     try {
-        const reviewData = await request.json();
-        const response = await reviewSPController.createReview(reviewData);
+        // only login account can see this
+        const { user, response } = await authenticateRequest(request);
+        if (response) return response;
 
-        return NextResponse.json(response, { status: response.status === "success" ? 200:400 });
+        const reviewData = await request.json();
+        const responseData = await reviewSPController.createReview(reviewData);
+
+        return NextResponse.json(responseData, { status: responseData.status === "success" ? 200:400 });
     } catch (error) {
         console.error("API error (post review)");
         return NextResponse.json(
