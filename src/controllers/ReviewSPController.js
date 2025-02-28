@@ -17,10 +17,10 @@ export class ReviewSPController {
                     service: { include: { provider: true } } // include service provider details
                 }
             });
-            return { status: "success", coupons };
+            return { success: true, coupons };
         } catch (error) {
             console.error("Error fetching redeemable coupons", error);
-            return { status: "failed", message: "Failed to fetch redeemable coupons." };
+            return { success: false, message: "Failed to fetch redeemable coupons." };
         }
     }
 
@@ -34,15 +34,15 @@ export class ReviewSPController {
             });
 
             if (!coupon) {
-                return { status: "failed", message: "Invalid coupon id"};
+                return { success: false, message: "Invalid coupon id"};
             }
 
             if (coupon.review) {
-                return { status: "failed", message: "This coupon has already been reviewed"};
+                return { success: false, message: "This coupon has already been reviewed"};
             }
 
             if (!rating || rating<1 || rating>5) {
-                return { status: "failed", message: "Rating must be between 1 and 5"};
+                return { success: false, message: "Rating must be between 1 and 5"};
             }
 
             const newReview = await this.prisma.review.create({
@@ -56,13 +56,13 @@ export class ReviewSPController {
             });
 
             return {
-                status: "success",
+                success: true,
                 message: "Review submitted successfully",
                 review: newReview
             };
         } catch (error) {
             console.error("Error creating review");
-            return { status: "failed", message: "Failed to submit review"};
+            return { success: false, message: "Failed to submit review"};
         }
     }
 }
