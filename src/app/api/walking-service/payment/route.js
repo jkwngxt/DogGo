@@ -1,14 +1,19 @@
-import { WalkingServicePaymentController } from "@/controllers/WSPaymentController";
+import { WSPaymentController } from "@/controllers/WSPaymentController";
 import { NextResponse } from "next/server";
+import { authenticateRequest } from "@/utils/jwt";
 
 export async function POST(request) {
     try {
+        // only customer account can see this
+        const { user, response } = await authenticateRequest(request, ['customer']);
+        if (response) return response;
+
         const paymentData = await request.json();
         const wsPaymentController = new WSPaymentController();
-        const response = await wsPaymentController.processPayment(paymentData);
+        const responseData = await wsPaymentController.processPayment(paymentData);
         
-        return NextResponse.json(response, {
-            status: response.status === "success" ? 200:400
+        return NextResponse.json(responseData, {
+            status: responseData.status === "success" ? 200:400
         });
     } catch (error) {
         console.error("API payment error:", error);
