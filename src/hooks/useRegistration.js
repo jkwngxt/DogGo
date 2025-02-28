@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 /**
  * Custom hook สำหรับจัดการข้อมูลการลงทะเบียน
@@ -33,34 +33,6 @@ export const useRegistration = () => {
         zone: "",
     });
 
-    // โหลดข้อมูลจาก localStorage
-    useEffect(() => {
-        try {
-            const storedUserData = localStorage.getItem("registerUserData");
-            if (storedUserData) {
-                setUserData(JSON.parse(storedUserData));
-            }
-
-            const storedDogData = localStorage.getItem("registerDogData");
-            if (storedDogData) {
-                setDogData(JSON.parse(storedDogData));
-            }
-        } catch (error) {
-            console.error("Error loading data from localStorage:", error);
-            localStorage.removeItem("registerUserData");
-            localStorage.removeItem("registerDogData");
-        }
-    }, []);
-
-    // บันทึกข้อมูลลง localStorage เมื่อมีการเปลี่ยนแปลง
-    useEffect(() => {
-        localStorage.setItem("registerUserData", JSON.stringify(userData));
-    }, [userData]);
-
-    useEffect(() => {
-        localStorage.setItem("registerDogData", JSON.stringify(dogData));
-    }, [dogData]);
-
     // อัปเดตข้อมูลผู้ใช้
     const updateUserData = (field, value) => {
         // ล้าง error เมื่อมีการเปลี่ยนแปลงข้อมูล
@@ -83,6 +55,8 @@ export const useRegistration = () => {
         const newErrors = { ...errors };
 
         // Username
+        const usernameRegex = /^[a-z0-9-_.@]+$/; // อนุญาตภาษาอังกฤษพิมพ์เล็ก ตัวเลข และอักษรพิเศษบางตัว (-_.@)
+
         if (!userData.username) {
             newErrors.username = "กรุณากรอก Username";
             isValid = false;
@@ -92,7 +66,10 @@ export const useRegistration = () => {
         ) {
             newErrors.username = "Username ต้องไม่ขึ้นต้นด้วย dw- หรือ sp-";
             isValid = false;
-        }  else {
+        } else if (!usernameRegex.test(userData.username)) {
+            newErrors.username = "Username ต้องเป็นภาษาอังกฤษพิมพ์เล็ก ตัวเลข และสัญลักษณ์ -_.@ เท่านั้น";
+            isValid = false;
+        } else {
             newErrors.username = "";
         }
 
@@ -230,9 +207,6 @@ export const useRegistration = () => {
             address: "",
             zone: "",
         });
-
-        localStorage.removeItem("registerUserData");
-        localStorage.removeItem("registerDogData");
     };
 
     return {
