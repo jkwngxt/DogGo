@@ -36,7 +36,7 @@ const WalkerWalkConfirmation = ({ type }) => {
             <div className="grid flex-1 gap-2"></div>
           </div>
           <DialogFooter className="sm:justify-center">
-            <Button onClick={()=>redirect('/dog-walker/homepage')}>ยืนยัน</Button>
+            <Button onClick={()=>redirect('/dog-walker/workpage')}>ยืนยัน</Button>
             <DialogClose asChild>
               <Button variant="destructive">ยกเลิก</Button>
             </DialogClose>
