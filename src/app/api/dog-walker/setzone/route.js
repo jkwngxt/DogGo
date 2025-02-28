@@ -1,8 +1,13 @@
 import { SetZoneController } from '@/controllers/SetZoneController';
 import { NextResponse } from "next/server";
+import { authenticateRequest } from '@/utils/jwt';
 
 export async function POST(request) {
     try {
+        // only dog walker can set zone
+        const { user, response } = await authenticateRequest(request, ['dogWalker']);
+        if (response) return response;
+
         const setZoneController = new SetZoneController();
         const formData = await request.formData();
         
@@ -29,13 +34,17 @@ export async function POST(request) {
 
         const result = await setZoneController.updateProfile(dogWalkerData);
 
-        if (!result.success) {
-            return NextResponse.json(result, { status: 500 });
+        if (!result || !result.success) {
+            return NextResponse.json(
+                result || { success: false, message: 'Failed to update profile' },
+                { status: 500 }
+            );
         }
 
         return NextResponse.json(result, { status: 200 });
 
     } catch (error) {
+        console.error("API error (post set-zone)", error);
         return NextResponse.json(
             {
                 success: false,

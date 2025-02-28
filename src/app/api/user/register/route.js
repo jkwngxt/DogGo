@@ -17,7 +17,6 @@ export async function POST(request) {
         return NextResponse.json(result, { status: 201 });
 
     } catch (error) {
-        console.error('Registration error:', error);
         return NextResponse.json(
             {
                 success: false,

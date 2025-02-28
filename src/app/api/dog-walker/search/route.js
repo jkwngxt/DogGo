@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { SearchDWController } from "@/controllers/SearchDWController";
+import { authenticateRequest } from '@/utils/jwt';
 
 function serializeBigInt(obj) {
     return JSON.parse(JSON.stringify(obj, (key, value) => {
@@ -12,6 +13,11 @@ function serializeBigInt(obj) {
 
 export async function POST(request) {
     try {
+        // ตรวจสอบการยืนยันตัวตนด้วย JWT
+        // เฉพาะ customer เท่านั้นที่สามารถค้นหา dog walker ได้
+        const { user, response } = await authenticateRequest(request, ['customer']);
+        if (response) return response;
+
         const body = await request.json();
         const { date, startTimeInt, endTimeInt, userZone } = body;
 
@@ -31,7 +37,11 @@ export async function POST(request) {
         // If 9.00-11.00 slot time will be [1, 2]
 
         const searchDWController = new SearchDWController();
-        const result = await searchDWController.searchDogWalkers(date, timeSlots, userZone);
+
+        // ใช้ userZone จาก body ถ้ามี หรือดึงจากข้อมูลผู้ใช้ในกรณีที่ไม่ได้ระบุใน body
+        const zoneToSearch = userZone || user.zone;
+
+        const result = await searchDWController.searchDogWalkers(date, timeSlots, zoneToSearch);
 
         const serializedResult = serializeBigInt(result);
 
