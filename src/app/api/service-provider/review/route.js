@@ -1,0 +1,44 @@
+import { ReviewSPController } from "@/controllers/ReviewSPController";
+import { NextResponse } from "next/server";
+
+const reviewSPController = new ReviewSPController();
+
+// get redeemed coupons for review
+export async function GET(request) {
+    try {
+        const { searchParams } = new URL(request.url);
+        const userId = parseInt(searchParams.get("userId"));
+
+        if (!userId) {
+            return NextResponse.json(
+                { status: "failed", message: "User id is required"},
+                { status: 400}
+            );
+        }
+
+        const response = await reviewSPController.getRedeemableCoupons(userId);
+        return NextResponse.json(response, { status: response.status === "success" ? 200 : 400});
+    } catch (error) {
+        console.error("API error (get coupons)");
+        return NextResponse.json(
+            { status: "failed", message: "Error fetching coupons"},
+            { status: 500 }
+        );
+    }
+}
+
+// post to submit a new review
+export async function POST(request) {
+    try {
+        const reviewData = await request.json();
+        const response = await reviewSPController.createReview(reviewData);
+
+        return NextResponse.json(response, { status: response.status === "success" ? 200:400 });
+    } catch (error) {
+        console.error("API error (post review)");
+        return NextResponse.json(
+            { status: "failed", message: "Error submitting review"},
+            { status: 500 }
+        );
+    }
+}
