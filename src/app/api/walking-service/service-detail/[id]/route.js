@@ -1,12 +1,17 @@
-// app/api/walking-service/service-detail/[id]/route.js
 import { NextResponse } from 'next/server';
 import { FetchWSController } from '@/controllers/FetchWSController';
+import { authenticateRequest } from "@/utils/jwt";
 
 const wsController = new FetchWSController();
 
-export async function GET(request, { params }) {
+export async function GET(request, context) {
+    const { user, response } = await authenticateRequest(request);
+    if (response) return response;
+
     try {
-        const { id } = params;
+        // Await the params object
+        const params = await context.params;
+        const id = params.id;
 
         if (!id) {
             return NextResponse.json(

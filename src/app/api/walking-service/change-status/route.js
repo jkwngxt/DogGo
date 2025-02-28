@@ -1,9 +1,13 @@
 import { ChangeWSStatusController } from "@/controllers/ChangeWSStatusController";
 import { NextResponse } from "next/server";
+import {authenticateRequest} from "@/utils/jwt";
 
 const controller = new ChangeWSStatusController();
 
 export async function PUT(request) {
+    const { user, response } = await authenticateRequest(request);
+    if (response) return response;
+
     try {
         // รับข้อมูลจาก request body
         const body = await request.json();

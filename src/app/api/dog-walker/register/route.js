@@ -1,9 +1,13 @@
 import { DogWalkerRegisterController } from '@/controllers/DogWalkerRegisterController.js';
 import { NextResponse } from "next/server";
+import {authenticateRequest} from "@/utils/jwt";
 
 
 export async function POST(request) {
     try {
+        const { user, response } = await authenticateRequest(request, ["admin"]);
+        if (response) return response;
+
         const dogWalkerController = new DogWalkerRegisterController();
         const formData = await request.formData();
         const name = formData.get('name');
