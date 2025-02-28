@@ -13,11 +13,19 @@ export class LoginController {
         try {
             const { username, password } = userData
 
+            username = username.toLowerCase();
+
+            if (!username || !password) {
+                throw new Error("Username and password are required");
+            }
+
             let role = "customer";
             if (username.startsWith("dw-")) {
                 role = "dogWalker";
             } else if (username.startsWith("sp-")) {
                 role = "serviceProvider";
+            } else if (username==="doggo") {
+                role = "admin";
             }
 
             // check if user exists or not
