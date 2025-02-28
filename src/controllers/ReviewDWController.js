@@ -17,26 +17,31 @@ export class ReviewDWController {
                     dogWalker: true // fetch related dog walker details
                 }
             });
-            return { status: "success", walkingServices };
+            return { success: true, walkingServices };
         } catch (error) {
             console.error("Error fetching reviewable walking services:", error);
-            return { status: "failed", message: "Failed to fetch walking service" };
+            return { success: false, message: "Failed to fetch walking service" };
         }
     }
 
     async createReview({ userId, walkingServiceId, rating, text }) {
         try {
             if (!rating || rating<1 || rating>5) {
-                return { status: "failed", message: "Rating must be between 1 to 5"};
+                return { success: false, message: "Rating must be between 1 to 5"};
             }
 
+            // check if the service exists & belongs to the user
             const walkingService = await this.prisma.walkingService.findUnique({
                 where: { id: walkingServiceId },
-                include: { review: true }
+                select: { userId: true, review: true }
             });
 
+            if (!walkingService || walkingService.userId !== userId) {
+                return { success: false, message: "Invalid service or unauthorized access" };
+            }
+
             if (walkingService.review) {
-                return { status: "failed", message: "This service has already been reviewed"};
+                return { success: false, message: "This service has already been reviewed"};
             }
 
             // create new review
@@ -50,10 +55,10 @@ export class ReviewDWController {
                 }
             });
 
-            return { status: "success", message: "Review submitted successfully", review: newReview };
+            return { success: true, message: "Review submitted successfully", review: newReview };
         } catch (error) {
             console.error("Error submitting review:", error);
-            return { status: "failed", message: "Failed to submit review" };
+            return { success: false, message: "Failed to submit review" };
         }
     }
 }
