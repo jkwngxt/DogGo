@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { FetchReviewDWController } from "@/controllers/FetchReviewDWController";
+import {authenticateRequest} from "@/utils/jwt";
 
 function serializeBigInt(obj) {
     return JSON.parse(JSON.stringify(obj, (key, value) => {
@@ -12,11 +13,19 @@ function serializeBigInt(obj) {
 
 export async function POST(request) {
     try {
+        // ตรวจสอบการยืนยันตัวตนด้วย JWT
+        // อ่านได้ทุก role แต่ต้อง login ก่อน
+        const { user, response } = await authenticateRequest(request);
+        let userId = user.id;
+        if (response) return response;
+
         const body = await request.json();
-        const { userId, dwId } = body;
+        const { dwId } = body;
+
+
 
         const fetchReviewDW = new FetchReviewDWController();
-        const result = await fetchReviewDW.getReviewByDwId(userId, dwId);
+        const result = await fetchReviewDW.getReviewByDwId((userId), dwId);
 
         if (!result.success) {
             if (result.message.includes('not found')) {

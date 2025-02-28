@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { FetchWSController } from "@/controllers/FetchWSController";
+import {authenticateRequest} from "@/utils/jwt";
 
 function serializeBigInt(obj) {
     return JSON.parse(JSON.stringify(obj, (key, value) => {
@@ -12,6 +13,9 @@ function serializeBigInt(obj) {
 
 export async function POST(request) {
     try {
+        const { user, response } = await authenticateRequest(request);
+        if (response) return response;
+
         const body = await request.json();
         const { role, id } = body;
 

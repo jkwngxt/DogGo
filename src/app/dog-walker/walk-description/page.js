@@ -1,7 +1,7 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import WalkerWalkConfirmation from "@/components/walker-walk-confirmation";
-import DogTable from '@/components/dog-table';
+import DogTable from "@/components/dog-table";
 
 export default function DogWalkDescription() {
   const info = {
@@ -14,9 +14,25 @@ export default function DogWalkDescription() {
     startTime: "10:00",
     endTime: "12:00",
     dw_tel: "5551234567",
-    total: 500,
-    dogs: ["มะลิ", "ชบา"],
+    dogs: [
+      {
+        d_id: 1,
+        d_name: "มะลิ",
+        d_breed: "บางแก้ว",
+      },
+      {
+        d_id: 2,
+        d_name: "ลัคกี้",
+        d_breed: "ชิวาวา",
+      },
+      {
+        d_id: 3,
+        d_name: "บ๊อบ",
+        d_breed: "โกลเด้นรีทรีฟเวอร์",
+      },
+    ],
   };
+
 
   const formatDate = (dateString) => {
     const [year, month, day] = dateString.split("-");
@@ -30,7 +46,7 @@ export default function DogWalkDescription() {
         <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4">
           รายละเอียดงาน
         </h1>
-        <Card className="w-[100%] sm:w-[60%] md:w-[60%] lg:w-[80%] p-6 h-[70vh] flex flex-col justify-between">
+        <Card className="w-[100%] sm:w-[60%] md:w-[60%] lg:w-[80%] p-6 h-auto flex flex-col justify-between">
           {/* Content Section */}
           <div className="flex-grow flex flex-col space-y-4 items-center">
             <div className="space-y-4 w-[60%] text-left">
@@ -91,6 +107,10 @@ export default function DogWalkDescription() {
             <div className="space-y-4 w-[60%] px-16 text-left">
               <span className="font-bold">รายการสุนัข</span>
               <DogTable dogs={info.dogs} />
+            </div>
+            <div className="space-x-2 flex row">
+              <WalkerWalkConfirmation type="รับงาน"/>
+              <WalkerWalkConfirmation type="ปฏิเสธ"/>
             </div>
           </div>
         </Card>

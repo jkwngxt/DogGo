@@ -1,7 +1,6 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import DogTable from "@/components/dog-table";
-import WalkerWalkConfirmation from "@/components/walker-walk-confirmation";
 export default function WalkDescription() {
   const info = {
     pet_owner: "Pet Owner 1",
