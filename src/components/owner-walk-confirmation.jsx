@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { redirect } from "next/navigation";
-const WalkConfirmation = ({  }) => {
+const OwnerWalkConfirmation = ({  }) => {
   return (
     <div>
       <Dialog>
@@ -42,4 +42,4 @@ const WalkConfirmation = ({  }) => {
   );
 };
 
-export default WalkConfirmation;
+export default OwnerWalkConfirmation;

@@ -30,6 +30,7 @@ import ServiceProviderNav from "@/components/nav-bar/nav-service-provider";
 import AdminNav from "@/components/nav-bar/nav-admin";
 import HomeDogWalker from "@/components/home-dog-walker";
 import SelectDateTime from "@/components/select-datetime";
+import { redirect } from "next/navigation";
 
 export default function Home() {
   return (
@@ -37,7 +38,7 @@ export default function Home() {
       <SelectDateTime/>
       <div className="flex flex-row">
         <Link href="/pet-owner/homepage">Pet Owner</Link>
-        <Button>Dog Walker</Button>
+        <Link href="/dog-walker/homepage">Dog Walker</Link>
         <Button>Admin</Button>
         <Button>Service</Button>
       </div>
