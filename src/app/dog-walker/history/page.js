@@ -49,6 +49,7 @@ const DogWalkerWorkPage = () => {
               endTime={work.endTime}
               dw_tel={work.dw_tel}
               ws_status={work.ws_status}
+              source="history"
             />
           ))}
         </div>

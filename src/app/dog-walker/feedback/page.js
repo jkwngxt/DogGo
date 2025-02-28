@@ -4,7 +4,7 @@ import React from 'react'
 import { Label } from "@/components/ui/label";
 import Review from "@/components/review";
 import { Star } from "lucide-react";
-import {Card, CardHeader} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 
 const feedbackData = {
   averageRating: 4.6,

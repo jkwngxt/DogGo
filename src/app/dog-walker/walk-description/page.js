@@ -108,10 +108,6 @@ export default function DogWalkDescription() {
               <span className="font-bold">รายการสุนัข</span>
               <DogTable dogs={info.dogs} />
             </div>
-            <div className="space-x-2 flex row">
-              <WalkerWalkConfirmation type="รับงาน"/>
-              <WalkerWalkConfirmation type="ปฏิเสธ"/>
-            </div>
           </div>
         </Card>
       </div>
