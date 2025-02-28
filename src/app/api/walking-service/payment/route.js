@@ -1,11 +1,11 @@
-import { WalkingServicePaymentController } from "@/controllers/WalkingServicePaymentController";
+import { WalkingServicePaymentController } from "@/controllers/WSPaymentController";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
     try {
         const paymentData = await request.json();
-        const walkingServicePaymentController = new WalkingServicePaymentController();
-        const response = await walkingServicePaymentController.processPayment(paymentData);
+        const wsPaymentController = new WSPaymentController();
+        const response = await wsPaymentController.processPayment(paymentData);
         
         return NextResponse.json(response, {
             status: response.status === "success" ? 200:400
