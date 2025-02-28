@@ -28,7 +28,7 @@ export default function WalkingService() {
   ];
   return (
     <div>
-      <div className="flex flex-col flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-center items-center">
         <div className="w-9/12 p-6 h-auto space-y-4 ">
           <div className="flex flex-col px-10">
             <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4">
