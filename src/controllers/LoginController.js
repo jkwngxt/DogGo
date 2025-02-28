@@ -33,7 +33,7 @@ export class LoginController {
             if (!user) {
                 return {
                     status: 401,
-                    body: { message: "Couldn't find your username."}
+                    body: { message: "Username not found. Please try again."}
                 };
             }
 

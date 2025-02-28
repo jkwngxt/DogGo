@@ -1,64 +1,35 @@
-"use client"; // Ensures it's a client component
+"use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation"; // Next.js navigation
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import logoSVG from "/public/image/logo.svg"; 
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/useAuth";
 
-export default function LoginPage() {
+const LoginPage = () => {
+
+    const { login } = useAuth();
+
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState(null);
-    const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
+    // ฟังก์ชัน Login
     const handleLogin = async () => {
+        setIsLoading(true);
+        setErrorMessage(""); 
         try {
-            // const response = await fetch("/api/login", {
-            //     method: "POST",
-            //     headers: { "Content-Type": "application/json" },
-            //     body: JSON.stringify({ username, password }),
-            // });
-
-            // const data = await response.json();
-            
-
-            // if (response.ok) {
-            //     // Store role in sessionStorage //change dog walker in to userRole later
-            //     sessionStorage.setItem("dog_walker", data.role);
-
-            //     // Redirect based on role
-            //     if (data.role === "dog_walker") {
-            //         router.push("publicPage/dog-walker/dog-walker-home");
-            //     } else if (data.role === "admin") {
-            //         router.push("/admin-home");
-            //     } else if (data.role === "pet_owner") {
-            //         router.push("/pet-owner-home");
-            //     } else if (data.role === "service_provider") {
-            //         router.push("/service-provider-home");
-            //     } else {
-            //         router.push("/"); // Default homepage
-            //     }
-            // } else {
-            //     setError("Invalid username or password");
-            // }
-            const data = 'dog_walker';
-            sessionStorage.setItem("dog_walker", data);
-
-                // Redirect based on role
-                if (data === "dog_walker") {
-                    router.push("dog-walker/dog-walker-home");
-                } else if (data === "admin") {
-                    router.push("/admin-home");
-                } else if (data === "pet_owner") {
-                    router.push("/pet-owner-home");
-                } else if (data === "service_provider") {
-                    router.push("/service-provider-home");
-                } 
+            const result = await login(username, password);
+            if (!result.success) {
+                setErrorMessage(result.message);
+            }
         } catch (err) {
-            console.error("Login error:", err);
-            setError("An error occurred. Please try again.");
+            setErrorMessage("An error occurred. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -70,10 +41,9 @@ export default function LoginPage() {
                     <Image src={logoSVG} alt="Logo" width={250} height={250} />
                 </div>
                 
-                {/* Login Form */}
                 <Label className="text-5xl font-semibold text-white mb-9 mt-4">Login</Label>
-                {error && <p className="text-red-500">{error}</p>}
-                
+                {errorMessage && <p className="text-red-500 text-sm mb-4">{errorMessage}</p>}
+
                 <input
                     type="text"
                     placeholder="Username"
@@ -90,16 +60,22 @@ export default function LoginPage() {
                 />
                 <button 
                     onClick={handleLogin}
-                    className="w-full p-2 mt-5 text-white bg-[#FFC74A] rounded-md font-semibold hover:bg-yellow-500 shadow-md shadow-[#0f4099]"
+                    disabled={isLoading}
+                    className={`w-full p-2 mt-5 text-white bg-[#FFC74A] rounded-md font-semibold shadow-md shadow-[#0f4099] ${
+                        isLoading ? "opacity-50 cursor-not-allowed" : "hover:bg-yellow-500"
+                    }`}
                 >
-                    LOGIN
+                    {isLoading ? "Logging in..." : "LOGIN"}
                 </button>
 
                 {/* Sign Up Link */}
                 <p className="mt-6 mr-1 text-xs font-semibold text-black">
-                    Don’t have an account? <Link href="/signup" className="font-semibold text-white">Sign Up</Link>
+                    Don’t have an account? <Link href="/register" className="font-semibold text-white">Sign Up</Link>
                 </p>
             </div>
         </div>
     );
-}
+};
+
+export default LoginPage;
+
