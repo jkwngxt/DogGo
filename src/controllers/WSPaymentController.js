@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { EmailService } from '@/utils/email/emailService';
 
-export class WalkingServicePaymentController {
+export class WSPaymentController {
     constructor(prismaInstance = new PrismaClient(), emailServiceInstance = new EmailService()) {
         this.prisma = prismaInstance;
         this.emailService = emailServiceInstance;
@@ -78,7 +78,7 @@ export class WalkingServicePaymentController {
                 userZone: user.zone
             };
 
-            const emailPath = await this.emailService.sendBookingNotification(
+            await this.emailService.sendBookingNotification(
                 walkingService.id,
                 dogWalker.username,
                 bookingDetails
