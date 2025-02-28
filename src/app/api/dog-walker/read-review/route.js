@@ -16,10 +16,13 @@ export async function POST(request) {
         // ตรวจสอบการยืนยันตัวตนด้วย JWT
         // อ่านได้ทุก role แต่ต้อง login ก่อน
         const { user, response } = await authenticateRequest(request);
+        let userId = user.id;
         if (response) return response;
 
         const body = await request.json();
-        const { userId, dwId } = body;
+        const { dwId } = body;
+
+
 
         const fetchReviewDW = new FetchReviewDWController();
         const result = await fetchReviewDW.getReviewByDwId((userId), dwId);

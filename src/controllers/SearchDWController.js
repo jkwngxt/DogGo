@@ -14,6 +14,8 @@ export class SearchDWController {
             const availableDogWalkers = await this.queryAvailableDogWalkers(searchDate, timeSlots, userZone);
 
 
+
+
             if (availableDogWalkers.length === 0) {
                 return {
                     success: true,
