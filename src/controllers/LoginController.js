@@ -11,7 +11,7 @@ export class LoginController {
 
     async login(userData) {
         try {
-            const { username, password } = userData
+            let { username, password } = userData
 
             username = username.toLowerCase();
 

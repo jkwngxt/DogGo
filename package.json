@@ -28,6 +28,7 @@
     "cross-fetch": "^4.1.0",
     "date-fns": "^3.6.0",
     "dog-go": "file:",
+    "jose": "^6.0.8",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.475.0",
     "next": "^15.1.7",
