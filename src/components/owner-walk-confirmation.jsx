@@ -1,4 +1,7 @@
+"use client";
+
 import React from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,35 +13,37 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { redirect } from "next/navigation";
-const OwnerWalkConfirmation = ({  }) => {
+
+const OwnerWalkConfirmation = () => {
+  const router = useRouter(); // Initialize router
+
+  const handleConfirmClick = (e) => {
+    e.stopPropagation(); // Prevents triggering card's click event
+    router.push("/pet-owner/homepage"); // Navigate to homepage
+  };
+
   return (
-    <div>
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="secondary">ได้รับบริการ</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader className="flex items-center">
-            <DialogTitle>ยืนยันการได้รับบริการ</DialogTitle>
-            <DialogDescription className="text-md text-black">
-              โปรดยืนยันการได้รับบริการของท่านอีกครั้ง
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex items-center space-x-2">
-            <div className="grid flex-1 gap-2"></div>
-          </div>
-          <DialogFooter className="sm:justify-center">
-            <Button onClick={() => redirect("/pet-owner/homepage")}>
-              ยืนยัน
-            </Button>
-            <DialogClose asChild>
-              <Button variant="destructive">ยกเลิก</Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="secondary" onClick={(e) => e.stopPropagation()}>
+          ได้รับบริการ
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md" onClick={(e) => e.stopPropagation()}>
+        <DialogHeader className="flex items-center">
+          <DialogTitle>ยืนยันการได้รับบริการ</DialogTitle>
+          <DialogDescription className="text-md text-black">
+            โปรดยืนยันการได้รับบริการของท่านอีกครั้ง
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="sm:justify-center">
+          <Button onClick={handleConfirmClick}>ยืนยัน</Button>
+          <DialogClose asChild>
+            <Button variant="destructive">ยกเลิก</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
