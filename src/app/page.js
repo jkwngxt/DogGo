@@ -98,11 +98,6 @@ export default function Home() {
         userName="Dog Walker"
       />
 
-      <ServiceProviderNav
-        userImage="/image/user-placeholder.jpg"
-        userName="Service Provider"
-      />
-
       <AdminNav userImage="/image/user-placeholder.jpg" userName="Admin" />
 
       <WorkDescription
