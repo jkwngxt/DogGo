@@ -5,15 +5,28 @@ export class SearchDWController {
         this.prisma = prismaClient;
     }
 
-    async searchDogWalkers(date, timeSlots, userZone) {
+    async searchDogWalkers(date, timeSlots, userId) {
 
         try {
             // Find available dog walkers who don't have services that conflict with the requested time
+            const user = await  this.prisma.user.findUnique({
+                where: {
+                    id: userId
+                }
+            })
+
+            if (!user) {
+                return {
+                    success: false,
+                    msg: 'No user found.'
+                }
+            }
+
+            const userZone = user.zone;
+
             const searchDate = new Date(date);
             searchDate.setHours(0, 0, 0, 0);
             const availableDogWalkers = await this.queryAvailableDogWalkers(searchDate, timeSlots, userZone);
-
-
 
 
             if (availableDogWalkers.length === 0) {

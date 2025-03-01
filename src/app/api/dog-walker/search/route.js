@@ -19,7 +19,7 @@ export async function POST(request) {
         if (response) return response;
 
         const body = await request.json();
-        const { date, startTimeInt, endTimeInt, userZone } = body;
+        const { date, startTimeInt, endTimeInt } = body;
 
         // Define constants
         const START_TIME = 9; // 9:00 AM is the first slot
@@ -38,10 +38,7 @@ export async function POST(request) {
 
         const searchDWController = new SearchDWController();
 
-        // ใช้ userZone จาก body ถ้ามี หรือดึงจากข้อมูลผู้ใช้ในกรณีที่ไม่ได้ระบุใน body
-        const zoneToSearch = userZone || user.zone;
-
-        const result = await searchDWController.searchDogWalkers(date, timeSlots, zoneToSearch);
+        const result = await searchDWController.searchDogWalkers(date, timeSlots, user.userId);
 
         const serializedResult = serializeBigInt(result);
 

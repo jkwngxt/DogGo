@@ -12,11 +12,12 @@ function serializeBigInt(obj) {
 }
 
 export async function POST(request) {
+    // req ส่งเข้ามาเพียง Dog Walker Id
     try {
         // ตรวจสอบการยืนยันตัวตนด้วย JWT
         // อ่านได้ทุก role แต่ต้อง login ก่อน
         const { user, response } = await authenticateRequest(request);
-        let userId = user.id;
+        let userId = user.userId;
         if (response) return response;
 
         const body = await request.json();
