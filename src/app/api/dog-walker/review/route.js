@@ -4,6 +4,7 @@ import { authenticateRequest } from "@/utils/jwt";
 
 const reviewDWController = new ReviewDWController();
 
+// noted: both test send api with postman (without authentication) passed
 // get reviewable walking services
 export async function GET(request) {
     try {
