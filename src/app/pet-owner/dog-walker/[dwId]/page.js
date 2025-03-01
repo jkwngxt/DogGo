@@ -7,12 +7,15 @@ import { Button } from "@/components/ui/button";
 import Reviews from "@/components/review";
 import React, { useEffect, useState } from "react";
 import ClientDogSelector from "@/components/client-dog";
+import {notFound} from "next/navigation";
+import Loading from "@/components/loading";
 
 export default function DogWalker({ params }) {
   const [dogWalkerData, setDogWalkerData] = useState(null);
   const [userDogs, setUserDogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userZone, setUserZone] = useState(null);
 
 // Use React.use to unwrap the params Promise
   const unwrappedParams = React.use(params);
@@ -31,13 +34,14 @@ export default function DogWalker({ params }) {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch dog walker data');
+          notFound();
         }
 
         const data = await response.json();
         if (data.success) {
           setDogWalkerData(data.dogWalkers);
           setUserDogs(data.dogs.map(dog => dog.name)); // Extract dog names for selector
+          setUserZone(data.userZone);
         } else {
           throw new Error(data.message || 'Failed to fetch dog walker data');
         }
@@ -56,20 +60,12 @@ export default function DogWalker({ params }) {
 
   if (loading) {
     return (
-        <div className="p-4 flex justify-center items-center min-h-screen text-9xl text-blue-800">
-          <p className="text-lg">กำลังโหลดข้อมูล...</p>
-        </div>
+        <Loading />
     );
   }
 
   if (error || !dogWalkerData) {
-    return (
-        <div className="p-4 flex justify-center items-center min-h-screen">
-          <p className="text-lg text-red-500">
-            {error || 'ไม่พบข้อมูล Dog Walker ที่ต้องการ'}
-          </p>
-        </div>
-    );
+    notFound();
   }
 
   // Prepare and format the reviews
@@ -109,7 +105,6 @@ export default function DogWalker({ params }) {
                     alt={`${dogWalkerData.name} profile`}
                     className="w-48 h-48 rounded-full object-cover"
                     onError={(e) => {
-                      console.error('Image load error, using fallback');
                       e.target.onerror = null;
                       e.target.src = "/image/user-placeholder.jpg";
                     }}
@@ -142,11 +137,18 @@ export default function DogWalker({ params }) {
                   </div>
                 </div>
 
-                <Reviews reviewData={reviewData} />
+                <Reviews reviewData={reviewData}/>
                 <div className="flex flex-row space-x-4">
-                  <ClientDogSelector dogs={userDogs} />
+                  {userZone && Array.isArray(dogWalkerData.zone) && dogWalkerData.zone.includes(userZone) ? (
+                      <ClientDogSelector dogs={userDogs}/>
+                  ) : (
+                      <div className="opacity-50 pointer-events-none">
+                        <ClientDogSelector dogs={userDogs}/>
+                      </div>
+                  )}
                   <Button variant="destructive">ยกเลิก</Button>
                 </div>
+                <p className="text-sm text-red-500 mt-1">ท่านอยู่นอกเขตที่ dog walker ให้บริการ</p>
               </div>
             </Card>
           </div>
