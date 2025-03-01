@@ -13,12 +13,12 @@ export async function POST(request) {
         const responseData = await wsPaymentController.processPayment(paymentData);
         
         return NextResponse.json(responseData, {
-            status: responseData.status === "success" ? 200:400
+            status: responseData.success ? 200:400
         });
     } catch (error) {
         console.error("API payment error:", error);
         return NextResponse.json(
-            { status: "failed", message: "Payment processing error" },
+            { success: false, message: "Payment processing error" },
             { status: 500 }
         );
     }
