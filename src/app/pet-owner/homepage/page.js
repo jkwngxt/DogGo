@@ -69,9 +69,6 @@ export default function page() {
               rating={walker.rating}
             />
           ))}
-          <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4">
-            คูปองของฉัน
-          </h1>
         </Card>
       </div>
     </div>
