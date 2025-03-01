@@ -25,7 +25,7 @@ const WalkerWalkConfirmation = ({ type }) => {
           <DialogHeader className="flex items-center">
             <DialogTitle>  {type === "รับงาน"
                   ? "ยืนยันการรับงาน"
-                  : "ยืนยันการไม่รับงาน"}</DialogTitle>
+                  : "ยืนยันการปฏิเสธงาน"}</DialogTitle>
             <DialogDescription className="text-md text-black">
                 {type === "รับงาน"
                   ? "โปรดยืนยันการรับงานของท่านอีกครั้ง"
