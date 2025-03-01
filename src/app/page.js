@@ -38,7 +38,7 @@ export default function Home() {
       <SelectDateTime/>
       <div className="flex flex-row">
         <Link href="/pet-owner/homepage">Pet Owner</Link>
-        <Link href="/dog-walker/homepage">Dog Walker</Link>
+        <Link href="/dog-walker/workpage">Dog Walker</Link>
         <Button>Admin</Button>
         <Button>Service</Button>
       </div>
