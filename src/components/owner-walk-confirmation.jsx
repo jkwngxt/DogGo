@@ -58,7 +58,6 @@ const OwnerWalkConfirmation = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Confirmation Dialog */}
       <Confirmation 
         status="success"
         open={showConfirmation}

@@ -22,7 +22,7 @@ const Confirmation = ({ status, message, action, open, onOpenChange }) => {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="sm:justify-center">
-          <Button variant="secondary" onClick={action}>ยืนยัน</Button>
+          <Button variant="secondary" onClick={action}>ตกลง</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
