@@ -11,7 +11,7 @@ export class ReviewDWController {
                 where: {
                     userId: userId,
                     status: 204, // completed
-                    review: null
+                    review: { is: null }
                 },
                 include: {
                     dogWalker: true // fetch related dog walker details
