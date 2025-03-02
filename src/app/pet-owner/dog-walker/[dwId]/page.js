@@ -7,17 +7,18 @@ import { Button } from "@/components/ui/button";
 import Reviews from "@/components/review";
 import React, { useEffect, useState } from "react";
 import ClientDogSelector from "@/components/client-dog";
-import {notFound} from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import Loading from "@/components/loading";
 
 export default function DogWalker({ params }) {
+  const router = useRouter();
   const [dogWalkerData, setDogWalkerData] = useState(null);
   const [userDogs, setUserDogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userZone, setUserZone] = useState(null);
 
-// Use React.use to unwrap the params Promise
+  // Use React.use to unwrap the params Promise
   const unwrappedParams = React.use(params);
   const dwId = parseInt(unwrappedParams.dwId);
 
@@ -91,6 +92,20 @@ export default function DogWalker({ params }) {
 
   const imgPath = getImagePath(dogWalkerData.pic);
 
+  const handleBack = () => {
+    try {
+      // ใช้ window.history เพื่อตรวจสอบว่ามีหน้าก่อนหน้าหรือไม่
+      if (window.history.length > 1) {
+        router.back();
+      } else {
+        router.push("/");
+      }
+    } catch (error) {
+      // หากเกิดข้อผิดพลาดใดๆ ให้ใช้ window.location แทน
+      window.location.href = "/";
+    }
+  };
+
   return (
       <>
         <div className="p-4 space-y-4">
@@ -149,7 +164,11 @@ export default function DogWalker({ params }) {
                         <ClientDogSelector dogs={userDogs}/>
                       </div>
                   )}
-                  <Button variant="destructive">ยกเลิก</Button>
+                  <Button variant="destructive"
+                          onClick={handleBack}
+                  >
+                    ยกเลิก
+                  </Button>
                 </div>
                 {userZone && Array.isArray(dogWalkerData.zone) && dogWalkerData.zone.includes(userZone) ? null :
                     <p className="text-blue-800  mt-1">ท่านอยู่นอกเขตที่ dog walker ให้บริการ</p>
