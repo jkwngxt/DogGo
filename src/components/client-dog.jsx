@@ -22,9 +22,12 @@ const ClientDogSelector = ({ dogs, searchTime, dogWalker }) => {
   // Initialize selectedDogs when the component mounts or dogs change
   useEffect(() => {
     if (dogs && dogs.length > 0) {
-      setSelectedDogs(
-          dogs.reduce((acc, dog) => ({ ...acc, [dog]: false }), {})
-      );
+      // สร้าง object ด้วย id เป็น key เพื่อใช้ในการ track การเลือก
+      const initialSelected = {};
+      dogs.forEach(dog => {
+        initialSelected[dog.id] = false;
+      });
+      setSelectedDogs(initialSelected);
     }
   }, [dogs]);
 
@@ -36,33 +39,33 @@ const ClientDogSelector = ({ dogs, searchTime, dogWalker }) => {
   };
 
   const handleConfirm = () => {
-    // Get the selected dogs
-    const selectedDogsList = Object.keys(selectedDogs).filter(
-        (dog) => selectedDogs[dog]
-    );
+    // Get the selected dogs (เลือกเฉพาะตัวที่ถูกเลือก)
+    const selectedDogIds = Object.keys(selectedDogs)
+        .filter(dogId => selectedDogs[dogId])
+        .map(dogId => parseInt(dogId)); // แปลงเป็น integer
 
-    // Construct the URL with query parameters
-    const queryParams = new URLSearchParams();
+    // เก็บรายชื่อสุนัขที่ถูกเลือกเพื่อแสดงผล
+    const selectedDogNames = dogs
+        .filter(dog => selectedDogs[dog.id])
+        .map(dog => dog.name);
 
-    // Add searchTime parameters if they exist
-    if (searchTime) {
-      if (searchTime.startTimeSearch) queryParams.append('startTime', searchTime.startTimeSearch);
-      if (searchTime.endTimeSearch) queryParams.append('endTime', searchTime.endTimeSearch);
-      if (searchTime.dateSearch) queryParams.append('date', searchTime.dateSearch);
-    }
+    // เก็บข้อมูลลง sessionStorage แทนการใช้ URL parameters
+    const bookingData = {
+      startTime: searchTime?.startTimeSearch,
+      endTime: searchTime?.endTimeSearch,
+      date: searchTime?.dateSearch,
+      dwId: dogWalker?.id,
+      dwName: dogWalker?.name,
+      dwTel: dogWalker?.tel,
+      dogIds: selectedDogIds, // เก็บ IDs สำหรับส่งไป API
+      dogNames: selectedDogNames // เก็บชื่อสำหรับแสดงผล
+    };
 
-    // Add dog walker information if it exists
-    if (dogWalker) {
-      if (dogWalker.id) queryParams.append('dwId', dogWalker.id);
-      if (dogWalker.name) queryParams.append('dwName', dogWalker.name);
-      if (dogWalker.tel) queryParams.append('dwTel', dogWalker.tel);
-    }
+    // เก็บข้อมูลลง sessionStorage
+    sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
 
-    // Add selected dogs
-    queryParams.append('dogs', JSON.stringify(selectedDogsList));
-
-    // Navigate to billing page with parameters
-    router.push(`/pet-owner/billing?${queryParams.toString()}`);
+    // Navigate to billing page โดยไม่ส่งพารามิเตอร์ผ่าน URL
+    router.push(`/pet-owner/billing`);
   };
 
   return (
@@ -78,18 +81,18 @@ const ClientDogSelector = ({ dogs, searchTime, dogWalker }) => {
             <div className="grid flex-1 gap-2">
               {dogs && dogs.length > 0 ? (
                   dogs.map((dog) => (
-                      <div key={dog} className="flex items-center justify-between p-2 border rounded">
+                      <div key={dog.id} className="flex items-center justify-between p-2 border rounded">
                         <Label
-                            htmlFor={dog}
+                            htmlFor={`dog-${dog.id}`}
                             className="flex-grow cursor-pointer py-2"
-                            onClick={() => handleDogChange(dog)}
+                            onClick={() => handleDogChange(dog.id)}
                         >
-                          {dog}
+                          {dog.name}
                         </Label>
                         <Checkbox
-                            id={dog}
-                            checked={selectedDogs[dog] || false}
-                            onCheckedChange={() => handleDogChange(dog)}
+                            id={`dog-${dog.id}`}
+                            checked={selectedDogs[dog.id] || false}
+                            onCheckedChange={() => handleDogChange(dog.id)}
                             className="h-5 w-5"
                         />
                       </div>

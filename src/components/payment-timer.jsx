@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,7 +15,6 @@ import ConfirmationDialogs from "./confirmation-dialogs";
 
 const PaymentTimer = ({ total }) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
@@ -29,35 +27,31 @@ const PaymentTimer = ({ total }) => {
     setIsLoading(true);
 
     try {
-      // Get data from URL parameters to prepare the booking request
-      const dwId = searchParams.get('dwId');
-      const date = searchParams.get('date');
-      const startTime = parseInt(searchParams.get('startTime'));
-      const endTime = parseInt(searchParams.get('endTime'));
-      const dogsParam = searchParams.get('dogs');
+      // ดึงข้อมูลจาก sessionStorage แทนการใช้ URL parameters
+      const bookingDataStr = sessionStorage.getItem('bookingData');
 
-      // Parse dogs JSON array
-      let dogsList = [];
-      try {
-        if (dogsParam) {
-          dogsList = JSON.parse(dogsParam);
-        }
-      } catch (error) {
-        console.error('Error parsing dogs data:', error);
+      if (!bookingDataStr) {
+        setMessage("ข้อมูลการจองไม่ถูกต้อง กรุณาทำรายการใหม่อีกครั้ง");
+        setShowErrorDialog(true);
+        throw new Error('ข้อมูลการจองไม่ถูกต้อง');
       }
 
-      // Define constants
-      const START_TIME = 9; // 9:00 AM is the first slot
+      const bookingInfo = JSON.parse(bookingDataStr);
 
-      // Calculate slot indices
-      let start = startTime - START_TIME + 1;
-      let end = endTime - START_TIME + 1;
-
-      // Generate array of slots
-      const timeSlots = [];
-      for (let i = start; i < end; i++) {
-        timeSlots.push(i);
+      // ตรวจสอบความถูกต้องของข้อมูล
+      if (!bookingInfo.dwId || !bookingInfo.startTime || !bookingInfo.endTime ||
+          !bookingInfo.date || !Array.isArray(bookingInfo.dogIds) || bookingInfo.dogIds.length === 0) {
+        setMessage("ข้อมูลการจองไม่ถูกต้อง กรุณาทำรายการใหม่อีกครั้ง");
+        setShowErrorDialog(true);
+        throw new Error('รูปแบบข้อมูลการจองไม่ถูกต้อง');
       }
+
+      // Get data from sessionStorage
+      const dwId = bookingInfo.dwId;
+      const date = bookingInfo.date;
+      const startTime = parseInt(bookingInfo.startTime);
+      const endTime = parseInt(bookingInfo.endTime);
+      const dogIds = bookingInfo.dogIds || [];
 
       // Prepare request body
       const requestBody = {
@@ -65,7 +59,7 @@ const PaymentTimer = ({ total }) => {
         date: date,
         startTimeInt: startTime,
         endTimeInt: endTime,
-        dogIds: dogsList,
+        dogIds: dogIds,
         price: total
       };
 
@@ -107,6 +101,9 @@ const PaymentTimer = ({ total }) => {
   const handleConfirmClick = () => {
     setShowPaymentDialog(false); // Close payment dialog
 
+    // ลบข้อมูลการจองจาก sessionStorage เมื่อการชำระเงินเสร็จสิ้น
+    sessionStorage.removeItem('bookingData');
+
     // Show success message after payment confirmation
     setMessage("การชำระเงินเสร็จสิ้น อยู่ระหว่างการยืนยันจาก Dog Walker");
     setShowSuccessDialog(true);
@@ -119,6 +116,8 @@ const PaymentTimer = ({ total }) => {
 
   const handleErrorDialogClose = () => {
     setShowErrorDialog(false);
+    // ลบข้อมูลการจองจาก sessionStorage เมื่อเกิดข้อผิดพลาด
+    sessionStorage.removeItem('bookingData');
     // Redirect to home page when error dialog is closed
     router.push('/');
   };
@@ -139,6 +138,8 @@ const PaymentTimer = ({ total }) => {
           if (prev <= 1) {
             clearInterval(timerRef.current);
             timerRef.current = null;
+            // เมื่อเวลาหมด ให้ลบข้อมูลการจองจาก sessionStorage
+            sessionStorage.removeItem('bookingData');
             return 0;
           }
           return prev - 1;
@@ -152,6 +153,16 @@ const PaymentTimer = ({ total }) => {
       }
     };
   }, [showPaymentDialog]);
+
+  // // เพิ่ม effect ที่จะจัดการเมื่อเวลาหมด
+  // useEffect(() => {
+  //   if (timeLeft === 0 && showPaymentDialog) {
+  //     setShowPaymentDialog(false);
+  //     sessionStorage.removeItem('bookingData');
+  //     setMessage("เวลาในการชำระเงินหมดลง การจองถูกยกเลิก");
+  //     setShowErrorDialog(true);
+  //   }
+  // }, [timeLeft, showPaymentDialog]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -192,7 +203,15 @@ const PaymentTimer = ({ total }) => {
             <DialogFooter className="sm:justify-center">
               <Button onClick={handleConfirmClick}>เสร็จสิ้น</Button>
               <DialogClose asChild>
-                <Button variant="destructive">ยกเลิก</Button>
+                <Button
+                    variant="destructive"
+                    onClick={() => {
+                      // ลบข้อมูลการจองจาก sessionStorage เมื่อผู้ใช้ยกเลิก
+                      sessionStorage.removeItem('bookingData');
+                    }}
+                >
+                  ยกเลิก
+                </Button>
               </DialogClose>
             </DialogFooter>
           </DialogContent>

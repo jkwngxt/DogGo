@@ -27,7 +27,26 @@ export default function DogWalker({ params }) {
 
   const startTimeSearch = searchParams.get('startTime') ? parseInt(searchParams.get('startTime')) : 0;
   const endTimeSearch = searchParams.get('endTime') ? parseInt(searchParams.get('endTime')) : 0;
-  const dateSearch = searchParams.get('date') || null;
+
+  // Get the date from URL and format it with timezone information
+  const rawDateSearch = searchParams.get('date') || null;
+
+  // Convert the date string to a Date object with timezone information
+  const formatDateWithTimezone = (dateString) => {
+    if (!dateString) return null;
+
+    // Create a date object from the string
+    const date = new Date(dateString);
+
+    // Check if the date is valid
+    if (isNaN(date.getTime())) return null;
+
+    // Format the date in ISO format which includes timezone offset
+    // This will use the local timezone of the user's browser
+    return date.toISOString();
+  };
+
+  const dateSearch = formatDateWithTimezone(rawDateSearch);
 
   useEffect(() => {
     const fetchDogWalkerData = async () => {
@@ -53,7 +72,7 @@ export default function DogWalker({ params }) {
         const data = await response.json();
         if (data.success) {
           setDogWalkerData(data.dogWalkers);
-          setUserDogs(data.dogs.map(dog => dog.name)); // Extract dog names for selector
+          setUserDogs(data.dogs);
           setUserZone(data.userZone);
           setCanBook(data.canBook);
         } else {
@@ -177,7 +196,7 @@ export default function DogWalker({ params }) {
                           searchTime={{
                             startTimeSearch,
                             endTimeSearch,
-                            dateSearch
+                            dateSearch: dateSearch // Pass original string for display purposes
                           }}
                           dogWalker={{
                             id: dwId,
@@ -196,8 +215,6 @@ export default function DogWalker({ params }) {
                     ยกเลิก
                   </Button>
                 </div>
-
-
 
                 {!canBook ? (
                     <p className="text-blue-800 mt-1">ท่านไม่ได้ค้นหา dog walker อย่างถูกต้อง กรุณาทำรายการในหน้าค้นหาอีกครั้ง</p>

@@ -4,10 +4,16 @@ import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import PaymentTimer from "@/components/payment-timer";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function Billing() {
-  const searchParams = useSearchParams();
   const router = useRouter();
   const [info, setInfo] = useState({
     userImage: "/image/user-placeholder.jpg",
@@ -20,46 +26,63 @@ export default function Billing() {
     dogs: [],
   });
 
-  useEffect(() => {
-    // Get data from URL parameters
-    const dwId = searchParams.get('dwId');
-    const dwName = searchParams.get('dwName');
-    const dwTel = searchParams.get('dwTel');
-    const date = searchParams.get('date');
-    const startTime = searchParams.get('startTime');
-    const endTime = searchParams.get('endTime');
-    const dogsParam = searchParams.get('dogs');
+  const [showInvalidDataDialog, setShowInvalidDataDialog] = useState(false);
 
-    // Parse dogs JSON array
-    let dogsList = [];
-    try {
-      if (dogsParam) {
-        dogsList = JSON.parse(dogsParam);
-      }
-    } catch (error) {
-      console.error('Error parsing dogs data:', error);
+  useEffect(() => {
+    // ดึงข้อมูลจาก sessionStorage แทนการใช้ URL parameters
+    const bookingDataStr = sessionStorage.getItem('bookingData');
+
+    if (!bookingDataStr) {
+      // ถ้าไม่มีข้อมูลใน sessionStorage แสดงว่าผู้ใช้อาจเข้ามาโดยตรง
+      setShowInvalidDataDialog(true);
+      return;
     }
 
-    // Calculate total (250 per hour per dog)
-    const hours = startTime && endTime ? (parseInt(endTime) - parseInt(startTime)) : 0;
-    const total = hours * 250 * dogsList.length;
+    try {
+      const bookingData = JSON.parse(bookingDataStr);
 
-    // Format start and end times to display as HH:00
-    const formattedStartTime = startTime ? `${startTime}:00` : "";
-    const formattedEndTime = endTime ? `${endTime}:00` : "";
+      // ตรวจสอบว่าข้อมูลครบถ้วนและถูกต้องหรือไม่
+      if (!bookingData.dwId || !bookingData.startTime || !bookingData.endTime ||
+          !bookingData.date || !Array.isArray(bookingData.dogIds) || bookingData.dogIds.length === 0 ||
+          !Array.isArray(bookingData.dogNames) || bookingData.dogNames.length === 0) {
+        console.error('Invalid booking data structure');
+        setShowInvalidDataDialog(true);
+        return;
+      }
 
-    // Update state with the retrieved information
-    setInfo({
-      userImage: "/image/user-placeholder.jpg",
-      dw_username: dwName || "",
-      ws_date: date || "",
-      startTime: formattedStartTime,
-      endTime: formattedEndTime,
-      dw_tel: dwTel || "",
-      total: total,
-      dogs: dogsList,
-    });
-  }, [searchParams]);
+      // Calculate total (250 per hour per dog)
+      const hours = bookingData.startTime && bookingData.endTime
+          ? (parseInt(bookingData.endTime) - parseInt(bookingData.startTime))
+          : 0;
+
+      if (hours <= 0) {
+        console.error('Invalid time range');
+        setShowInvalidDataDialog(true);
+        return;
+      }
+
+      const total = hours * 250 * bookingData.dogIds.length;
+
+      // Format start and end times to display as HH:00
+      const formattedStartTime = bookingData.startTime ? `${bookingData.startTime}:00` : "";
+      const formattedEndTime = bookingData.endTime ? `${bookingData.endTime}:00` : "";
+
+      // Update state with the retrieved information
+      setInfo({
+        userImage: "/image/user-placeholder.jpg",
+        dw_username: bookingData.dwName || "",
+        ws_date: bookingData.date || "",
+        startTime: formattedStartTime,
+        endTime: formattedEndTime,
+        dw_tel: bookingData.dwTel || "",
+        total: total,
+        dogs: bookingData.dogNames || [],
+      });
+    } catch (error) {
+      console.error('Error parsing booking data:', error);
+      setShowInvalidDataDialog(true);
+    }
+  }, [router]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -70,6 +93,9 @@ export default function Billing() {
   const formattedDate = formatDate(info.ws_date);
 
   const handleCancel = () => {
+    // ล้างข้อมูลใน sessionStorage เมื่อยกเลิก
+    sessionStorage.removeItem('bookingData');
+
     try {
       // Go back to previous page if history exists
       if (window.history.length > 1) {
@@ -83,8 +109,33 @@ export default function Billing() {
     }
   };
 
+  // ฟังก์ชันสำหรับจัดการกรณีข้อมูลไม่ถูกต้อง
+  const handleInvalidDataClose = () => {
+    // ลบข้อมูลใน sessionStorage
+    sessionStorage.removeItem('bookingData');
+    // นำผู้ใช้กลับไปหน้า home
+    router.push('/');
+  };
+
   return (
       <div className="p-4 space-y-4">
+        {/* Dialog สำหรับแจ้งเตือนกรณีข้อมูลไม่ถูกต้อง */}
+        <Dialog open={showInvalidDataDialog} onOpenChange={setShowInvalidDataDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>ข้อมูลการจองไม่ถูกต้อง</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              กรุณาทำรายการใหม่อีกครั้ง
+            </div>
+            <DialogFooter>
+              <Button onClick={handleInvalidDataClose}>
+                ตกลง
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <div className="flex flex-col px-10 items-center">
           <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4">
             รายละเอียดการชำระเงิน

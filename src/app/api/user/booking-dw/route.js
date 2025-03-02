@@ -42,6 +42,8 @@ export async function POST(request) {
             price: price
         };
 
+        console.log(data);
+
         const bookDogWalkerController = new BookDogWalkerController();
         const result = await bookDogWalkerController.bookDogWalker(data);
 

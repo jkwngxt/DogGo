@@ -33,83 +33,91 @@ export class FetchReviewDWController {
                 }
             }
 
-            // Get the current date if not provided
-            const today = new Date();
-            const dateStr = date ||
-                `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+            // Handle date with timezone information
+            let searchDate;
 
-            // Create a date object and set hours, minutes, seconds, and ms to zero
-            const searchDate = new Date(dateStr);
+            if (date) {
+                // If a date with timezone info is provided, parse it
+                searchDate = new Date(date);
+            } else {
+                // Get the current date if not provided
+                searchDate = new Date();
+            }
+
+            // Ensure the time is set to beginning of day in local timezone
             searchDate.setHours(0, 0, 0, 0);
+
+            // Format as YYYY-MM-DD for database query
+            const formattedDate = searchDate.toISOString().split('T')[0];
 
             // Execute a single SQL query to get all the required information including availability
             const result = await this.prisma.$queryRaw`
                 WITH dog_walker_data AS (
-                    SELECT 
-                        dw_id as id, 
+                    SELECT
+                        dw_id as id,
                         dw_name as name,
                         dw_pic as pic,
                         dw_tel as tel,
                         dw_zone as zone
-                    FROM dog_walker
-                    WHERE dw_id = ${dwId}
-                ),
-                user_zone AS (
-                    SELECT u_zone as zone
-                    FROM "user"
-                    WHERE u_id = ${userId}
-                ),
-                user_dogs AS (
-                    SELECT 
-                        d_id as id, 
-                        d_name as name
-                    FROM dog
-                    WHERE u_id = ${userId}
-                ),
-                relevant_services AS (
-                    SELECT ws_id as id
-                    FROM walking_service
-                    WHERE dw_id = ${dwId}
-                ),
-                review_data AS (
-                    SELECT 
-                        r.r_id,
-                        r.u_id as user_id,
-                        u.u_username as username,
-                        r.r_text as text,
-                        r.rating,
-                        r.r_time as time
-                    FROM review r
+                FROM dog_walker
+                WHERE dw_id = ${dwId}
+                    ),
+                    user_zone AS (
+                SELECT u_zone as zone
+                FROM "user"
+                WHERE u_id = ${userId}
+                    ),
+                    user_dogs AS (
+                SELECT
+                    d_id as id,
+                    d_name as name
+                FROM dog
+                WHERE u_id = ${userId}
+                    ),
+                    relevant_services AS (
+                SELECT ws_id as id
+                FROM walking_service
+                WHERE dw_id = ${dwId}
+                    ),
+                    review_data AS (
+                SELECT
+                    r.r_id,
+                    r.u_id as user_id,
+                    u.u_username as username,
+                    r.r_text as text,
+                    r.rating,
+                    r.r_time as time
+                FROM review r
                     JOIN "user" u ON r.u_id = u.u_id
-                    WHERE r.ws_id IN (SELECT id FROM relevant_services)
-                ),
-                rating_summary AS (
-                    SELECT 
-                        COALESCE(AVG(rating), 0) as mean_rating,
-                        COUNT(r_id) as rating_count
-                    FROM review
-                    WHERE ws_id IN (SELECT id FROM relevant_services)
-                ),
-                availability_check AS (
-                    SELECT
-                        CASE
-                            WHEN ${startTimeInt} < 9 OR ${startTimeInt} > 18 OR ${endTimeInt} < 9 OR ${endTimeInt} > 18 THEN false
-                            WHEN EXISTS (
-                                SELECT 1
-                                FROM walking_service ws2
-                                WHERE
-                                    ws2.dw_id = ${dwId}
-                                    AND ws2.ws_date = ${searchDate}::date
-                                    AND ws2.ws_time && ${timeSlots}::smallint[]
-                                    AND ws2.ws_status NOT IN (210, 220)
-                            ) THEN false
-                            ELSE true
-                        END as can_book
-                )
-                SELECT 
+                WHERE r.ws_id IN (SELECT id FROM relevant_services)
+                    ),
+                    rating_summary AS (
+                SELECT
+                    COALESCE(AVG(rating), 0) as mean_rating,
+                    COUNT(r_id) as rating_count
+                FROM review
+                WHERE ws_id IN (SELECT id FROM relevant_services)
+                    ),
+                    availability_check AS (
+                SELECT
+                    CASE
+                    WHEN ${startTimeInt} < 9 OR ${startTimeInt} > 18 OR ${endTimeInt} < 9 OR ${endTimeInt} > 18 THEN false
+                        WHEN EXISTS (
+                        SELECT 1
+                        FROM walking_service ws2
+                        WHERE
+                        ws2.dw_id = ${dwId}
+                        AND ws2.ws_date = ${formattedDate}::date
+                        AND ws2.ws_time && ${timeSlots}::smallint[]
+                        AND ws2.ws_status NOT IN (210, 220)
+                    ) THEN false
+                    ELSE true
+                    END as can_book
+                    )
+                SELECT
                     json_build_object(
-                        'dogWalker', (SELECT row_to_json(dog_walker_data) FROM dog_walker_data),
-                        'userZone', (SELECT zone FROM user_zone),
+                            'dogWalker', (SELECT row_to_json(dog_walker_data) FROM dog_walker_data),
+                            'userZone', (SELECT zone FROM user_zone),
                         'dogs', (SELECT json_agg(row_to_json(user_dogs)) FROM user_dogs),
                         'reviews', (SELECT json_agg(row_to_json(review_data)) FROM review_data),
                         'ratingStats', (SELECT row_to_json(rating_summary) FROM rating_summary),
