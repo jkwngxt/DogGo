@@ -32,21 +32,6 @@ export default function DogWalker({ params }) {
   const rawDateSearch = searchParams.get('date') || null;
 
   // Convert the date string to a Date object with timezone information
-  const formatDateWithTimezone = (dateString) => {
-    if (!dateString) return null;
-
-    // Create a date object from the string
-    const date = new Date(dateString);
-
-    // Check if the date is valid
-    if (isNaN(date.getTime())) return null;
-
-    // Format the date in ISO format which includes timezone offset
-    // This will use the local timezone of the user's browser
-    return date.toISOString();
-  };
-
-  const dateSearch = formatDateWithTimezone(rawDateSearch);
 
   useEffect(() => {
     const fetchDogWalkerData = async () => {
@@ -61,7 +46,7 @@ export default function DogWalker({ params }) {
             dwId,
             startTimeInt: startTimeSearch,
             endTimeInt: endTimeSearch,
-            date: dateSearch,
+            date: rawDateSearch,
           }),
         });
 
@@ -89,7 +74,7 @@ export default function DogWalker({ params }) {
     if (dwId) {
       fetchDogWalkerData();
     }
-  }, [dwId, startTimeSearch, endTimeSearch, dateSearch]);
+  }, [dwId, startTimeSearch, endTimeSearch, rawDateSearch]);
 
   if (loading) {
     return (
@@ -196,7 +181,7 @@ export default function DogWalker({ params }) {
                           searchTime={{
                             startTimeSearch,
                             endTimeSearch,
-                            dateSearch: dateSearch // Pass original string for display purposes
+                            dateSearch: rawDateSearch // Pass original string for display purposes
                           }}
                           dogWalker={{
                             id: dwId,

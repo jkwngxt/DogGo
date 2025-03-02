@@ -19,21 +19,22 @@ export class BookDogWalkerController {
             const bookingDate = new Date(date);
             bookingDate.setHours(0, 0, 0, 0);
 
-            // Check availability using raw SQL query for better performance
-            const availabilityResult = await prisma.$queryRaw`
-                SELECT EXISTS (
-                    SELECT 1
-                    FROM walking_service ws
-                    WHERE 
-                        ws.dw_id = ${dogWalkerId}
-                        AND ws.ws_date = ${bookingDate}::date
-                        AND ws.ws_time && ${time}::smallint[]
-                        AND ws.ws_status NOT IN (210, 220)
-                ) AS has_conflict
-            `;
+            // Check availability using Prisma query builder
+            const conflictingService = await prisma.walkingService.findFirst({
+                where: {
+                    dogWalkerId: dogWalkerId,
+                    date: bookingDate,
+                    time: {
+                        hasSome: time // Checks if any time slot conflicts
+                    },
+                    status: {
+                        notIn: [210, 220] // Excluding certain status codes
+                    }
+                }
+            });
 
             // If there's a conflict, return an error
-            if (availabilityResult[0].has_conflict) {
+            if (conflictingService) {
                 return {
                     error: "Dog walker is already booked for the requested time slots.",
                     altFlow: true
