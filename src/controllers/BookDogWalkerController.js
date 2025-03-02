@@ -15,14 +15,39 @@ export class BookDogWalkerController {
                 return { error: "dogIds must be an array." };
             }
 
-            // create walking service
+            // Convert date string to Date object
+            const bookingDate = new Date(date);
+            bookingDate.setHours(0, 0, 0, 0);
+
+            // Check availability using raw SQL query for better performance
+            const availabilityResult = await prisma.$queryRaw`
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM walking_service ws
+                    WHERE 
+                        ws.dw_id = ${dogWalkerId}
+                        AND ws.ws_date = ${bookingDate}::date
+                        AND ws.ws_time && ${time}::smallint[]
+                        AND ws.ws_status NOT IN (210, 220)
+                ) AS has_conflict
+            `;
+
+            // If there's a conflict, return an error
+            if (availabilityResult[0].has_conflict) {
+                return {
+                    error: "Dog walker is already booked for the requested time slots.",
+                    altFlow: true
+                };
+            }
+
+            // If no conflict, proceed with booking
             const walkingService = await prisma.walkingService.create({
                 data: {
                     userId,
                     dogWalkerId,
                     dogs: dogIds, // array
                     request: new Date(),
-                    date: new Date(date), 
+                    date: bookingDate,
                     time, // time slots
                     price,
                     status: 201 // awaiting payment
@@ -35,7 +60,7 @@ export class BookDogWalkerController {
                     userId,
                     status: 100, // awaiting payment
                     total: price,
-                    walkingServiceId: walkingService.id 
+                    walkingServiceId: walkingService.id
                 }
             });
 
@@ -46,7 +71,7 @@ export class BookDogWalkerController {
             };
 
         } catch (error) {
-            console.error("Prisma errorr", error);
+            console.error("Prisma error", error);
             return { error: "Internal server error" };
         }
     }
