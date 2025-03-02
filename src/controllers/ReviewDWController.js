@@ -26,6 +26,11 @@ export class ReviewDWController {
 
     async createReview({ userId, walkingServiceId, rating, text }) {
         try {
+            if (!userId) {
+                console.error("Error: userId is missing!");
+                return { success: false, message: "User authentication failed" };
+            }
+
             if (!rating || rating<1 || rating>5) {
                 return { success: false, message: "Rating must be between 1 to 5"};
             }
@@ -37,16 +42,18 @@ export class ReviewDWController {
             });
 
             if (!walkingService) {
+                console.error("Error: Invalid service ID!");
                 return { success: false, message: "Invalid service ID" };
             }
     
             if (walkingService.userId !== userId) {
-                // console.log(`Service belongs to user ${walkingService.userId}, but request from ${userId}`);
+                console.error(`Service belongs to user ${walkingService.userId}, but request from ${userId}`);
                 return { success: false, message: "Unauthorized access" };
             }
 
             if (walkingService.review) {
-                return { success: false, message: "This service has already been reviewed"};
+                console.error("Error: This service has already been reviewed!");
+                return { success: false, message: "This service has already been reviewed" };
             }
 
             // create new review
