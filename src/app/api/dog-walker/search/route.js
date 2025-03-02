@@ -26,7 +26,7 @@ export async function POST(request) {
 
         // Calculate slot indices
         let start = startTimeInt - START_TIME + 1;
-        let end = endTimeInt - START_TIME;
+        let end = endTimeInt - START_TIME + 1;
 
         // Generate array of slots
         const timeSlots = [];
