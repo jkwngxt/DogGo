@@ -34,7 +34,7 @@ const CouponCard = ({ c_id, sp_name, s_name, s_type, s_price, c_status }) => {
   };
 
   return (
-    <div onClick={() => redirect("/pet-owner/walk-description")}>
+    <div onClick={() => redirect("/pet-owner/service-description")}>
       <Card className="max-w-full">
         <CardHeader className="grid grid-cols-6 items-center gap-4">
           <div className="w-28 text-center">{c_id}</div>

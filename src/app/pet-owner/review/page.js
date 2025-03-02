@@ -1,10 +1,49 @@
+"use client";
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import React from "react";
+import React, { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import Rating from "@/components/rating";
+import ConfirmationDialogs from "@/components/confirmation-dialogs";
+import { useRouter } from "next/navigation";
 
 export default function Review() {
+  const router = useRouter();
+  const [rating, setRating] = useState(0);
+  const [review, setReview] = useState("");
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const handleRatingChange = (value) => {
+    setRating(value);
+  };
+
+  const handleReviewChange = (e) => {
+    setReview(e.target.value);
+  };
+
+  const handleSubmit = () => {
+    console.log("Submit button clicked");
+    if (rating > 0) {
+      setMessage("ทำการส่งรีวิวเรียบร้อย");
+      setShowSuccessDialog(true);
+    } else {
+      setMessage("โปรดให้คะแนนก่อนส่งรีวิว");
+      setShowErrorDialog(true);
+    }
+  };
+
+  const handleDialogClose = () => {
+    setShowSuccessDialog(false);
+    setShowErrorDialog(false);
+    if (showSuccessDialog) {
+      console.log("Review submitted:", { rating, review });
+      router.push("/pet-owner/homepage");
+    }
+  };
+
   return (
     <>
       <div className="p-4 space-y-4">
@@ -16,19 +55,33 @@ export default function Review() {
             {/* Content */}
             <div className="space-y-4 w-[80%] text-left flex-grow">
               <h2 className="font-bold text-md">ให้คะแนน</h2>
-              <Rating />
+              <Rating value={rating} onChange={handleRatingChange} />
               <h2 className="font-bold text-md">เขียนรีวิว</h2>
-              <Textarea className="h-[200px]" placeholder="เขียนรีวิว" />
+              <Textarea 
+                className="h-[200px]" 
+                placeholder="เขียนรีวิว" 
+                value={review}
+                onChange={handleReviewChange}
+              />
             </div>
 
             {/* Buttons at the bottom */}
             <div className="flex flex-row space-x-4 justify-center">
-              <Button>เสร็จสิ้น</Button>
-              <Button variant="destructive">ยกเลิก</Button>
+              <Button onClick={handleSubmit}>เสร็จสิ้น</Button>
+              <Button variant="destructive" onClick={() => router.back()}>ยกเลิก</Button>
             </div>
           </Card>
         </div>
       </div>
+
+      {/* Success & Error Confirmation Dialogs */}
+      <ConfirmationDialogs
+        showSuccessDialog={showSuccessDialog}
+        showErrorDialog={showErrorDialog}
+        message={message}
+        onSuccessClose={handleDialogClose}
+        onErrorClose={handleDialogClose}
+      />
     </>
   );
 }
