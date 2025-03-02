@@ -69,10 +69,8 @@ const WalkerWalkConfirmation = ({ type }) => {
       {/* Success Dialogs */}
       <ConfirmationDialogs
         showSuccessDialog={showSuccessDialog}
-        showErrorDialog={false}
         message={message}
         onSuccessClose={handleDialogClose}
-        onErrorClose={false}
       />
     </div>
   );

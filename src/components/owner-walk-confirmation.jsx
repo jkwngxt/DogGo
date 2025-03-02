@@ -13,21 +13,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import Confirmation from "./confirmation-dialogs";
+import ConfirmationDialogs from "./confirmation-dialogs";
 
 const OwnerWalkConfirmation = () => {
   const router = useRouter();
   const [showFirstDialog, setShowFirstDialog] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const handleConfirmClick = () => {
     console.log("Confirmation button clicked"); // Console log
     setShowFirstDialog(false); // Close first dialog
-    setShowConfirmation(true); // Show Confirmation dialog
+    setShowSuccessDialog(true); // Show Confirmation dialog
   };
 
-  const handleCloseConfirmation = () => {
-    setShowConfirmation(false);
+  const handleDialogClose = () => {
+    setShowSuccessDialog(false);
     router.push("/pet-owner/homepage"); // Navigate after confirmation closes
   };
 
@@ -58,13 +57,11 @@ const OwnerWalkConfirmation = () => {
         </DialogContent>
       </Dialog>
 
-      <Confirmation 
-        status="success"
-        open={showConfirmation}
-        onOpenChange={setShowConfirmation}
+      <ConfirmationDialogs
+        showSuccessDialog={showSuccessDialog}
         message="การได้รับบริการสำเร็จ"
-        action={handleCloseConfirmation}
-        />
+        onSuccessClose={handleDialogClose}
+      />
     </>
   );
 };
