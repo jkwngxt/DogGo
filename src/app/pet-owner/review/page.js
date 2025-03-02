@@ -5,15 +5,16 @@ import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import Rating from "@/components/rating";
-import Confirmation from "@/components/confirmation";
+import ConfirmationDialogs from "@/components/confirmation-dialogs";
 import { useRouter } from "next/navigation";
 
 export default function Review() {
   const router = useRouter();
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
-  const [showSuccessConfirmation, setShowSuccessConfirmation] = useState(false);
-  const [showFailConfirmation, setShowFailConfirmation] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [message, setMessage] = useState("");
 
   const handleRatingChange = (value) => {
     setRating(value);
@@ -26,24 +27,21 @@ export default function Review() {
   const handleSubmit = () => {
     console.log("Submit button clicked");
     if (rating > 0) {
-      // If rating is selected, show success confirmation
-      setShowSuccessConfirmation(true);
+      setMessage("ทำการส่งรีวิวเรียบร้อย");
+      setShowSuccessDialog(true);
     } else {
-      // If no rating is selected, show fail confirmation
-      setShowFailConfirmation(true);
+      setMessage("โปรดให้คะแนนก่อนส่งรีวิว");
+      setShowErrorDialog(true);
     }
   };
 
-  const handleCloseSuccessConfirmation = () => {
-    setShowSuccessConfirmation(false);
-    // Navigate to another page or perform other actions after successful submission
-    console.log("Review submitted:", { rating, review });
-    router.push("/pet-owner/homepage");
-  };
-
-  const handleCloseFailConfirmation = () => {
-    setShowFailConfirmation(false);
-    // Just close the dialog and let the user select a rating
+  const handleDialogClose = () => {
+    setShowSuccessDialog(false);
+    setShowErrorDialog(false);
+    if (showSuccessDialog) {
+      console.log("Review submitted:", { rating, review });
+      router.push("/pet-owner/homepage");
+    }
   };
 
   return (
@@ -75,23 +73,14 @@ export default function Review() {
           </Card>
         </div>
       </div>
-      
-      {/* Success Confirmation Dialog */}
-      <Confirmation 
-        status="success"
-        open={showSuccessConfirmation}
-        onOpenChange={setShowSuccessConfirmation}
-        message="ทำการส่งรีวิวเรียบร้อย"
-        action={handleCloseSuccessConfirmation}
-      />
 
-      {/* Fail Confirmation Dialog */}
-      <Confirmation 
-        status="fail"
-        open={showFailConfirmation}
-        onOpenChange={setShowFailConfirmation}
-        message="โปรดให้คะแนน"
-        action={handleCloseFailConfirmation}
+      {/* Success & Error Confirmation Dialogs */}
+      <ConfirmationDialogs
+        showSuccessDialog={showSuccessDialog}
+        showErrorDialog={showErrorDialog}
+        message={message}
+        onSuccessClose={handleDialogClose}
+        onErrorClose={handleDialogClose}
       />
     </>
   );

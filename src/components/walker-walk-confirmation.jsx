@@ -12,47 +12,51 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import Confirmation from "./confirmation";
+import ConfirmationDialogs from "./confirmation-dialogs";
 
 const WalkerWalkConfirmation = ({ type }) => {
-   const router = useRouter();
-    const [showFirstDialog, setShowFirstDialog] = useState(false);
-    const [showConfirmation, setShowConfirmation] = useState(false);
-  
-    const handleConfirmClick = () => {
-      console.log("Confirmation button clicked");
-      setShowFirstDialog(false); // Close first dialog
-      setShowConfirmation(true); // Show Confirmation dialog
-    };
-  
-    const handleCloseConfirmation = () => {
-      setShowConfirmation(false);
-       // handle เปลี่ยนสถานะตาม type 
-      router.push("/dog-walker/history"); // Navigate after confirmation closes
-    };
+  const router = useRouter();
+  const [showFirstDialog, setShowFirstDialog] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const handleConfirmClick = () => {
+    setShowFirstDialog(false); // Close first dialog
+    if (type === "รับงาน") {
+      setMessage("การรับงานสำเร็จ");
+    } else {
+      setMessage("การปฏิเสธงานสำเร็จ");
+    }
+    setShowSuccessDialog(true);
+  };
+
+  const handleDialogClose = () => {
+    setShowSuccessDialog(false);
+    router.push("/dog-walker/history"); 
+  };
 
   return (
     <div>
+      {/* First Confirmation Dialog */}
       <Dialog open={showFirstDialog} onOpenChange={setShowFirstDialog}>
         <DialogTrigger asChild>
-        {type === "รับงาน"
-                  ?  <Button >รับงาน</Button>
-                  : <Button variant="destructive">ปฏิเสธ</Button>}
+          {type === "รับงาน" ? (
+            <Button>รับงาน</Button>
+          ) : (
+            <Button variant="destructive">ปฏิเสธ</Button>
+          )}
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader className="flex items-center">
-            <DialogTitle>  {type === "รับงาน"
-                  ? "ยืนยันการรับงาน"
-                  : "ยืนยันการปฏิเสธงาน"}</DialogTitle>
+            <DialogTitle>
+              {type === "รับงาน" ? "ยืนยันการรับงาน" : "ยืนยันการปฏิเสธงาน"}
+            </DialogTitle>
             <DialogDescription className="text-md text-black">
-                {type === "รับงาน"
-                  ? "โปรดยืนยันการรับงานของท่านอีกครั้ง"
-                  : "โปรดยืนยันการปฏิเสธงานของท่านอีกครั้ง"}
+              {type === "รับงาน"
+                ? "โปรดยืนยันการรับงานของท่านอีกครั้ง"
+                : "โปรดยืนยันการปฏิเสธงานของท่านอีกครั้ง"}
             </DialogDescription>
           </DialogHeader>
-          <div className="flex items-center space-x-2">
-            <div className="grid flex-1 gap-2"></div>
-          </div>
           <DialogFooter className="sm:justify-center">
             <Button onClick={handleConfirmClick}>ยืนยัน</Button>
             <DialogClose asChild>
@@ -62,15 +66,14 @@ const WalkerWalkConfirmation = ({ type }) => {
         </DialogContent>
       </Dialog>
 
-      <Confirmation 
-        status="success"
-        open={showConfirmation}
-        onOpenChange={setShowConfirmation}
-        message={type === "รับงาน"
-                ? "การรับงานสำเร็จ"
-                : "การปฏิเสธงานสำเร็จ"}
-        action={handleCloseConfirmation}
-        />
+      {/* Success Dialogs */}
+      <ConfirmationDialogs
+        showSuccessDialog={showSuccessDialog}
+        showErrorDialog={false}
+        message={message}
+        onSuccessClose={handleDialogClose}
+        onErrorClose={false}
+      />
     </div>
   );
 };

@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Confirmation from "@/components/Confirmation";
+import Confirmation from "@/components/confirmation-dialogs";
 
 const TimePickerSelect = ({ value, onChange }) => {
   const timeOptions = [];
