@@ -15,8 +15,6 @@ export default function Review() {
   const [showSuccessConfirmation, setShowSuccessConfirmation] = useState(false);
   const [showFailConfirmation, setShowFailConfirmation] = useState(false);
 
-  // This assumes your Rating component accepts an onChange prop
-  // If it doesn't, you'll need to modify your Rating component
   const handleRatingChange = (value) => {
     setRating(value);
   };

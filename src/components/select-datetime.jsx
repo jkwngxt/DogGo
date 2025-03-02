@@ -1,21 +1,10 @@
 'use client';
 
-import React from 'react';
-import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useState } from 'react';
 import { format } from "date-fns";
 import { CalendarIcon, Clock } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
 import {
   Popover,
   PopoverContent,
@@ -28,33 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import Confirmation from "@/components/Confirmation";
 
-// Validation schema
-const FormSchema = z.object({
-  startDate: z.date({
-    required_error: "กรุณาใส่วันที่",
-  }),
-  startTime: z.string({
-    required_error: "กรุณาใส่เวลาเริ่มต้น",
-  }),
-  endTime: z.string({
-    required_error: "กรุณาใส่เวลาสิ้นสุด",
-  }),
-}).refine((data) => {
-  const [startHour, startMinute] = data.startTime.split(':').map(Number);
-  const [endHour, endMinute] = data.endTime.split(':').map(Number);
-  
-  // Convert time to minutes for easier comparison
-  const startTotalMinutes = startHour * 60 + startMinute;
-  const endTotalMinutes = endHour * 60 + endMinute;
-
-  return endTotalMinutes > startTotalMinutes;
-}, {
-  message: "เวลาสิ้นสุดต้องอยู่หลังเวลาเริ่มต้น",
-  path: ["endTime"]
-});
-
-// Time Picker Component
 const TimePickerSelect = ({ value, onChange }) => {
   const timeOptions = [];
   for (let hour = 9; hour < 19; hour++) {
@@ -78,97 +42,50 @@ const TimePickerSelect = ({ value, onChange }) => {
   );
 };
 
-// Main Component
 const DateTimeRangePicker = () => {
-  const form = useForm({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      startTime: "09:00",
-      endTime: "17:00",
-    },
-  });
+  const [confirmation, setConfirmation] = useState({ open: false, message: "", status: "fail" });
+  const [startDate, setStartDate] = useState(null);
+  const [startTime, setStartTime] = useState("09:00");
+  const [endTime, setEndTime] = useState("17:00");
 
-  function onSubmit(data) {
-    console.log("Form submitted:", data);
+  function onSubmit() {
+    console.log("Selected Data:", { startDate, startTime, endTime });
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-start gap-4">
+    <>
+      <form onSubmit={onSubmit} className="flex items-start gap-4">
         <div className="flex gap-2">
-          <FormField
-            control={form.control}
-            name="startDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        className="w-[180px] pl-3 text-left font-normal bg-white"
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>เลือกวันที่</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="startTime"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    <TimePickerSelect {...field} />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-[180px] pl-3 text-left font-normal bg-white"
+              >
+                {startDate ? format(startDate, "PPP") : <span>เลือกวันที่</span>}
+                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar mode="single" selected={startDate} onSelect={setStartDate} initialFocus />
+            </PopoverContent>
+          </Popover>
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            <TimePickerSelect value={startTime} onChange={setStartTime} />
+          </div>
         </div>
         <h1 className='py-2'>ถึง</h1>
         <div className="flex gap-2">
-          <FormField
-            control={form.control}
-            name="endTime"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    <TimePickerSelect {...field} />
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            <TimePickerSelect value={endTime} onChange={setEndTime} />
+          </div>
         </div>
-
         <Button variant="secondary" type="submit">ค้นหา</Button>
       </form>
-    </Form>
+      <Confirmation {...confirmation} onOpenChange={() => setConfirmation({ ...confirmation, open: false })} action={() => setConfirmation({ ...confirmation, open: false })} />
+    </>
   );
 };
 

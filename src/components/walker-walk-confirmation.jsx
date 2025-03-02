@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,11 +12,28 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { redirect } from "next/navigation";
+import Confirmation from "./confirmation";
+
 const WalkerWalkConfirmation = ({ type }) => {
+   const router = useRouter();
+    const [showFirstDialog, setShowFirstDialog] = useState(false);
+    const [showConfirmation, setShowConfirmation] = useState(false);
+  
+    const handleConfirmClick = () => {
+      console.log("Confirmation button clicked");
+      setShowFirstDialog(false); // Close first dialog
+      setShowConfirmation(true); // Show Confirmation dialog
+    };
+  
+    const handleCloseConfirmation = () => {
+      setShowConfirmation(false);
+       // handle เปลี่ยนสถานะตาม type 
+      router.push("/dog-walker/history"); // Navigate after confirmation closes
+    };
+
   return (
     <div>
-      <Dialog>
+      <Dialog open={showFirstDialog} onOpenChange={setShowFirstDialog}>
         <DialogTrigger asChild>
         {type === "รับงาน"
                   ?  <Button >รับงาน</Button>
@@ -36,13 +54,23 @@ const WalkerWalkConfirmation = ({ type }) => {
             <div className="grid flex-1 gap-2"></div>
           </div>
           <DialogFooter className="sm:justify-center">
-            <Button onClick={()=>redirect('/dog-walker/workpage')}>ยืนยัน</Button>
+            <Button onClick={handleConfirmClick}>ยืนยัน</Button>
             <DialogClose asChild>
               <Button variant="destructive">ยกเลิก</Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Confirmation 
+        status="success"
+        open={showConfirmation}
+        onOpenChange={setShowConfirmation}
+        message={type === "รับงาน"
+                ? "การรับงานสำเร็จ"
+                : "การปฏิเสธงานสำเร็จ"}
+        action={handleCloseConfirmation}
+        />
     </div>
   );
 };
