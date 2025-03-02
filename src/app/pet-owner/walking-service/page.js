@@ -27,13 +27,19 @@ export default function WalkingService() {
 
     // Check if date is tomorrow or further
     // Check if start time is before end time
-    if (startHour >= endHour || startDate < tomorrow) {
+    if (startDate < tomorrow) {
       setMessage("เวลาไม่ถูกต้อง")
       setShowErrorDialog(true);
       return;
     }
 
-    if (dog_walker_not_found) {
+    if (startHour >= endHour) {
+      setMessage("เวลาไม่ถูกต้อง")
+      setShowErrorDialog(true);
+      return;
+    }
+
+    if (false) {
       setMessage("ไม่มี Dog Walker ที่พร้อมให้บริการ")
       setShowErrorDialog(true);
       return;
