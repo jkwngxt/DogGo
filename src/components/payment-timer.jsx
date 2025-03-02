@@ -20,6 +20,7 @@ const PaymentTimer = ({ total }) => {
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
   const [bookingData, setBookingData] = useState(null);
 
   // Function to handle payment button click and make the booking API call
@@ -33,7 +34,6 @@ const PaymentTimer = ({ total }) => {
       if (!bookingDataStr) {
         setMessage("ข้อมูลการจองไม่ถูกต้อง กรุณาทำรายการใหม่อีกครั้ง");
         setShowErrorDialog(true);
-        throw new Error('ข้อมูลการจองไม่ถูกต้อง');
       }
 
       const bookingInfo = JSON.parse(bookingDataStr);
@@ -43,7 +43,6 @@ const PaymentTimer = ({ total }) => {
           !bookingInfo.date || !Array.isArray(bookingInfo.dogIds) || bookingInfo.dogIds.length === 0) {
         setMessage("ข้อมูลการจองไม่ถูกต้อง กรุณาทำรายการใหม่อีกครั้ง");
         setShowErrorDialog(true);
-        throw new Error('รูปแบบข้อมูลการจองไม่ถูกต้อง');
       }
 
       // Get data from sessionStorage
@@ -91,26 +90,70 @@ const PaymentTimer = ({ total }) => {
       }
     } catch (error) {
       console.error("Error during booking process:", error);
-      setMessage("การจองล้มเหลว: ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
+      setMessage("การจองล้มเหลว กรุณาทำรายการใหม่อีกครั้ง");
       setShowErrorDialog(true);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleConfirmClick = () => {
-    setShowPaymentDialog(false); // Close payment dialog
+  const handleConfirmClick = async () => {
+    if (!bookingData || !bookingData.billingId) {
+      setMessage("ข้อมูลการชำระเงินไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง");
+      setShowErrorDialog(true);
+      setShowPaymentDialog(false);
+      return;
+    }
 
-    // ลบข้อมูลการจองจาก sessionStorage เมื่อการชำระเงินเสร็จสิ้น
-    sessionStorage.removeItem('bookingData');
+    setIsConfirmingPayment(true);
 
-    // Show success message after payment confirmation
-    setMessage("การชำระเงินเสร็จสิ้น อยู่ระหว่างการยืนยันจาก Dog Walker");
-    setShowSuccessDialog(true);
+    try {
+      // Create payment confirmation request
+      const paymentConfirmation = {
+        userId: null, // Will be filled by the backend from JWT
+        billingId: bookingData.billingId,
+        amount: total,
+        confirmed: true
+      };
 
-    // Store booking reference if needed
-    if (bookingData) {
-      localStorage.setItem('latestBookingId', bookingData.walkingServiceId);
+      // Send payment confirmation to the backend
+      const response = await fetch('/api/walking-service/payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(paymentConfirmation),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setShowPaymentDialog(false); // Close payment dialog
+
+        // ลบข้อมูลการจองจาก sessionStorage เมื่อการชำระเงินเสร็จสิ้น
+        sessionStorage.removeItem('bookingData');
+
+        // Show success message after payment confirmation
+        setMessage("การชำระเงินเสร็จสิ้น อยู่ระหว่างการยืนยันจาก Dog Walker");
+        setShowSuccessDialog(true);
+
+        // Store booking reference if needed
+        if (bookingData) {
+          localStorage.setItem('latestBookingId', bookingData.walkingServiceId);
+        }
+      } else {
+        // Payment confirmation failed
+        setShowPaymentDialog(false);
+        setMessage("การชำระเงินล้มเหลว  กรุณาลองใหม่อีกครั้ง");
+        setShowErrorDialog(true);
+      }
+    } catch (error) {
+      console.error("Error during payment confirmation:", error);
+      setShowPaymentDialog(false);
+      setMessage("การชำระเงินล้มเหลว กรุณาลองใหม่อีกครั้ง");
+      setShowErrorDialog(true);
+    } finally {
+      setIsConfirmingPayment(false);
     }
   };
 
@@ -119,13 +162,13 @@ const PaymentTimer = ({ total }) => {
     // ลบข้อมูลการจองจาก sessionStorage เมื่อเกิดข้อผิดพลาด
     sessionStorage.removeItem('bookingData');
     // Redirect to home page when error dialog is closed
-    router.push('/');
+    router.push("/");
   };
 
   const handleSuccessDialogClose = () => {
     setShowSuccessDialog(false);
     // Redirect to dashboard after successful payment
-    router.push('/dashboard');
+    router.back();
   };
 
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes (600 seconds)
@@ -154,15 +197,15 @@ const PaymentTimer = ({ total }) => {
     };
   }, [showPaymentDialog]);
 
-  // // เพิ่ม effect ที่จะจัดการเมื่อเวลาหมด
-  // useEffect(() => {
-  //   if (timeLeft === 0 && showPaymentDialog) {
-  //     setShowPaymentDialog(false);
-  //     sessionStorage.removeItem('bookingData');
-  //     setMessage("เวลาในการชำระเงินหมดลง การจองถูกยกเลิก");
-  //     setShowErrorDialog(true);
-  //   }
-  // }, [timeLeft, showPaymentDialog]);
+  // เพิ่ม effect ที่จะจัดการเมื่อเวลาหมด
+  useEffect(() => {
+    if (timeLeft === 0 && showPaymentDialog) {
+      setShowPaymentDialog(false);
+      sessionStorage.removeItem('bookingData');
+      setMessage("เวลาในการชำระเงินหมดลง การจองถูกยกเลิก");
+      setShowErrorDialog(true);
+    }
+  }, [timeLeft, showPaymentDialog]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -201,7 +244,12 @@ const PaymentTimer = ({ total }) => {
               {formatTime(timeLeft)} นาที
             </div>
             <DialogFooter className="sm:justify-center">
-              <Button onClick={handleConfirmClick}>เสร็จสิ้น</Button>
+              <Button
+                  onClick={handleConfirmClick}
+                  disabled={isConfirmingPayment}
+              >
+                {isConfirmingPayment ? "กำลังยืนยัน..." : "เสร็จสิ้น"}
+              </Button>
               <DialogClose asChild>
                 <Button
                     variant="destructive"
