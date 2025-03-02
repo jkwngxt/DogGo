@@ -27,9 +27,7 @@ export default function DogWalker({ params }) {
 
   const startTimeSearch = searchParams.get('startTime') ? parseInt(searchParams.get('startTime')) : 0;
   const endTimeSearch = searchParams.get('endTime') ? parseInt(searchParams.get('endTime')) : 0;
-  console.log("Raw date param:", searchParams.get('date'));
   const dateSearch = searchParams.get('date') || null;
-  console.log("Processed dateSearch:", dateSearch);
 
   useEffect(() => {
     const fetchDogWalkerData = async () => {
@@ -174,10 +172,22 @@ export default function DogWalker({ params }) {
                 <Reviews reviewData={reviewData}/>
                 <div className="flex flex-row space-x-4">
                   { canBook && (userZone && Array.isArray(dogWalkerData.zone) && dogWalkerData.zone.includes(userZone)) ? (
-                      <ClientDogSelector dogs={userDogs}/>
+                      <ClientDogSelector
+                          dogs={userDogs}
+                          searchTime={{
+                            startTimeSearch,
+                            endTimeSearch,
+                            dateSearch
+                          }}
+                          dogWalker={{
+                            id: dwId,
+                            name: dogWalkerData.name,
+                            tel: dogWalkerData.tel
+                          }}
+                      />
                   ) : (
                       <div className="opacity-50 pointer-events-none">
-                        <ClientDogSelector dogs={userDogs}/>
+                        <ClientDogSelector dogs={[]} />
                       </div>
                   )}
                   <Button variant="destructive"
@@ -186,6 +196,8 @@ export default function DogWalker({ params }) {
                     ยกเลิก
                   </Button>
                 </div>
+
+
 
                 {!canBook ? (
                     <p className="text-blue-800 mt-1">ท่านไม่ได้ค้นหา dog walker อย่างถูกต้อง กรุณาทำรายการในหน้าค้นหาอีกครั้ง</p>
