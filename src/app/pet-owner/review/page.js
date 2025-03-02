@@ -24,7 +24,7 @@ export default function Review() {
         const data = await response.json();
         
         if (data.success && data.walkingServices.length > 0) {
-          setWalkingServiceId(data.walkingServices[0].id); // Use first available service ID
+          setWalkingServiceId(data.walkingServices[0].id); // use first available service ID
         } else {
           setMessage("ไม่มีบริการที่สามารถรีวิวได้");
           setShowErrorDialog(true);
@@ -95,6 +95,10 @@ export default function Review() {
     if (showSuccessDialog) {
       console.log("Review submitted:", { rating, review, walkingServiceId });
       router.push("/pet-owner/homepage");
+    }
+
+    if (message === "ไม่มีบริการที่สามารถรีวิวได้") {
+      router.back(); // go back if no service is available
     }
   };
 
