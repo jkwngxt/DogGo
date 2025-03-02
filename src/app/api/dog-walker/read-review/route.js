@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { FetchReviewDWController } from "@/controllers/FetchReviewDWController";
-import {authenticateRequest} from "@/utils/jwt";
+import { authenticateRequest } from "@/utils/jwt";
 
 function serializeBigInt(obj) {
     return JSON.parse(JSON.stringify(obj, (key, value) => {
@@ -12,23 +12,25 @@ function serializeBigInt(obj) {
 }
 
 export async function POST(request) {
-    // req ส่งเข้ามาเพียง Dog Walker Id
     try {
-        // ตรวจสอบการยืนยันตัวตนด้วย JWT
-        // อ่านได้ทุก role แต่ต้อง login ก่อน
+        // Authentication check
         const { user, response } = await authenticateRequest(request);
         if (response) return response;
 
         let userId = user.userId;
 
-
         const body = await request.json();
-        const { dwId } = body;
-
-
+        const { dwId, startTimeInt, endTimeInt, date } = body;
+        console.log(body);
 
         const fetchReviewDW = new FetchReviewDWController();
-        const result = await fetchReviewDW.getReviewByDwId((userId), dwId);
+        const result = await fetchReviewDW.getReviewByDwId(
+            userId,
+            dwId,
+            startTimeInt,
+            endTimeInt,
+            date
+        );
 
         if (!result.success) {
             if (result.message.includes('not found')) {

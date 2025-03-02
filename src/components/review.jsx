@@ -39,7 +39,7 @@ const Reviews = ({ reviewData }) => {
             <img
               src={review.avatar || '/api/placeholder/40/40'}
               alt={review.u_username}
-              className="w-10 h-10 rounded-full"
+              className="w-12 h-12 rounded-full"
             />
             <div>
               <div className="flex items-center gap-2 mb-1">
