@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import Rating from "@/components/rating";
 import ConfirmationDialogs from "@/components/confirmation-dialogs";
@@ -15,6 +15,28 @@ export default function Review() {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [message, setMessage] = useState("");
+  const [walkingServiceId, setWalkingServiceId] = useState(null);
+
+  useEffect(() => {
+    const fetchReviewableService = async () => {
+      try {
+        const response = await fetch("/api/dog-walker/review");
+        const data = await response.json();
+        
+        if (data.success && data.walkingServices.length > 0) {
+          setWalkingServiceId(data.walkingServices[0].id); // use first available service ID
+        } else {
+          setMessage("ไม่มีบริการที่สามารถรีวิวได้");
+          setShowErrorDialog(true);
+        }
+      } catch (error) {
+        console.error("Error fetching reviewable services:", error);
+      }
+    };
+
+    fetchReviewableService();
+  }, []);
+
 
   const handleRatingChange = (value) => {
     setRating(value);
@@ -24,11 +46,43 @@ export default function Review() {
     setReview(e.target.value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log("Submit button clicked");
+
+    if (!walkingServiceId) {
+      setMessage("ไม่มีบริการที่สามารถรีวิวได้");
+      setShowErrorDialog(true);
+      return;
+    }
+
     if (rating > 0) {
-      setMessage("ทำการส่งรีวิวเรียบร้อย");
-      setShowSuccessDialog(true);
+      try {
+        const response = await fetch("/api/dog-walker/review", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            walkingServiceId: walkingServiceId, // use fetched service ID
+            rating: rating,
+            text: review,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setMessage("ทำการส่งรีวิวเรียบร้อย");
+          setShowSuccessDialog(true);
+        } else {
+          setMessage(data.message || "เกิดข้อผิดพลาดในการส่งรีวิว");
+          setShowErrorDialog(true);
+        }
+      } catch (error) {
+        console.error("Error submitting review:", error);
+        setMessage("เกิดข้อผิดพลาดในการส่งรีวิว");
+        setShowErrorDialog(true);
+      }
     } else {
       setMessage("โปรดให้คะแนนก่อนส่งรีวิว");
       setShowErrorDialog(true);
@@ -39,8 +93,12 @@ export default function Review() {
     setShowSuccessDialog(false);
     setShowErrorDialog(false);
     if (showSuccessDialog) {
-      console.log("Review submitted:", { rating, review });
+      console.log("Review submitted:", { rating, review, walkingServiceId });
       router.push("/pet-owner/homepage");
+    }
+
+    if (message === "ไม่มีบริการที่สามารถรีวิวได้") {
+      router.back(); // go back if no service is available
     }
   };
 

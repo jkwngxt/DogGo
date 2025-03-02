@@ -11,7 +11,7 @@ export class ReviewDWController {
                 where: {
                     userId: userId,
                     status: 204, // completed
-                    review: null
+                    review: { is: null }
                 },
                 include: {
                     dogWalker: true // fetch related dog walker details
@@ -36,8 +36,13 @@ export class ReviewDWController {
                 select: { userId: true, review: true }
             });
 
-            if (!walkingService || walkingService.userId !== userId) {
-                return { success: false, message: "Invalid service or unauthorized access" };
+            if (!walkingService) {
+                return { success: false, message: "Invalid service ID" };
+            }
+    
+            if (walkingService.userId !== userId) {
+                // console.log(`Service belongs to user ${walkingService.userId}, but request from ${userId}`);
+                return { success: false, message: "Unauthorized access" };
             }
 
             if (walkingService.review) {

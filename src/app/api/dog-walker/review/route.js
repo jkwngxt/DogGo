@@ -29,6 +29,8 @@ export async function POST(request) {
         if (response) return response;
 
         const reviewData = await request.json();
+        reviewData.userId = user.userId;
+        
         const result = await reviewDWController.createReview(reviewData);
 
         return NextResponse.json(result, { status: result.success ? 201:400 });
