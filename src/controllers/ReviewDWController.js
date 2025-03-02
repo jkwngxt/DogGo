@@ -11,7 +11,7 @@ export class ReviewDWController {
                 where: {
                     userId: userId,
                     status: 204, // completed
-                    review: null
+                    review: { is: null }
                 },
                 include: {
                     dogWalker: true // fetch related dog walker details
@@ -26,6 +26,11 @@ export class ReviewDWController {
 
     async createReview({ userId, walkingServiceId, rating, text }) {
         try {
+            if (!userId) {
+                console.error("Error: userId is missing!");
+                return { success: false, message: "User authentication failed" };
+            }
+
             if (!rating || rating<1 || rating>5) {
                 return { success: false, message: "Rating must be between 1 to 5"};
             }
@@ -36,12 +41,19 @@ export class ReviewDWController {
                 select: { userId: true, review: true }
             });
 
-            if (!walkingService || walkingService.userId !== userId) {
-                return { success: false, message: "Invalid service or unauthorized access" };
+            if (!walkingService) {
+                console.error("Error: Invalid service ID!");
+                return { success: false, message: "Invalid service ID" };
+            }
+    
+            if (walkingService.userId !== userId) {
+                console.error(`Service belongs to user ${walkingService.userId}, but request from ${userId}`);
+                return { success: false, message: "Unauthorized access" };
             }
 
             if (walkingService.review) {
-                return { success: false, message: "This service has already been reviewed"};
+                console.error("Error: This service has already been reviewed!");
+                return { success: false, message: "This service has already been reviewed" };
             }
 
             // create new review

@@ -46,10 +46,10 @@ export default function WalkDescription() {
         <Card className="w-[100%] sm:w-[60%] md:w-[60%] lg:w-[80%] p-6 h-auto flex flex-col justify-between">
           {/* Content Section */}
           <div className="flex-grow flex flex-col space-y-4 items-center">
-            <div className="space-y-4 w-[60%] text-left">
+            <div className="space-y-4 w-[80%] text-left">
               <h1 className="flex text-3xl font-bold">ข้อมูลลูกค้า</h1>
             </div>
-            <div className="flex justify-between w-[60%] px-10">
+            <div className="flex justify-between w-[80%] px-10">
               <div className="space-y-2">
                 <div className="flex space-x-2">
                   <span className="font-bold">ชื่อพนักงาน:</span>
@@ -61,7 +61,7 @@ export default function WalkDescription() {
                 </div>
                 <div className="flex space-x-2">
                   <span className="font-bold">ที่อยู่:</span>
-                  <span className="w-[60%]">{info.u_address}</span>
+                  <span className="w-[80%]">{info.u_address}</span>
                 </div>
               </div>
               <div className="space-y-2">
@@ -84,10 +84,10 @@ export default function WalkDescription() {
                 </div>
               </div>
             </div>
-            <div className="space-y-4 w-[60%] text-left">
+            <div className="space-y-4 w-[80%] text-left">
               <h1 className="flex text-3xl font-bold">ข้อมูลผู้รับผิดชอบ</h1>
             </div>
-            <div className="flex justify-between w-[60%] px-10">
+            <div className="flex justify-between w-[80%] px-10">
               <div className="space-y-2">
                 <div className="flex space-x-2">
                   <span className="font-bold">ชื่อพนักงาน:</span>

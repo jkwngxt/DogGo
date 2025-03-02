@@ -20,7 +20,7 @@ function Calendar(props) {
           head_cell: "text-muted-foreground text-center text-sm p-2 font-medium",
           row: "flex w-full justify-between my-1",
           cell: "p-0 text-center text-sm relative focus-within:relative focus-within:z-20",
-          day: "h-9 w-9 p-0 font-normal hover:bg-gray-100 rounded-md",
+          day: "h-9 w-9 p-0 font-normal text-center hover:bg-gray-100 rounded-md",
           day_selected: "bg-blue-600 text-white hover:bg-blue-600",
           day_today: "border border-blue-500",
         }}
