@@ -7,17 +7,18 @@ import { Button } from "@/components/ui/button";
 import Reviews from "@/components/review";
 import React, { useEffect, useState } from "react";
 import ClientDogSelector from "@/components/client-dog";
-import {notFound} from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import Loading from "@/components/loading";
 
 export default function DogWalker({ params }) {
+  const router = useRouter();
   const [dogWalkerData, setDogWalkerData] = useState(null);
   const [userDogs, setUserDogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userZone, setUserZone] = useState(null);
 
-// Use React.use to unwrap the params Promise
+  // Use React.use to unwrap the params Promise
   const unwrappedParams = React.use(params);
   const dwId = parseInt(unwrappedParams.dwId);
 
@@ -91,6 +92,20 @@ export default function DogWalker({ params }) {
 
   const imgPath = getImagePath(dogWalkerData.pic);
 
+  const handleBack = () => {
+    try {
+      // ใช้ window.history เพื่อตรวจสอบว่ามีหน้าก่อนหน้าหรือไม่
+      if (window.history.length > 1) {
+        router.back();
+      } else {
+        router.push("/");
+      }
+    } catch (error) {
+      // หากเกิดข้อผิดพลาดใดๆ ให้ใช้ window.location แทน
+      window.location.href = "/";
+    }
+  };
+
   return (
       <>
         <div className="p-4 space-y-4">
@@ -109,12 +124,15 @@ export default function DogWalker({ params }) {
                       e.target.src = "/image/user-placeholder.jpg";
                     }}
                 />
-                <div className="flex flex-row font-bold">
+                <div className="flex flex-row font-bold items-baseline">
                   <FontAwesomeIcon
                       icon={faStar}
-                      className="h-5 w-5 text-yellow-400"
+                      className="h-5 w-5 text-yellow-400 mr-1"
                   />
-                  {dogWalkerData.meanRating || 0} ({dogWalkerData.ratingCount || 0})
+                  {dogWalkerData.meanRating ? dogWalkerData.meanRating.toFixed(1) : "0.0"}
+                  <div className="flex flex-row font-semibold text-sm ml-1">
+                    ({dogWalkerData.ratingCount || 0} รีวิว)
+                  </div>
                 </div>
                 <div className="flex justify-between w-6/12">
                   <div className="space-y-2">
@@ -146,9 +164,15 @@ export default function DogWalker({ params }) {
                         <ClientDogSelector dogs={userDogs}/>
                       </div>
                   )}
-                  <Button variant="destructive">ยกเลิก</Button>
+                  <Button variant="destructive"
+                          onClick={handleBack}
+                  >
+                    ยกเลิก
+                  </Button>
                 </div>
-                <p className="text-sm text-red-500 mt-1">ท่านอยู่นอกเขตที่ dog walker ให้บริการ</p>
+                {userZone && Array.isArray(dogWalkerData.zone) && dogWalkerData.zone.includes(userZone) ? null :
+                    <p className="text-blue-800  mt-1">ท่านอยู่นอกเขตที่ dog walker ให้บริการ</p>
+                }
               </div>
             </Card>
           </div>
