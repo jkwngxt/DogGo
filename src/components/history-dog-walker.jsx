@@ -52,7 +52,9 @@ const HistoryDogWalker = ({
     if (ws_status === "การบริการเสร็จสิ้น") {
       return <p className="font-bold text-[#6498FA]">การบริการเสร็จสิ้น</p>;
     }
-    return <OwnerWalkConfirmation />;
+    return  <div onClick={(e) => e.stopPropagation()}>
+    <OwnerWalkConfirmation />
+  </div>;
   };
 
   return (

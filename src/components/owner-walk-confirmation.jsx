@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,37 +13,60 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import Confirmation from "./confirmation";
 
 const OwnerWalkConfirmation = () => {
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
+  const [showFirstDialog, setShowFirstDialog] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
-  const handleConfirmClick = (e) => {
-    e.stopPropagation(); // Prevents triggering card's click event
-    router.push("/pet-owner/homepage"); // Navigate to homepage
+  const handleConfirmClick = () => {
+    console.log("Confirmation button clicked"); // Console log
+    setShowFirstDialog(false); // Close first dialog
+    setShowConfirmation(true); // Show Confirmation dialog
+  };
+
+  const handleCloseConfirmation = () => {
+    setShowConfirmation(false);
+    router.push("/pet-owner/homepage"); // Navigate after confirmation closes
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="secondary" onClick={(e) => e.stopPropagation()}>
-          ได้รับบริการ
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md" onClick={(e) => e.stopPropagation()}>
-        <DialogHeader className="flex items-center">
-          <DialogTitle>ยืนยันการได้รับบริการ</DialogTitle>
-          <DialogDescription className="text-md text-black">
-            โปรดยืนยันการได้รับบริการของท่านอีกครั้ง
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="sm:justify-center">
-          <Button onClick={handleConfirmClick}>ยืนยัน</Button>
-          <DialogClose asChild>
-            <Button variant="destructive">ยกเลิก</Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Dialog open={showFirstDialog} onOpenChange={setShowFirstDialog}>
+        <DialogTrigger asChild>
+          <Button 
+            variant="secondary" 
+            onClick={() => setShowFirstDialog(true)}
+          >
+            ได้รับบริการ
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="flex items-center">
+            <DialogTitle>ยืนยันการได้รับบริการ</DialogTitle>
+            <DialogDescription className="text-md text-black">
+              โปรดยืนยันการได้รับบริการของท่านอีกครั้ง
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center">
+            <Button onClick={handleConfirmClick}>ยืนยัน</Button>
+            <DialogClose asChild>
+              <Button variant="destructive">ยกเลิก</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmation Dialog */}
+      <Confirmation 
+        status="success"
+        open={showConfirmation}
+        onOpenChange={setShowConfirmation}
+        message="การได้รับบริการสำเร็จ"
+        action={handleCloseConfirmation}
+        />
+    </>
   );
 };
 
