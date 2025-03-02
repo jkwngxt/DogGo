@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useState } from 'react';
 import { format } from "date-fns";
 import { CalendarIcon, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -28,7 +27,7 @@ const TimePickerSelect = ({ value, onChange }) => {
 
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="w-24">
+      <SelectTrigger className="w-24 text-[#6498FA] border-[#6498FA] focus:ring-[#6498FA]">
         <SelectValue placeholder="Time" />
       </SelectTrigger>
       <SelectContent>
@@ -42,19 +41,9 @@ const TimePickerSelect = ({ value, onChange }) => {
   );
 };
 
-const DateTimeRangePicker = () => {
-  const [confirmation, setConfirmation] = useState({ open: false, message: "", status: "fail" });
-  const [startDate, setStartDate] = useState(null);
-  const [startTime, setStartTime] = useState("09:00");
-  const [endTime, setEndTime] = useState("17:00");
-
-  function onSubmit() {
-    console.log("Selected Data:", { startDate, startTime, endTime });
-  }
-
+const DateTimeRangePicker = ({startDate,setStartDate,startTime,setStartTime,endTime,setEndTime}) => {
   return (
     <>
-      <form onSubmit={onSubmit} className="flex items-start gap-4">
         <div className="flex gap-2">
           <Popover>
             <PopoverTrigger asChild>
@@ -82,9 +71,6 @@ const DateTimeRangePicker = () => {
             <TimePickerSelect value={endTime} onChange={setEndTime} />
           </div>
         </div>
-        <Button variant="secondary" type="submit">ค้นหา</Button>
-      </form>
-      <Confirmation {...confirmation} onOpenChange={() => setConfirmation({ ...confirmation, open: false })} action={() => setConfirmation({ ...confirmation, open: false })} />
     </>
   );
 };
