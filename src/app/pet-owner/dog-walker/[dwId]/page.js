@@ -109,12 +109,15 @@ export default function DogWalker({ params }) {
                       e.target.src = "/image/user-placeholder.jpg";
                     }}
                 />
-                <div className="flex flex-row font-bold">
+                <div className="flex flex-row font-bold items-baseline">
                   <FontAwesomeIcon
                       icon={faStar}
-                      className="h-5 w-5 text-yellow-400"
+                      className="h-5 w-5 text-yellow-400 mr-1"
                   />
-                  {dogWalkerData.meanRating || 0} ({dogWalkerData.ratingCount || 0})
+                  {dogWalkerData.meanRating ? dogWalkerData.meanRating.toFixed(1) : "0.0"}
+                  <div className="flex flex-row font-semibold text-sm ml-1">
+                    ({dogWalkerData.ratingCount || 0} รีวิว)
+                  </div>
                 </div>
                 <div className="flex justify-between w-6/12">
                   <div className="space-y-2">
@@ -148,7 +151,9 @@ export default function DogWalker({ params }) {
                   )}
                   <Button variant="destructive">ยกเลิก</Button>
                 </div>
-                <p className="text-sm text-red-500 mt-1">ท่านอยู่นอกเขตที่ dog walker ให้บริการ</p>
+                {userZone && Array.isArray(dogWalkerData.zone) && dogWalkerData.zone.includes(userZone) ? null :
+                    <p className="text-blue-800  mt-1">ท่านอยู่นอกเขตที่ dog walker ให้บริการ</p>
+                }
               </div>
             </Card>
           </div>
