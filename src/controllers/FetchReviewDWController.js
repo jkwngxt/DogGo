@@ -1,4 +1,4 @@
-import {PrismaClient} from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 export class FetchReviewDWController {
     constructor(prismaClient = new PrismaClient()) {
@@ -7,21 +7,83 @@ export class FetchReviewDWController {
 
     async getReviewByDwId(userId, dwId) {
         try {
-            const dogWalker = await this.getDogWalker(dwId);
-            if (!dogWalker) {
+            const result = await this.prisma.$queryRaw`
+                WITH dog_walker_data AS (
+                    SELECT 
+                        dw_id as id, 
+                        dw_name as name,
+                        dw_pic as pic,
+                        dw_tel as tel,
+                        dw_zone as zone
+                    FROM dog_walker
+                    WHERE dw_id = ${dwId}
+                ),
+                user_zone AS (
+                    SELECT u_zone as zone
+                    FROM "user"
+                    WHERE u_id = ${userId}
+                ),
+                user_dogs AS (
+                    SELECT 
+                        d_id as id, 
+                        d_name as name
+                    FROM dog
+                    WHERE u_id = ${userId}
+                ),
+                relevant_services AS (
+                    SELECT ws_id as id
+                    FROM walking_service
+                    WHERE dw_id = ${dwId}
+                ),
+                review_data AS (
+                    SELECT 
+                        r.r_id,
+                        r.u_id as user_id,
+                        u.u_username as username,
+                        r.r_text as text,
+                        r.rating,
+                        r.r_time as time
+                    FROM review r
+                    JOIN "user" u ON r.u_id = u.u_id
+                    WHERE r.ws_id IN (SELECT id FROM relevant_services)
+                ),
+                rating_summary AS (
+                    SELECT 
+                        COALESCE(AVG(rating), 0) as mean_rating,
+                        COUNT(r_id) as rating_count
+                    FROM review
+                    WHERE ws_id IN (SELECT id FROM relevant_services)
+                )
+                SELECT 
+                    json_build_object(
+                        'dogWalker', (SELECT row_to_json(dog_walker_data) FROM dog_walker_data),
+                        'userZone', (SELECT zone FROM user_zone),
+                        'dogs', (SELECT json_agg(row_to_json(user_dogs)) FROM user_dogs),
+                        'reviews', (SELECT json_agg(row_to_json(review_data)) FROM review_data),
+                        'ratingStats', (SELECT row_to_json(rating_summary) FROM rating_summary)
+                    ) as result
+            `;
+
+            // If no dog walker found
+            if (!result[0].result.dogWalker) {
                 return {
                     success: false,
                     message: 'dog walker not found',
                 };
             }
 
-            const reviews = await this.getReviews(dwId);
+            const { dogWalker, userZone, dogs, reviews, ratingStats } = result[0].result;
 
-            const dogs = await this.findDogByUserId(userId);
-
-            const meanRating = reviews.length > 0
-                ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
-                : 0;
+            // Format reviews and filter out null text reviews
+            const formattedReviews = (reviews || [])
+                .filter(r => r.text !== null)
+                .map(r => ({
+                    user_id: r.user_id,
+                    username: r.username || "",
+                    text: r.text,
+                    rating: r.rating,
+                    time: r.time
+                }));
 
             return {
                 success: true,
@@ -31,17 +93,12 @@ export class FetchReviewDWController {
                     pic: dogWalker.pic,
                     tel: dogWalker.tel,
                     zone: dogWalker.zone,
-                    meanRating: parseFloat(meanRating.toFixed(2)),
-                    ratingCount: reviews.length,
-                    reviews: reviews.filter(r => r.text !== null).map(r => ({
-                        user_id: r.userId,
-                        username: r.user?.username || "",
-                        text: r.text,
-                        rating: r.rating,
-                        time: r.time
-                    }))
+                    meanRating: parseFloat(ratingStats.mean_rating.toFixed(2)),
+                    ratingCount: ratingStats.rating_count,
+                    reviews: formattedReviews
                 },
-                dogs: dogs
+                dogs: dogs || [],
+                userZone: userZone
             };
 
         } catch (error) {
@@ -51,60 +108,5 @@ export class FetchReviewDWController {
                 message: 'Failed to fetch dog walker reviews'
             };
         }
-    }
-
-    // Get dog walker basic info
-    async getDogWalker(dwId) {
-        return this.prisma.dogWalker.findUnique({
-            where: {
-                id: dwId
-            }
-        });
-    }
-
-    async getReviews(dwId) {
-        const walkingServices = await this.prisma.walkingService.findMany({
-            where: {
-                dogWalkerId: dwId
-            },
-            select: {
-                id: true
-            }
-        });
-
-        const serviceIds = walkingServices.map(service => service.id);
-
-        if (serviceIds.length === 0) {
-            return []; // No services, so no reviews
-        }
-
-        return this.prisma.review.findMany({
-            where: {
-                walkingServiceId: {
-                    in: serviceIds
-                }
-            },
-            include: {
-                user: {
-                    select: {
-                        id: true,
-                        username: true
-                    }
-                }
-            }
-        });
-    }
-
-    // Get user's dogs
-    async findDogByUserId(userId) {
-        return this.prisma.dog.findMany({
-            where: {
-                ownerId: userId
-            },
-            select: {
-                id: true,
-                name: true
-            }
-        });
     }
 }
