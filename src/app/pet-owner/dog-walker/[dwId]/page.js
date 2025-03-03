@@ -7,20 +7,31 @@ import { Button } from "@/components/ui/button";
 import Reviews from "@/components/review";
 import React, { useEffect, useState } from "react";
 import ClientDogSelector from "@/components/client-dog";
-import { notFound, useRouter } from "next/navigation";
+import { notFound, useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/components/loading";
 
 export default function DogWalker({ params }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [dogWalkerData, setDogWalkerData] = useState(null);
   const [userDogs, setUserDogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userZone, setUserZone] = useState(null);
+  const [canBook, setCanBook] = useState(false);
 
   // Use React.use to unwrap the params Promise
+  // ตัวอย่าง route http://localhost:3000/pet-owner/dog-walker/1?startTime=15&endTime=18&date=2025-02-24
   const unwrappedParams = React.use(params);
   const dwId = parseInt(unwrappedParams.dwId);
+
+  const startTimeSearch = searchParams.get('startTime') ? parseInt(searchParams.get('startTime')) : 0;
+  const endTimeSearch = searchParams.get('endTime') ? parseInt(searchParams.get('endTime')) : 0;
+
+  // Get the date from URL and format it with timezone information
+  const rawDateSearch = searchParams.get('date') || null;
+
+  // Convert the date string to a Date object with timezone information
 
   useEffect(() => {
     const fetchDogWalkerData = async () => {
@@ -31,7 +42,12 @@ export default function DogWalker({ params }) {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ dwId }),
+          body: JSON.stringify({
+            dwId,
+            startTimeInt: startTimeSearch,
+            endTimeInt: endTimeSearch,
+            date: rawDateSearch,
+          }),
         });
 
         if (!response.ok) {
@@ -41,8 +57,9 @@ export default function DogWalker({ params }) {
         const data = await response.json();
         if (data.success) {
           setDogWalkerData(data.dogWalkers);
-          setUserDogs(data.dogs.map(dog => dog.name)); // Extract dog names for selector
+          setUserDogs(data.dogs);
           setUserZone(data.userZone);
+          setCanBook(data.canBook);
         } else {
           throw new Error(data.message || 'Failed to fetch dog walker data');
         }
@@ -57,7 +74,7 @@ export default function DogWalker({ params }) {
     if (dwId) {
       fetchDogWalkerData();
     }
-  }, [dwId]);
+  }, [dwId, startTimeSearch, endTimeSearch, rawDateSearch]);
 
   if (loading) {
     return (
@@ -113,6 +130,7 @@ export default function DogWalker({ params }) {
             <h1 className="text-3xl font-bold text-gray-900 mt-8 mb-4">
               รายละเอียด Dog Walker
             </h1>
+
             <Card className="w-[100%] sm:w-[60%] md:w-[60%] lg:w-[80%] p-6">
               <div className="flex flex-col space-y-2 items-center">
                 <img
@@ -157,11 +175,23 @@ export default function DogWalker({ params }) {
 
                 <Reviews reviewData={reviewData}/>
                 <div className="flex flex-row space-x-4">
-                  {userZone && Array.isArray(dogWalkerData.zone) && dogWalkerData.zone.includes(userZone) ? (
-                      <ClientDogSelector dogs={userDogs}/>
+                  { canBook && (userZone && Array.isArray(dogWalkerData.zone) && dogWalkerData.zone.includes(userZone)) ? (
+                      <ClientDogSelector
+                          dogs={userDogs}
+                          searchTime={{
+                            startTimeSearch,
+                            endTimeSearch,
+                            dateSearch: rawDateSearch // Pass original string for display purposes
+                          }}
+                          dogWalker={{
+                            id: dwId,
+                            name: dogWalkerData.name,
+                            tel: dogWalkerData.tel
+                          }}
+                      />
                   ) : (
                       <div className="opacity-50 pointer-events-none">
-                        <ClientDogSelector dogs={userDogs}/>
+                        <ClientDogSelector dogs={[]} />
                       </div>
                   )}
                   <Button variant="destructive"
@@ -170,9 +200,15 @@ export default function DogWalker({ params }) {
                     ยกเลิก
                   </Button>
                 </div>
-                {userZone && Array.isArray(dogWalkerData.zone) && dogWalkerData.zone.includes(userZone) ? null :
-                    <p className="text-blue-800  mt-1">ท่านอยู่นอกเขตที่ dog walker ให้บริการ</p>
-                }
+
+                {!canBook ? (
+                    <p className="text-blue-800 mt-1">ท่านไม่ได้ค้นหา dog walker อย่างถูกต้อง กรุณาทำรายการในหน้าค้นหาอีกครั้ง</p>
+                ) : (
+                    userZone && Array.isArray(dogWalkerData.zone) && !dogWalkerData.zone.includes(userZone) ? (
+                        <p className="text-blue-800 mt-1">ท่านอยู่นอกเขตที่ dog walker ให้บริการ</p>
+                    ) : null
+                )}
+
               </div>
             </Card>
           </div>

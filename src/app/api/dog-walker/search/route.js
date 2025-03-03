@@ -2,15 +2,6 @@ import { NextResponse } from 'next/server';
 import { SearchDWController } from "@/controllers/SearchDWController";
 import { authenticateRequest } from '@/utils/jwt';
 
-function serializeBigInt(obj) {
-    return JSON.parse(JSON.stringify(obj, (key, value) => {
-        if (typeof value === 'bigint') {
-            return Number(value);
-        }
-        return value;
-    }));
-}
-
 export async function POST(request) {
     try {
         // ตรวจสอบการยืนยันตัวตนด้วย JWT
@@ -40,9 +31,7 @@ export async function POST(request) {
 
         const result = await searchDWController.searchDogWalkers(date, timeSlots, user.userId);
 
-        const serializedResult = serializeBigInt(result);
-
-        return NextResponse.json(serializedResult);
+        return NextResponse.json(result);
 
     } catch (error) {
         console.error('Search dog walkers error:', error);

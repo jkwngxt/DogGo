@@ -5,81 +5,161 @@ export class FetchReviewDWController {
         this.prisma = prismaClient;
     }
 
-    async getReviewByDwId(userId, dwId) {
+    async getReviewByDwId(userId, dwId, startTimeInt, endTimeInt, date) {
         try {
-            const result = await this.prisma.$queryRaw`
-                WITH dog_walker_data AS (
-                    SELECT 
-                        dw_id as id, 
-                        dw_name as name,
-                        dw_pic as pic,
-                        dw_tel as tel,
-                        dw_zone as zone
-                    FROM dog_walker
-                    WHERE dw_id = ${dwId}
-                ),
-                user_zone AS (
-                    SELECT u_zone as zone
-                    FROM "user"
-                    WHERE u_id = ${userId}
-                ),
-                user_dogs AS (
-                    SELECT 
-                        d_id as id, 
-                        d_name as name
-                    FROM dog
-                    WHERE u_id = ${userId}
-                ),
-                relevant_services AS (
-                    SELECT ws_id as id
-                    FROM walking_service
-                    WHERE dw_id = ${dwId}
-                ),
-                review_data AS (
-                    SELECT 
-                        r.r_id,
-                        r.u_id as user_id,
-                        u.u_username as username,
-                        r.r_text as text,
-                        r.rating,
-                        r.r_time as time
-                    FROM review r
-                    JOIN "user" u ON r.u_id = u.u_id
-                    WHERE r.ws_id IN (SELECT id FROM relevant_services)
-                ),
-                rating_summary AS (
-                    SELECT 
-                        COALESCE(AVG(rating), 0) as mean_rating,
-                        COUNT(r_id) as rating_count
-                    FROM review
-                    WHERE ws_id IN (SELECT id FROM relevant_services)
-                )
-                SELECT 
-                    json_build_object(
-                        'dogWalker', (SELECT row_to_json(dog_walker_data) FROM dog_walker_data),
-                        'userZone', (SELECT zone FROM user_zone),
-                        'dogs', (SELECT json_agg(row_to_json(user_dogs)) FROM user_dogs),
-                        'reviews', (SELECT json_agg(row_to_json(review_data)) FROM review_data),
-                        'ratingStats', (SELECT row_to_json(rating_summary) FROM rating_summary)
-                    ) as result
-            `;
+            // Define constants
+            const START_TIME = 9; // 9:00 AM is the first slot
+            const END_TIME = 18;  // 6:00 PM is the last slot
 
-            // If no dog walker found
-            if (!result[0].result.dogWalker) {
+            // Check time range validity
+            let canBook = true;
+            let timeSlots = [];
+
+            // Validate time range (9-18)
+            if (startTimeInt < START_TIME || startTimeInt > END_TIME ||
+                endTimeInt < START_TIME || endTimeInt > END_TIME ||
+                endTimeInt < startTimeInt
+            ) {
+                canBook = false;
+            } else {
+                // Calculate slot indices
+                let start = startTimeInt - START_TIME + 1;
+                let end = endTimeInt - START_TIME + 1;
+
+                // Generate array of slots
+                timeSlots = [];
+                for (let i = start; i < end; i++) {
+                    timeSlots.push(i);
+                }
+            }
+
+            // Handle date with timezone information
+            let searchDate;
+
+            if (date) {
+                // If a date with timezone info is provided, parse it
+                searchDate = new Date(date);
+            } else {
+                // Get the current date if not provided
+                searchDate = new Date();
+            }
+
+            // Ensure the time is set to beginning of day in local timezone
+            searchDate.setHours(0, 0, 0, 0);
+
+            // Format as YYYY-MM-DD for database query
+            const formattedDate = searchDate.toISOString().split('T')[0];
+
+            // Fetch dog walker data
+            const dogWalker = await this.prisma.dogWalker.findUnique({
+                where: {
+                    id: dwId
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    pic: true,
+                    tel: true,
+                    zone: true
+                }
+            });
+
+            if (!dogWalker) {
                 return {
                     success: false,
                     message: 'dog walker not found',
                 };
             }
 
-            const { dogWalker, userZone, dogs, reviews, ratingStats } = result[0].result;
+            // Fetch user zone
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    id: userId
+                },
+                select: {
+                    zone: true
+                }
+            });
+
+            // Fetch user's dogs
+            const dogs = await this.prisma.dog.findMany({
+                where: {
+                    ownerId: userId
+                },
+                select: {
+                    id: true,
+                    name: true
+                }
+            });
+
+            // Get relevant services for this dog walker
+            const relevantServices = await this.prisma.walkingService.findMany({
+                where: {
+                    dogWalkerId: dwId
+                },
+                select: {
+                    id: true
+                }
+            });
+
+            const relevantServiceIds = relevantServices.map(service => service.id);
+
+            // Get reviews for these services
+            const reviews = await this.prisma.review.findMany({
+                where: {
+                    walkingServiceId: {
+                        in: relevantServiceIds
+                    }
+                },
+                select: {
+                    id: true,
+                    userId: true,
+                    text: true,
+                    rating: true,
+                    time: true,
+                    user: {
+                        select: {
+                            username: true
+                        }
+                    }
+                }
+            });
+
+            // Calculate rating summary
+            const reviewsWithRating = reviews.filter(review => review.rating !== null);
+            const ratingStats = {
+                mean_rating: reviewsWithRating.length > 0
+                    ? reviewsWithRating.reduce((sum, review) => sum + review.rating, 0) / reviewsWithRating.length
+                    : 0,
+                rating_count: reviewsWithRating.length
+            };
+
+            // Check availability
+            let dbCanBook = canBook;
+
+            if (canBook) {
+                const conflictingServices = await this.prisma.walkingService.findFirst({
+                    where: {
+                        dogWalkerId: dwId,
+                        date: new Date(formattedDate),
+                        time: {
+                            hasSome: timeSlots
+                        },
+                        status: {
+                            notIn: [210, 220]
+                        }
+                    }
+                });
+
+                dbCanBook = !conflictingServices;
+            }
 
             // Format reviews and filter out null text reviews
-            const formattedReviews = (reviews || [])
+            const formattedReviews = reviews
                 .filter(r => r.text !== null)
                 .map(r => ({
-                    user_id: r.user_id,
-                    username: r.username || "",
+                    user_id: r.userId,
+                    username: r.user?.username || "",
                     text: r.text,
                     rating: r.rating,
                     time: r.time
@@ -87,6 +167,7 @@ export class FetchReviewDWController {
 
             return {
                 success: true,
+                canBook: dbCanBook,
                 dogWalkers: {
                     id: dogWalker.id,
                     name: dogWalker.name,
@@ -98,7 +179,7 @@ export class FetchReviewDWController {
                     reviews: formattedReviews
                 },
                 dogs: dogs || [],
-                userZone: userZone
+                userZone: user ? user.zone : null
             };
 
         } catch (error) {
