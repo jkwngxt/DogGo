@@ -91,7 +91,6 @@ export function generateRejectionEmail(rejectionDetails) {
     let endTime = endHour.toString().padStart(2, '0') + ':00';
 
     let dateStr = new Date(serviceDate);
-    dateStr.setDate(dateStr.getDate() + 1);
     const options = { day: 'numeric', month: 'long', year: 'numeric' };
     let dateEN = dateStr.toLocaleDateString('en-US', options)
     let dateTH = dateStr.toLocaleDateString('th-TH', options)
