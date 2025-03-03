@@ -71,7 +71,7 @@ const SignUpPage = () => {
       formData.append("email", email);
       
       if (selectedFile) {
-        formData.append("imageFile", selectedFile);
+        formData.append("pic", selectedFile);
       } 
   
       // Send POST request to API
