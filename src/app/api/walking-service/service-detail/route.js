@@ -16,8 +16,8 @@ export async function POST(request) {
         const { user, response } = await authenticateRequest(request);
         if (response) return response;
 
-        const body = await request.json();
-        const { role, id } = body;
+        let role = user.role;
+        let id = user.userId
 
         if (!role || !id) {
             return NextResponse.json(

@@ -11,18 +11,18 @@ export async function PUT(request) {
     try {
         // รับข้อมูลจาก request body
         const body = await request.json();
-        const { status, id } = body;
+        const { status, walkingServiceId } = body;
 
         // ตรวจสอบว่ามีข้อมูลที่จำเป็นครบถ้วนหรือไม่
-        if (status === undefined || id === undefined) {
+        if (status === undefined || walkingServiceId === undefined) {
             return NextResponse.json(
-                { error: "Missing required fields: status and id" },
+                { error: "Missing required fields: status and walking service id" },
                 { status: 400 }
             );
         }
 
         // เรียกใช้ controller เพื่ออัปเดตสถานะ
-        const result = await controller.changeWSStatusController(status, id);
+        const result = await controller.changeWSStatusController(status, walkingServiceId);
 
         // ส่งผลลัพธ์กลับไป
         return NextResponse.json(result, { status: 200 });

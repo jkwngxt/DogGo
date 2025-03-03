@@ -27,7 +27,7 @@ export class WSPaymentController {
 
             if (!billing || !billing.walkingService || !billing.walkingService.dogWalker) {
                 return {
-                    status: "failed",
+                    success: false,
                     message: "Billing or related walking service not found"
                 };
             }
@@ -85,13 +85,13 @@ export class WSPaymentController {
             );
 
             return {
-                status: "success",
+                success: true,
                 message: "Payment successful. Booking is awaiting confirmation"
             };
         } catch (error) {
             console.error("Payment controller error:", error);
             return {
-                status: "failed",
+                success: false,
                 message: "Payment failed. Please try again"
             };
         }

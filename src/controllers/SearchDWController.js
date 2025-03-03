@@ -5,23 +5,25 @@ export class SearchDWController {
         this.prisma = prismaClient;
     }
 
-    async searchDogWalkers(date, timeSlots, userZone) {
-
+    async searchDogWalkers(date, timeSlots, userId) {
         try {
-            // Find available dog walkers who don't have services that conflict with the requested time
-            const searchDate = new Date(date);
-            searchDate.setHours(0, 0, 0, 0);
-            const availableDogWalkers = await this.queryAvailableDogWalkers(searchDate, timeSlots, userZone);
+            // Find user to get their zone
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    id: userId
+                }
+            });
 
-
-
-
-            if (availableDogWalkers.length === 0) {
+            if (!user) {
                 return {
-                    success: true,
-                    dogWalkers: []
+                    success: false,
+                    msg: 'No user found.'
                 };
             }
+
+            const userZone = user.zone;
+
+            const availableDogWalkers = await this.queryAvailableDogWalkers(date, timeSlots, userZone);
 
             return {
                 success: true,
@@ -29,6 +31,7 @@ export class SearchDWController {
             };
 
         } catch (error) {
+            console.error('Error searching dog walkers:', error);
             return {
                 success: false,
                 message: 'Failed to search dog walkers'
@@ -37,37 +40,93 @@ export class SearchDWController {
     }
 
     async queryAvailableDogWalkers(searchDate, timeSlots, userZone) {
-        return this.prisma.$queryRaw`
-            SELECT
-                dw.dw_id AS id,
-                dw.dw_name AS name,
-                dw.dw_pic AS pic,
-                dw.dw_address AS address,
-                dw.dw_zone AS zone,
-        COALESCE(AVG(r.rating)::NUMERIC(10,2), 0) AS "meanRating",
-        COUNT(r.rating) AS "ratingCount"
-            FROM
-                dog_walker dw
-                LEFT JOIN
-                walking_service ws ON dw.dw_id = ws.dw_id
-                LEFT JOIN
-                review r ON ws.ws_id = r.ws_id
-            WHERE
-                dw.dw_status = 1
-              AND ${userZone}::text = ANY(dw.dw_zone)
-              AND NOT EXISTS (
-                SELECT 1
-                FROM walking_service ws2
-                WHERE
-                ws2.dw_id = dw.dw_id
-              AND ws2.ws_date = ${searchDate}::date
-              AND ws2.ws_time && ${timeSlots}::smallint[]
-              AND ws2.ws_status NOT IN (210, 220, 230)
-                )
-            GROUP BY
-                dw.dw_id, dw.dw_name, dw.dw_pic, dw.dw_address, dw.dw_zone
-            ORDER BY
-                "meanRating" DESC;
-        `;
+        // แปลงให้เป็นวันที่เท่านั้น (YYYY-MM-DD)
+        const dateOnly = searchDate.toISOString().split('T')[0];
+
+        // First, find all dog walkers that match the initial criteria
+        const allDogWalkers = await this.prisma.dogWalker.findMany({
+            where: {
+                status: 1,
+                zone: {
+                    has: userZone
+                }
+            },
+            select: {
+                id: true,
+                name: true,
+                pic: true,
+                address: true,
+                zone: true,
+                services: {
+                    where: {
+                        date: {
+                            gte: new Date(`${dateOnly}T00:00:00.000Z`),
+                            lt: new Date(`${dateOnly}T23:59:59.999Z`)
+                        },
+                        time: {
+                            hasSome: timeSlots
+                        },
+                        status: {
+                            notIn: [210, 220, 230]
+                        }
+                    },
+                    select: {
+                        id: true
+                    }
+                }
+            }
+        });
+
+        // Filter out dog walkers that have conflicting services
+        const availableDogWalkers = allDogWalkers.filter(dw => dw.services.length === 0);
+
+        // For each available dog walker, fetch their rating information
+        const dogWalkersWithRatings = await Promise.all(
+            availableDogWalkers.map(async dw => {
+                // Get all services for this dog walker
+                const services = await this.prisma.walkingService.findMany({
+                    where: {
+                        dogWalkerId: dw.id
+                    },
+                    select: {
+                        id: true
+                    }
+                });
+
+                const serviceIds = services.map(s => s.id);
+
+                // Get reviews for these services
+                const reviews = await this.prisma.review.findMany({
+                    where: {
+                        walkingServiceId: {
+                            in: serviceIds.length > 0 ? serviceIds : [-1] // Avoid empty IN clause
+                        }
+                    },
+                    select: {
+                        rating: true
+                    }
+                });
+
+                // Calculate mean rating
+                const ratings = reviews.map(r => r.rating).filter(r => r !== null);
+                const meanRating = ratings.length > 0
+                    ? ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length
+                    : 0;
+
+                // Return dog walker with rating information
+                return {
+                    id: dw.id,
+                    name: dw.name,
+                    pic: dw.pic,
+                    address: dw.address,
+                    zone: dw.zone,
+                    meanRating: parseFloat(meanRating.toFixed(2)),
+                    ratingCount: ratings.length
+                };
+            })
+        );
+
+        // Sort by mean rating descending
+        return dogWalkersWithRatings.sort((a, b) => b.meanRating - a.meanRating);
     }
 }

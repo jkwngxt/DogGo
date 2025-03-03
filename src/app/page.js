@@ -38,9 +38,8 @@ export default function Home() {
       <SelectDateTime/>
       <div className="flex flex-row">
         <Link href="/pet-owner/homepage">Pet Owner</Link>
-        <Link href="/dog-walker/homepage">Dog Walker</Link>
-        <Button>Admin</Button>
-        <Button>Service</Button>
+        <Link href="/dog-walker/workpage">Dog Walker</Link>
+        <Link href="/admin/admin-service-provider">Admin</Link>
       </div>
       <div className="flex flex-row">
         <Button>Primary Button</Button>

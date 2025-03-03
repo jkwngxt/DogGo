@@ -16,18 +16,18 @@ export async function GET(request) {
 
         if (!userId) {
             return NextResponse.json(
-                { status: "failed", message: "User id is required"},
+                { success: false, message: "User id is required"},
                 { status: 400}
             );
         }
 
         const responseData = await reviewSPController.getRedeemableCoupons(userId);
-        return NextResponse.json(responseData, { status: responseData.status === "success" ? 200 : 400});
+        return NextResponse.json(responseData, { status: responseData.success ? 200 : 400});
 
     } catch (error) {
         console.error("API error (get coupons)");
         return NextResponse.json(
-            { status: "failed", message: "Error fetching coupons"},
+            { success: false, message: "Error fetching coupons"},
             { status: 500 }
         );
     }
@@ -43,11 +43,11 @@ export async function POST(request) {
         const reviewData = await request.json();
         const responseData = await reviewSPController.createReview(reviewData);
 
-        return NextResponse.json(responseData, { status: responseData.status === "success" ? 200:400 });
+        return NextResponse.json(responseData, { status: responseData.success ? 200:400 });
     } catch (error) {
         console.error("API error (post review)");
         return NextResponse.json(
-            { status: "failed", message: "Error submitting review"},
+            { success: false, message: "Error submitting review"},
             { status: 500 }
         );
     }

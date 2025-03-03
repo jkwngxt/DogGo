@@ -177,7 +177,12 @@ export class ChangeWSStatusController {
                     break;
 
                 case 210: // cancelled
-                    // Logic for cancelled service
+                    await prisma.billing.update({
+                        where: {walkingServiceId: walkingService.id},
+                        data: {
+                            status: 210, //cancelled
+                        }
+                    });
                     break;
             }
 

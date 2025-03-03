@@ -1,4 +1,7 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,13 +13,57 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { redirect } from "next/navigation";
-const OwnerWalkConfirmation = ({  }) => {
+import ConfirmationDialogs from "./confirmation-dialogs";
+
+const OwnerWalkConfirmation = ({ walkingServiceId, onStatusUpdate }) => {
+  const router = useRouter();
+  const [showFirstDialog, setShowFirstDialog] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  
+  const handleConfirmClick = async () => {
+    try {
+      const response = await fetch("/api/walking-service/change-status", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: 204, // Update to "Completed"
+          walkingServiceId: walkingServiceId,
+        }),
+      });
+  
+      const result = await response.json();
+  
+      if (response.ok) {
+        if (onStatusUpdate) {
+          onStatusUpdate(walkingServiceId, "รีวิว");
+        }
+        setShowFirstDialog(false);
+        setShowSuccessDialog(true);
+      } else {
+        console.error("Error updating status:", result.error);
+      }
+    } catch (error) {
+      console.error("Request failed:", error);
+    }
+  };  
+  
+  const handleDialogClose = () => {
+    setShowSuccessDialog(false);
+    router.push("/pet-owner/homepage"); // Navigate after confirmation closes
+  };
+
   return (
-    <div>
-      <Dialog>
+    <>
+      <Dialog open={showFirstDialog} onOpenChange={setShowFirstDialog}>
         <DialogTrigger asChild>
-          <Button variant="secondary">ได้รับบริการ</Button>
+          <Button 
+            variant="secondary" 
+            onClick={() => setShowFirstDialog(true)}
+          >
+            ได้รับบริการ
+          </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader className="flex items-center">
@@ -25,20 +72,22 @@ const OwnerWalkConfirmation = ({  }) => {
               โปรดยืนยันการได้รับบริการของท่านอีกครั้ง
             </DialogDescription>
           </DialogHeader>
-          <div className="flex items-center space-x-2">
-            <div className="grid flex-1 gap-2"></div>
-          </div>
           <DialogFooter className="sm:justify-center">
-            <Button onClick={() => redirect("/pet-owner/homepage")}>
-              ยืนยัน
-            </Button>
+            <Button onClick={handleConfirmClick}>ยืนยัน</Button>
             <DialogClose asChild>
               <Button variant="destructive">ยกเลิก</Button>
             </DialogClose>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+
+      {/* Success Dialog */}
+      <ConfirmationDialogs
+        showSuccessDialog={showSuccessDialog}
+        message="การได้รับบริการสำเร็จ"
+        onSuccessClose={handleDialogClose}
+      />
+    </>
   );
 };
 

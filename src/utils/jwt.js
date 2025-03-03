@@ -1,5 +1,6 @@
 import * as jose from 'jose';
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 const SECRET = new TextEncoder().encode(JWT_SECRET);
@@ -84,9 +85,26 @@ export const signToken = async (payload) => {
  * @returns {Promise<{user: object, response: NextResponse|null}>} ข้อมูลผู้ใช้และ response ถ้ามีข้อผิดพลาด
  */
 export const authenticateRequest = async (request, allowedRoles = []) => {
+    // ตรวจสอบ token จาก Authorization header ก่อน
     const authHeader = request.headers.get('authorization');
-    const user = await verifyToken(authHeader);
 
+    // ถ้ามี token ใน header ให้ตรวจสอบ
+    let user = null;
+    if (authHeader) {
+        user = await verifyToken(authHeader);
+    }
+
+    // ถ้าไม่มี token ใน header หรือ token ไม่ถูกต้อง ให้ตรวจสอบจาก cookies
+    if (!user) {
+        const cookieStore = await cookies();
+        const tokenFromCookie = cookieStore.get('token');
+
+        if (tokenFromCookie) {
+            user = await verifyTokenDirect(tokenFromCookie.value);
+        }
+    }
+
+    // ถ้าไม่มี token ที่ถูกต้องทั้งใน header และ cookie
     if (!user) {
         return {
             user: null,

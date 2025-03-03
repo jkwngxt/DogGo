@@ -57,10 +57,6 @@ const PetOwnerNav = ({ userImage, userName}) => {
                 <ul className="grid gap-3 p-2 md:w-[50px] lg:w-[150px] ]">
                   <ListItem href="/pet-owner/homepage" title="หน้าหลัก"/>
                   <ListItem href="/pet-owner/walking-service" title="บริการจูงสุนัข"/>
-                  <ListItem
-                    href="/pet-owner/other-service"
-                    title="บริการอื่นๆ"
-                  />
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>

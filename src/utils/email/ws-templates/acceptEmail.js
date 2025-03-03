@@ -94,6 +94,12 @@ export function generateAcceptanceEmail(acceptanceDetails) {
     let startTime = startHour.toString().padStart(2, '0') + ':00';
     let endTime = endHour.toString().padStart(2, '0') + ':00';
 
+    let dateStr = new Date(serviceDate);
+    const options = { day: 'numeric', month: 'long', year: 'numeric' };
+    let dateEN = dateStr.toLocaleDateString('en-US', options)
+    let dateTH = dateStr.toLocaleDateString('th-TH', options)
+
+
     return `
 <!DOCTYPE html>
 <html>
@@ -302,7 +308,8 @@ export function generateAcceptanceEmail(acceptanceDetails) {
             <div class="detail-row">
                 <div class="detail-label en-lang">${enText.date}</div>
                 <div class="detail-label th-lang">${thText.date}</div>
-                <div class="detail-value">${serviceDate}</div>
+                <div class="detail-value en-lang">${dateEN}</div>
+                <div class="detail-value th-lang">${dateTH}</div>
             </div>
             
             <div class="detail-row">

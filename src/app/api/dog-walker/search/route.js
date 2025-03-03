@@ -2,15 +2,6 @@ import { NextResponse } from 'next/server';
 import { SearchDWController } from "@/controllers/SearchDWController";
 import { authenticateRequest } from '@/utils/jwt';
 
-function serializeBigInt(obj) {
-    return JSON.parse(JSON.stringify(obj, (key, value) => {
-        if (typeof value === 'bigint') {
-            return Number(value);
-        }
-        return value;
-    }));
-}
-
 export async function POST(request) {
     try {
         // ตรวจสอบการยืนยันตัวตนด้วย JWT
@@ -19,7 +10,7 @@ export async function POST(request) {
         if (response) return response;
 
         const body = await request.json();
-        const { date, startTimeInt, endTimeInt, userZone } = body;
+        const { date, startTimeInt, endTimeInt } = body;
 
         // Define constants
         const START_TIME = 9; // 9:00 AM is the first slot
@@ -33,19 +24,16 @@ export async function POST(request) {
         for (let i = start; i < end; i++) {
             timeSlots.push(i);
         }
-
         // If 9.00-11.00 slot time will be [1, 2]
+
+        const dateTimeString = `${date} ${startTimeInt}:00:00`;
+        let dateSearch = new Date(dateTimeString);
 
         const searchDWController = new SearchDWController();
 
-        // ใช้ userZone จาก body ถ้ามี หรือดึงจากข้อมูลผู้ใช้ในกรณีที่ไม่ได้ระบุใน body
-        const zoneToSearch = userZone || user.zone;
+        const result = await searchDWController.searchDogWalkers(dateSearch, timeSlots, user.userId);
 
-        const result = await searchDWController.searchDogWalkers(date, timeSlots, zoneToSearch);
-
-        const serializedResult = serializeBigInt(result);
-
-        return NextResponse.json(serializedResult);
+        return NextResponse.json(result);
 
     } catch (error) {
         console.error('Search dog walkers error:', error);

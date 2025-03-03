@@ -1,13 +1,53 @@
-import {PrismaClient} from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 export class FetchReviewDWController {
     constructor(prismaClient = new PrismaClient()) {
         this.prisma = prismaClient;
     }
 
-    async getReviewByDwId(userId, dwId) {
+    async getReviewByDwId(userId, dwId, startTimeInt, endTimeInt, date) {
         try {
-            const dogWalker = await this.getDogWalker(dwId);
+            // Define constants
+            const START_TIME = 9; // 9:00 AM is the first slot
+            const END_TIME = 18;  // 6:00 PM is the last slot
+
+            // Check time range validity
+            let canBook = true;
+            let timeSlots = [];
+
+            // Validate time range (9-18)
+            if (startTimeInt < START_TIME || startTimeInt > END_TIME ||
+                endTimeInt < START_TIME || endTimeInt > END_TIME ||
+                endTimeInt < startTimeInt
+            ) {
+                canBook = false;
+            } else {
+                // Calculate slot indices
+                let start = startTimeInt - START_TIME + 1;
+                let end = endTimeInt - START_TIME + 1;
+
+                // Generate array of slots
+                timeSlots = [];
+                for (let i = start; i < end; i++) {
+                    timeSlots.push(i);
+                }
+            }
+
+
+            // Fetch dog walker data
+            const dogWalker = await this.prisma.dogWalker.findUnique({
+                where: {
+                    id: dwId
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    pic: true,
+                    tel: true,
+                    zone: true
+                }
+            });
+
             if (!dogWalker) {
                 return {
                     success: false,
@@ -15,33 +55,122 @@ export class FetchReviewDWController {
                 };
             }
 
-            const reviews = await this.getReviews(dwId);
+            // Fetch user zone
+            const user = await this.prisma.user.findUnique({
+                where: {
+                    id: userId
+                },
+                select: {
+                    zone: true
+                }
+            });
 
-            const dogs = await this.findDogByUserId(userId);
+            // Fetch user's dogs
+            const dogs = await this.prisma.dog.findMany({
+                where: {
+                    ownerId: userId
+                },
+                select: {
+                    id: true,
+                    name: true
+                }
+            });
 
-            const meanRating = reviews.length > 0
-                ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
-                : 0;
+            // Get relevant services for this dog walker
+            const relevantServices = await this.prisma.walkingService.findMany({
+                where: {
+                    dogWalkerId: dwId
+                },
+                select: {
+                    id: true
+                }
+            });
+
+            const relevantServiceIds = relevantServices.map(service => service.id);
+
+            // Get reviews for these services
+            const reviews = await this.prisma.review.findMany({
+                where: {
+                    walkingServiceId: {
+                        in: relevantServiceIds
+                    }
+                },
+                select: {
+                    id: true,
+                    userId: true,
+                    text: true,
+                    rating: true,
+                    time: true,
+                    user: {
+                        select: {
+                            username: true
+                        }
+                    }
+                }
+            });
+
+            // Calculate rating summary
+            const reviewsWithRating = reviews.filter(review => review.rating !== null);
+            const ratingStats = {
+                mean_rating: reviewsWithRating.length > 0
+                    ? reviewsWithRating.reduce((sum, review) => sum + review.rating, 0) / reviewsWithRating.length
+                    : 0,
+                rating_count: reviewsWithRating.length
+            };
+
+            // Check availability
+            let dbCanBook = canBook;
+
+            if (canBook) {
+                // ใช้ startsWith เพื่อเปรียบเทียบเฉพาะวันที่ (YYYY-MM-DD)
+                const dateOnly = date.toISOString().split('T')[0]; // เช่น "2025-03-03" จาก DateTime object
+
+                const conflictingServices = await this.prisma.walkingService.findFirst({
+                    where: {
+                        dogWalkerId: dwId,
+                        // เปรียบเทียบเฉพาะวันที่โดยใช้ startsWith
+                        date: {
+                            gte: new Date(`${dateOnly}T00:00:00.000Z`),
+                            lt: new Date(`${dateOnly}T23:59:59.999Z`)
+                        },
+                        time: {
+                            hasSome: timeSlots
+                        },
+                        status: {
+                            notIn: [210, 220]
+                        }
+                    }
+                });
+
+                dbCanBook = !conflictingServices;
+            }
+
+            // Format reviews and filter out null text reviews
+            const formattedReviews = reviews
+                .filter(r => r.text !== null)
+                .map(r => ({
+                    user_id: r.userId,
+                    username: r.user?.username || "",
+                    text: r.text,
+                    rating: r.rating,
+                    time: r.time
+                }));
 
             return {
                 success: true,
+                canBook: dbCanBook,
                 dogWalkers: {
                     id: dogWalker.id,
                     name: dogWalker.name,
                     pic: dogWalker.pic,
                     tel: dogWalker.tel,
                     zone: dogWalker.zone,
-                    meanRating: parseFloat(meanRating.toFixed(2)),
-                    ratingCount: reviews.length,
-                    reviews: reviews.filter(r => r.text !== null).map(r => ({
-                        user_id: r.userId,
-                        username: r.user?.username || "",
-                        text: r.text,
-                        rating: r.rating,
-                        time: r.time
-                    }))
+                    meanRating: parseFloat(ratingStats.mean_rating.toFixed(2)),
+                    ratingCount: ratingStats.rating_count,
+                    reviews: formattedReviews
                 },
-                dogs: dogs
+                dogs: dogs || [],
+                userZone: user ? user.zone : null
             };
 
         } catch (error) {
@@ -51,60 +180,5 @@ export class FetchReviewDWController {
                 message: 'Failed to fetch dog walker reviews'
             };
         }
-    }
-
-    // Get dog walker basic info
-    async getDogWalker(dwId) {
-        return this.prisma.dogWalker.findUnique({
-            where: {
-                id: dwId
-            }
-        });
-    }
-
-    async getReviews(dwId) {
-        const walkingServices = await this.prisma.walkingService.findMany({
-            where: {
-                dogWalkerId: dwId
-            },
-            select: {
-                id: true
-            }
-        });
-
-        const serviceIds = walkingServices.map(service => service.id);
-
-        if (serviceIds.length === 0) {
-            return []; // No services, so no reviews
-        }
-
-        return this.prisma.review.findMany({
-            where: {
-                walkingServiceId: {
-                    in: serviceIds
-                }
-            },
-            include: {
-                user: {
-                    select: {
-                        id: true,
-                        username: true
-                    }
-                }
-            }
-        });
-    }
-
-    // Get user's dogs
-    async findDogByUserId(userId) {
-        return this.prisma.dog.findMany({
-            where: {
-                ownerId: userId
-            },
-            select: {
-                id: true,
-                name: true
-            }
-        });
     }
 }
