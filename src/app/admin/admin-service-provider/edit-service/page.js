@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ServiceDescription from "@/components/service-description";
 
-const AddService = () => {
+const EditService = () => {
   const [inputRows, setInputRows] = useState([{ id: 1 }]);
 
   const addInputRow = () => {
@@ -194,4 +194,4 @@ const InputRow = () => {
   );
 };
 
-export default AddService;
+export default EditService;
