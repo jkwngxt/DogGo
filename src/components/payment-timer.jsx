@@ -34,6 +34,7 @@ const PaymentTimer = ({ total }) => {
       if (!bookingDataStr) {
         setMessage("ข้อมูลการจองไม่ถูกต้อง กรุณาทำรายการใหม่อีกครั้ง");
         setShowErrorDialog(true);
+        return;
       }
 
       const bookingInfo = JSON.parse(bookingDataStr);
@@ -43,6 +44,7 @@ const PaymentTimer = ({ total }) => {
           !bookingInfo.date || !Array.isArray(bookingInfo.dogIds) || bookingInfo.dogIds.length === 0) {
         setMessage("ข้อมูลการจองไม่ถูกต้อง กรุณาทำรายการใหม่อีกครั้ง");
         setShowErrorDialog(true);
+        return;
       }
 
       // Get data from sessionStorage
@@ -145,15 +147,48 @@ const PaymentTimer = ({ total }) => {
         // Payment confirmation failed
         setShowPaymentDialog(false);
         setMessage("ไม่สามารถติดต่อกับระบบชำระเงินได้");
+
+        // Cancel the booking if payment confirmation fails
+        if (bookingData && bookingData.walkingServiceId) {
+          await cancelBooking(bookingData.walkingServiceId);
+        }
+
         setShowErrorDialog(true);
       }
     } catch (error) {
       console.error("Error during payment confirmation:", error);
       setShowPaymentDialog(false);
       setMessage("ไม่สามารถติดต่อกับระบบชำระเงินได้");
+
+      // Cancel the booking if payment confirmation throws an error
+      if (bookingData && bookingData.walkingServiceId) {
+        await cancelBooking(bookingData.walkingServiceId);
+      }
+
       setShowErrorDialog(true);
     } finally {
       setIsConfirmingPayment(false);
+    }
+  };
+
+  // Function to cancel the booking when timer expires or other cancellation events
+  const cancelBooking = async (walkingServiceId) => {
+    try {
+      const response = await fetch('/api/walking-service/change-status', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          "status": 210, // Cancelled status code
+          "walkingServiceId": walkingServiceId,
+        }),
+      });
+
+      return response.ok;
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+      return false;
     }
   };
 
@@ -168,7 +203,6 @@ const PaymentTimer = ({ total }) => {
   const handleSuccessDialogClose = () => {
     setShowSuccessDialog(false);
     // Redirect to dashboard after successful payment
-
     router.push(`/pet-owner/walk-description?wId=${bookingData.walkingServiceId}`);
   };
 
@@ -202,11 +236,17 @@ const PaymentTimer = ({ total }) => {
   useEffect(() => {
     if (timeLeft === 0 && showPaymentDialog) {
       setShowPaymentDialog(false);
+
+      // Cancel the booking on the server when timer expires
+      if (bookingData && bookingData.walkingServiceId) {
+        cancelBooking(bookingData.walkingServiceId);
+      }
+
       sessionStorage.removeItem('bookingData');
       setMessage("เวลาในการชำระเงินหมดลง การจองถูกยกเลิก");
       setShowErrorDialog(true);
     }
-  }, [timeLeft, showPaymentDialog]);
+  }, [timeLeft, showPaymentDialog, bookingData]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
@@ -251,17 +291,24 @@ const PaymentTimer = ({ total }) => {
               >
                 {isConfirmingPayment ? "กำลังยืนยัน..." : "เสร็จสิ้น"}
               </Button>
-              <DialogClose asChild>
-                <Button
-                    variant="destructive"
-                    onClick={() => {
-                      // ลบข้อมูลการจองจาก sessionStorage เมื่อผู้ใช้ยกเลิก
-                      sessionStorage.removeItem('bookingData');
-                    }}
-                >
-                  ยกเลิก
-                </Button>
-              </DialogClose>
+              <Button
+                  variant="destructive"
+                  onClick={() => {
+                    // Cancel the booking when user manually cancels
+                    if (bookingData && bookingData.walkingServiceId) {
+                      cancelBooking(bookingData.walkingServiceId);
+                    }
+                    // ลบข้อมูลการจองจาก sessionStorage เมื่อผู้ใช้ยกเลิก
+                    sessionStorage.removeItem('bookingData');
+                    // ปิด payment dialog
+                    setShowPaymentDialog(false);
+                    // แสดง error dialog
+                    setMessage("การชำระเงินล้มเหลว การจองของคุณถูกยกเลิก");
+                    setShowErrorDialog(true);
+                  }}
+              >
+                ยกเลิก
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
