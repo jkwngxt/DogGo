@@ -33,11 +33,14 @@ export async function POST(request) {
             timeSlots.push(i);
         }
 
+        const dateTimeString = `${date} ${startTimeInt}:00:00`;
+        let dateSearch = new Date(dateTimeString);
+
         const data = {
             userId: user.userId,
             dogWalkerId: dogWalkerId,
             dogIds: dogIds,
-            date: date,
+            date: dateSearch,
             time: timeSlots,
             price: price
         };

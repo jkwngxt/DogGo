@@ -24,12 +24,14 @@ export async function POST(request) {
         for (let i = start; i < end; i++) {
             timeSlots.push(i);
         }
-
         // If 9.00-11.00 slot time will be [1, 2]
+
+        const dateTimeString = `${date} ${startTimeInt}:00:00`;
+        let dateSearch = new Date(dateTimeString);
 
         const searchDWController = new SearchDWController();
 
-        const result = await searchDWController.searchDogWalkers(date, timeSlots, user.userId);
+        const result = await searchDWController.searchDogWalkers(dateSearch, timeSlots, user.userId);
 
         return NextResponse.json(result);
 

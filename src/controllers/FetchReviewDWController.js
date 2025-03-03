@@ -33,22 +33,6 @@ export class FetchReviewDWController {
                 }
             }
 
-            // Handle date with timezone information
-            let searchDate;
-
-            if (date) {
-                // If a date with timezone info is provided, parse it
-                searchDate = new Date(date);
-            } else {
-                // Get the current date if not provided
-                searchDate = new Date();
-            }
-
-            // Ensure the time is set to beginning of day in local timezone
-            searchDate.setHours(0, 0, 0, 0);
-
-            // Format as YYYY-MM-DD for database query
-            const formattedDate = searchDate.toISOString().split('T')[0];
 
             // Fetch dog walker data
             const dogWalker = await this.prisma.dogWalker.findUnique({
@@ -138,10 +122,17 @@ export class FetchReviewDWController {
             let dbCanBook = canBook;
 
             if (canBook) {
+                // ใช้ startsWith เพื่อเปรียบเทียบเฉพาะวันที่ (YYYY-MM-DD)
+                const dateOnly = date.toISOString().split('T')[0]; // เช่น "2025-03-03" จาก DateTime object
+
                 const conflictingServices = await this.prisma.walkingService.findFirst({
                     where: {
                         dogWalkerId: dwId,
-                        date: new Date(formattedDate),
+                        // เปรียบเทียบเฉพาะวันที่โดยใช้ startsWith
+                        date: {
+                            gte: new Date(`${dateOnly}T00:00:00.000Z`),
+                            lt: new Date(`${dateOnly}T23:59:59.999Z`)
+                        },
                         time: {
                             hasSome: timeSlots
                         },

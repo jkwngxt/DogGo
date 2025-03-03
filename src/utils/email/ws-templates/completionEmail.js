@@ -92,7 +92,6 @@ export function generateCompletionEmail(completionDetails) {
     const formattedPaymentDate = paymentDate.toISOString().split('T')[0];
 
     let dateStr = new Date(serviceDate);
-    dateStr.setDate(dateStr.getDate() + 1);
     const options = { day: 'numeric', month: 'long', year: 'numeric' };
     let dateEN = dateStr.toLocaleDateString('en-US', options)
     let dateTH = dateStr.toLocaleDateString('th-TH', options)

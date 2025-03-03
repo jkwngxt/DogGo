@@ -23,10 +23,7 @@ export class SearchDWController {
 
             const userZone = user.zone;
 
-            const searchDate = new Date(date);
-            searchDate.setHours(0, 0, 0, 0);
-
-            const availableDogWalkers = await this.queryAvailableDogWalkers(searchDate, timeSlots, userZone);
+            const availableDogWalkers = await this.queryAvailableDogWalkers(date, timeSlots, userZone);
 
             return {
                 success: true,
@@ -43,6 +40,9 @@ export class SearchDWController {
     }
 
     async queryAvailableDogWalkers(searchDate, timeSlots, userZone) {
+        // แปลงให้เป็นวันที่เท่านั้น (YYYY-MM-DD)
+        const dateOnly = searchDate.toISOString().split('T')[0];
+
         // First, find all dog walkers that match the initial criteria
         const allDogWalkers = await this.prisma.dogWalker.findMany({
             where: {
@@ -59,7 +59,10 @@ export class SearchDWController {
                 zone: true,
                 services: {
                     where: {
-                        date: searchDate,
+                        date: {
+                            gte: new Date(`${dateOnly}T00:00:00.000Z`),
+                            lt: new Date(`${dateOnly}T23:59:59.999Z`)
+                        },
                         time: {
                             hasSome: timeSlots
                         },

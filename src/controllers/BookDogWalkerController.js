@@ -15,15 +15,17 @@ export class BookDogWalkerController {
                 return { error: "dogIds must be an array." };
             }
 
-            // Convert date string to Date object
-            const bookingDate = new Date(date);
-            bookingDate.setHours(0, 0, 0, 0);
+
+            const dateOnly = date.toISOString().split('T')[0];
 
             // Check availability using Prisma query builder
             const conflictingService = await prisma.walkingService.findFirst({
                 where: {
                     dogWalkerId: dogWalkerId,
-                    date: bookingDate,
+                    date: {
+                        gte: new Date(`${dateOnly}T00:00:00.000Z`),
+                        lt: new Date(`${dateOnly}T23:59:59.999Z`)
+                    },
                     time: {
                         hasSome: time // Checks if any time slot conflicts
                     },
@@ -48,7 +50,7 @@ export class BookDogWalkerController {
                     dogWalkerId,
                     dogs: dogIds, // array
                     request: new Date(),
-                    date: bookingDate,
+                    date: date,
                     time, // time slots
                     price,
                     status: 201 // awaiting payment
