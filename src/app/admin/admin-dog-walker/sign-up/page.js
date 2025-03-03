@@ -14,7 +14,6 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPen } from "@fortawesome/free-solid-svg-icons";
 import ConfirmationDialogs from "@/components/confirmation-dialogs";
-import { DatabaseZapIcon } from "lucide-react";
 
 const SignUpPage = () => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -25,6 +24,7 @@ const SignUpPage = () => {
   const [name, setName] = useState("");
   const [profileImage, setProfileImage] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -63,6 +63,7 @@ const SignUpPage = () => {
     }
   
     try {
+      setIsLoading(true)
       // Prepare FormData
       const formData = new FormData();
       formData.append("name", name);
@@ -87,7 +88,9 @@ const SignUpPage = () => {
       }
   
       const data = await response.json();
-  
+      
+      setIsLoading(false)
+
       if (data.success) {
         console.log(data)
         setMessage("บันทึกข้อมูลเข้าระบบเรียบร้อย");
@@ -186,8 +189,11 @@ const SignUpPage = () => {
               </div>
             </CardContent>
             <CardFooter className="flex justify-center space-x-4 mt-16">
-              <Button variant="default" onClick={handleConfirmClick}>
-                สร้างบัญชี
+              <Button 
+              variant="default" 
+              onClick={handleConfirmClick}
+              disabled={isLoading}>
+               {isLoading ? "กำลังสร้างบัญชี..." : "สร้างบัญชี"}
               </Button>
               <Button variant="destructive">ยกเลิก</Button>
             </CardFooter>
