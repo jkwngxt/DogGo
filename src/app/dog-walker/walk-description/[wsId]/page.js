@@ -5,38 +5,9 @@ import { Card } from "@/components/ui/card";
 import DogTable from "@/components/dog-table";
 import Loading from "@/components/loading";
 
-export default function DogWalkDescription({ params }) {
-  // Sample fallback data (will only be used if API fails)
-  const fallbackInfo = {
-    pet_owner: "Pet Owner 1",
-    dw_zone: "บางรัก",
-    u_address: "7/222 แขวงอรุณอมรินทร์ เขตบางรัก กรุงเทพมหานคร 10700",
-    u_tel: "0121234567",
-    dw_username: "Dog Walker 1",
-    ws_date: "2025-02-19",
-    startTime: "10:00",
-    endTime: "12:00",
-    dw_tel: "5551234567",
-    dogs: [
-      {
-        d_id: 1,
-        d_name: "มะลิ",
-        d_breed: "บางแก้ว",
-      },
-      {
-        d_id: 2,
-        d_name: "ลัคกี้",
-        d_breed: "ชิวาวา",
-      },
-      {
-        d_id: 3,
-        d_name: "บ๊อบ",
-        d_breed: "โกลเด้นรีทรีฟเวอร์",
-      },
-    ],
-  };
 
-  // Format date (moved outside of render function)
+export default function DogWalkDescription({ params }) {
+  
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -61,46 +32,40 @@ export default function DogWalkDescription({ params }) {
         setLoading(false);
         return;
       }
-
+  
       try {
         setLoading(true);
-        console.log("Fetching walking service details for wsId:", wsId);
-
+        setError(null); 
+  
         const response = await fetch(`/api/walking-service/service-detail/${wsId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
         });
-
-        if (!response.ok) {
-          // If response is not OK, read the error message
-          const errorData = await response.json();
-          throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+  
+        const data = await response.json(); 
+  
+        if (!data.success) { 
+          setError(data.message || "An error occurred while loading the service details.");
         }
   
-        const data = await response.json();
-        console.log("API Response:", data);
-  
-        if (data.success) {
-          setServiceInfo(data);
-        } else {
-          setError(data.message || "Failed to load service details.");
-        }
+        setServiceInfo(data);
       } catch (err) {
         console.error("Error fetching walking service details:", err);
         setError(err.message || "An error occurred while loading the service details.");
       } finally {
         setLoading(false);
       }
-    }
-
+    };
+  
     fetchServiceDetails();
   }, [wsId]);
-
+  
   if (loading) return <Loading />;
   
-  // Use either API data or fallback data
+  if (error) return <p className="p-2 text-red-600">Error: {error}</p>;
+
   const info = {
     pet_owner: serviceInfo.user.name || "N/A",
     dw_zone: serviceInfo.user.zone || "N/A",
@@ -112,12 +77,10 @@ export default function DogWalkDescription({ params }) {
     endTime: serviceInfo.service.endHour + (":00")|| "N/A",
     dw_tel: serviceInfo.dw.tel || "N/A",
     dogs: serviceInfo.service.dogs || [],
-  } 
+  };
 
   // Format the date from ws_date
   const formattedDate = formatDate(info.ws_date);
-
-  if (error) return <p className="text-red-600">{error}</p>;
 
   return (
     <div className="p-4 space-y-4">
