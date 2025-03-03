@@ -47,7 +47,7 @@ export default function page() {
                 ws_status: service.status,
                 dw_username: service.walkerName,
                 user_name: service.userName,
-                rating: service.isReview ? 5 : null 
+                isReviewed: service.isReview
             }));
 
             setWalkingServices(formattedServices);
@@ -70,10 +70,12 @@ export default function page() {
   const handleStatusUpdate = (id, newStatus) => {
     setWalkingServices((prev) =>
       prev.map((service) =>
-        service.id === id ? { ...service, ws_status: newStatus } : service
+        service.id === id
+          ? { ...service, ws_status: newStatus, isReviewed: newStatus === "รีวิว" }
+          : service
       )
     );
-  };
+  };  
 
   if (isLoading) {
     return (
@@ -108,7 +110,7 @@ export default function page() {
                 ws_date={service.ws_date}
                 timeRange={service.timeRange}
                 ws_status={service.ws_status}
-                rating={service.rating}
+                isReviewed={service.isReviewed}
                 walkingServiceId={service.id}
                 onStatusUpdate={handleStatusUpdate}
               />

@@ -22,22 +22,19 @@ const OwnerWalkConfirmation = ({ walkingServiceId, onStatusUpdate }) => {
   
   const handleConfirmClick = async () => {
     try {
-      console.log("Updating status for ID:", walkingServiceId);
-
       const response = await fetch("/api/walking-service/change-status", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          status: 204, // Update status to completed
+          status: 204, // Update to "Completed"
           walkingServiceId: walkingServiceId,
         }),
       });
-
+  
       const result = await response.json();
-      console.log("Update Result:", result);
-
+  
       if (response.ok) {
         if (onStatusUpdate) {
           onStatusUpdate(walkingServiceId, "รีวิว");
@@ -50,8 +47,8 @@ const OwnerWalkConfirmation = ({ walkingServiceId, onStatusUpdate }) => {
     } catch (error) {
       console.error("Request failed:", error);
     }
-  };
-
+  };  
+  
   const handleDialogClose = () => {
     setShowSuccessDialog(false);
     router.push("/pet-owner/homepage"); // Navigate after confirmation closes
@@ -84,6 +81,7 @@ const OwnerWalkConfirmation = ({ walkingServiceId, onStatusUpdate }) => {
         </DialogContent>
       </Dialog>
 
+      {/* Success Dialog */}
       <ConfirmationDialogs
         showSuccessDialog={showSuccessDialog}
         message="การได้รับบริการสำเร็จ"
