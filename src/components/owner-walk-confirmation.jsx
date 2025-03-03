@@ -15,14 +15,41 @@ import {
 } from "@/components/ui/dialog";
 import ConfirmationDialogs from "./confirmation-dialogs";
 
-const OwnerWalkConfirmation = () => {
+const OwnerWalkConfirmation = ({ walkingServiceId, onStatusUpdate }) => {
   const router = useRouter();
   const [showFirstDialog, setShowFirstDialog] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const handleConfirmClick = () => {
-    console.log("Confirmation button clicked"); // Console log
-    setShowFirstDialog(false); // Close first dialog
-    setShowSuccessDialog(true); // Show Confirmation dialog
+  
+  const handleConfirmClick = async () => {
+    try {
+      console.log("Updating status for ID:", walkingServiceId);
+
+      const response = await fetch("/api/walking-service/change-status", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: 204, // Update status to completed
+          walkingServiceId: walkingServiceId,
+        }),
+      });
+
+      const result = await response.json();
+      console.log("Update Result:", result);
+
+      if (response.ok) {
+        if (onStatusUpdate) {
+          onStatusUpdate(walkingServiceId, "รีวิว");
+        }
+        setShowFirstDialog(false);
+        setShowSuccessDialog(true);
+      } else {
+        console.error("Error updating status:", result.error);
+      }
+    } catch (error) {
+      console.error("Request failed:", error);
+    }
   };
 
   const handleDialogClose = () => {

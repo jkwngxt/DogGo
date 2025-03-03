@@ -12,20 +12,24 @@ const HistoryDogWalker = ({
   userImage,
   dw_username,
   ws_date,
-  startTime,
-  endTime,
+  timeRange,
   ws_status,
   rating,
+  walkingServiceId,
+  onStatusUpdate
 }) => {
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
+  const [status, setStatus] = React.useState(ws_status);
 
+  /*
   const formatDate = (dateString) => {
     const [year, month, day] = dateString.split("-");
     return `${day}/${month}/${year}`;
   };
 
   const formattedDate = formatDate(ws_date);
-
+  */
+ 
   const handleCardClick = () => {
     router.push("/pet-owner/walk-description");
   };
@@ -33,6 +37,13 @@ const HistoryDogWalker = ({
   const handleButtonClick = (e) => {
     e.stopPropagation(); // Prevents triggering card click event
     router.push("/pet-owner/review");
+  };
+
+  const handleStatusUpdate = (id, newStatus) => {
+    setStatus(newStatus);
+    if (onStatusUpdate) {
+      onStatusUpdate(id, newStatus);
+    }
   };
 
   const renderStatusButton = (ws_status) => {
@@ -52,9 +63,12 @@ const HistoryDogWalker = ({
     if (ws_status === "การบริการเสร็จสิ้น") {
       return <p className="font-bold text-[#6498FA]">การบริการเสร็จสิ้น</p>;
     }
-    return  <div onClick={(e) => e.stopPropagation()}>
-    <OwnerWalkConfirmation />
-  </div>;
+    return (
+      <OwnerWalkConfirmation
+        walkingServiceId={walkingServiceId} 
+        onStatusUpdate={handleStatusUpdate} 
+      />
+    );
   };
 
   return (
@@ -66,9 +80,9 @@ const HistoryDogWalker = ({
           className="w-12 h-12 rounded-full object-cover"
         />
         <div className="w-28 text-center">{dw_username}</div>
-        <div className="w-28 text-center">{formattedDate}</div>
+        <div className="w-28 text-center">{ws_date}</div>
         <div className="w-28 flex justify-center space-x-1">
-          <span>{startTime}</span> <span>-</span> <span>{endTime}</span>
+          <span>{timeRange}</span> 
         </div>
         <div className="w-28 flex justify-center items-center space-x-1">
           <FontAwesomeIcon icon={faStar} className="h-5 w-5 text-yellow-400" />
