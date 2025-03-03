@@ -49,12 +49,14 @@ const HistoryDogWalker = ({
             return <p className="font-bold text-red-500">การรับงานถูกปฏิเสธ</p>;
 
         case 203: // Accepted -> Show "ได้รับบริการ"
-            return (
-                <OwnerWalkConfirmation
-                    walkingServiceId={walkingServiceId}
-                    onStatusUpdate={() => handleStatusUpdate(walkingServiceId, 204)}
-                />
-            );
+        return (
+          <div onClick={(e) => e.stopPropagation()}>
+            <OwnerWalkConfirmation
+              walkingServiceId={walkingServiceId}
+              onStatusUpdate={() => handleStatusUpdate(walkingServiceId, 204)}
+            />
+          </div>
+        );        
 
         case 204: // Completed -> Show "รีวิว"
             return (
