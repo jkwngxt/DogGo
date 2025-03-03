@@ -37,7 +37,7 @@ export const useAuth = () => {
                     router.push("/dog-walker/homepage");
                     break;
                 case "admin":
-                    router.push("/admin-home");
+                    router.push("/admin/admin-dog-walker/sign-up");
                     break;
                 case "customer":
                     router.push("/pet-owner/homepage");
