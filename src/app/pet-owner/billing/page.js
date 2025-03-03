@@ -101,11 +101,11 @@ export default function Billing() {
       if (window.history.length > 1) {
         router.back();
       } else {
-        router.push("/");
+        router.push("/pet-owner/walking-service");
       }
     } catch (error) {
       // Fallback to home page
-      window.location.href = "/";
+      window.location.href = "/pet-owner/walking-service";
     }
   };
 
@@ -114,7 +114,7 @@ export default function Billing() {
     // ลบข้อมูลใน sessionStorage
     sessionStorage.removeItem('bookingData');
     // นำผู้ใช้กลับไปหน้า home
-    router.push('/');
+    router.push('/pet-owner/walking-service');
   };
 
   return (

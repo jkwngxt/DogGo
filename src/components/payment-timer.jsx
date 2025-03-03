@@ -84,7 +84,7 @@ const PaymentTimer = ({ total }) => {
           setMessage(`พนักงานพาสุนัขเดินคนนี้มีการจองในช่วงเวลาที่คุณเลือกแล้ว กรุณาเลือกช่วงเวลาอื่น`);
         } else {
           // Unexpected error
-          setMessage(`การจองล้มเหลว: ${data.error || 'เกิดข้อผิดพลาดในระบบ'}`);
+          setMessage(`การจองล้มเหลว กรุณาทำรายการใหม่อีกครั้ง'}`);
         }
         setShowErrorDialog(true);
       }
@@ -99,7 +99,7 @@ const PaymentTimer = ({ total }) => {
 
   const handleConfirmClick = async () => {
     if (!bookingData || !bookingData.billingId) {
-      setMessage("ข้อมูลการชำระเงินไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง");
+      setMessage("ข้อมูลการชำระเงินไม่ถูกต้อง กรุณาทำรายการใหม่อีกครั้ง");
       setShowErrorDialog(true);
       setShowPaymentDialog(false);
       return;
@@ -144,13 +144,13 @@ const PaymentTimer = ({ total }) => {
       } else {
         // Payment confirmation failed
         setShowPaymentDialog(false);
-        setMessage("การชำระเงินล้มเหลว  กรุณาลองใหม่อีกครั้ง");
+        setMessage("ไม่สามารถติดต่อกับระบบชำระเงินได้");
         setShowErrorDialog(true);
       }
     } catch (error) {
       console.error("Error during payment confirmation:", error);
       setShowPaymentDialog(false);
-      setMessage("การชำระเงินล้มเหลว กรุณาลองใหม่อีกครั้ง");
+      setMessage("ไม่สามารถติดต่อกับระบบชำระเงินได้");
       setShowErrorDialog(true);
     } finally {
       setIsConfirmingPayment(false);
@@ -162,13 +162,14 @@ const PaymentTimer = ({ total }) => {
     // ลบข้อมูลการจองจาก sessionStorage เมื่อเกิดข้อผิดพลาด
     sessionStorage.removeItem('bookingData');
     // Redirect to home page when error dialog is closed
-    router.push("/");
+    router.push("/pet-owner/walking-service");
   };
 
   const handleSuccessDialogClose = () => {
     setShowSuccessDialog(false);
     // Redirect to dashboard after successful payment
-    router.back();
+
+    router.push(`/pet-owner/walk-description?wId=${bookingData.walkingServiceId}`);
   };
 
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes (600 seconds)
