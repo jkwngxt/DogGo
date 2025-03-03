@@ -21,21 +21,9 @@ export async function POST(request) {
 
         const body = await request.json();
         const { dwId, startTimeInt, endTimeInt, date } = body;
-        console.log('Request body:', body);
 
-        // Ensure date is handled correctly with timezone information
-        let parsedDate = null;
-        if (date) {
-            try {
-                // Parse the ISO format date string with timezone
-                parsedDate = date;
-                console.log('Parsed date:', parsedDate);
-            } catch (e) {
-                console.error('Error parsing date:', e);
-                // If parsing fails, use the date as-is
-                parsedDate = date;
-            }
-        }
+        const dateTimeString = `${date} ${startTimeInt}:00:00`;
+        let dateSearch = new Date(dateTimeString);
 
         const fetchReviewDW = new FetchReviewDWController();
         const result = await fetchReviewDW.getReviewByDwId(
@@ -43,7 +31,7 @@ export async function POST(request) {
             dwId,
             startTimeInt,
             endTimeInt,
-            parsedDate
+            dateSearch
         );
 
         if (!result.success) {
