@@ -58,8 +58,10 @@ const HistoryDogWalker = ({
           </div>
         );        
 
-        case 204: // Completed -> Show "รีวิว"
-            return (
+        case 204: // Completed
+            return isReviewed ? (
+                <p className="font-bold text-[#6498FA]">การบริการเสร็จสิ้น</p>
+            ) : (
                 <Button onClick={handleButtonClick} variant="secondary">
                     รีวิว
                 </Button>
