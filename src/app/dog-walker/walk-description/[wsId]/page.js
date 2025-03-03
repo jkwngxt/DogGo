@@ -101,18 +101,18 @@ export default function DogWalkDescription({ params }) {
   if (loading) return <Loading />;
   
   // Use either API data or fallback data
-  const info = serviceInfo ? {
-    pet_owner: serviceInfo.user?.u_name || "N/A",
-    dw_zone: serviceInfo.user?.u_zone || "N/A",
-    u_address: serviceInfo.user?.u_address || "N/A",
-    u_tel: serviceInfo.user?.u_tel || "N/A",
-    dw_username: serviceInfo.dw?.dw_name || "N/A",
-    ws_date: serviceInfo.service?.ws_date || "N/A",
-    startTime: serviceInfo.service?.ws_startTime || "N/A",
-    endTime: serviceInfo.service?.ws_endTime || "N/A",
-    dw_tel: serviceInfo.dw?.dw_tel || "N/A",
-    dogs: serviceInfo.dogs || [],
-  } : fallbackInfo;
+  const info = {
+    pet_owner: serviceInfo.user.name || "N/A",
+    dw_zone: serviceInfo.user.zone || "N/A",
+    u_address: serviceInfo.user.address || "N/A",
+    u_tel: serviceInfo.user.tel || "N/A",
+    dw_username: serviceInfo.dw.name || "N/A",
+    ws_date: serviceInfo.service.date || "N/A",
+    startTime: serviceInfo.service.startTime + (":00")|| "N/A",
+    endTime: serviceInfo.service.endHour + (":00")|| "N/A",
+    dw_tel: serviceInfo.dw.tel || "N/A",
+    dogs: serviceInfo.service.dogs || [],
+  } 
 
   // Format the date from ws_date
   const formattedDate = formatDate(info.ws_date);
