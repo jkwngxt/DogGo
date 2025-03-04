@@ -2,12 +2,7 @@
 
 import React from "react";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
   NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -38,17 +33,17 @@ const ListItem = React.forwardRef(
 
 ListItem.displayName = "ListItem";
 
-const AdminNav = ({ userImage, userName}) => {
+const AdminNav = () => {
   return (
     <div className="flex px-10 bg-[#2668E3] justify-between">
       <img className="w-20 h-20" src="/image/logo.svg" alt="dog go logo" />
       <div className="flex flex-row space-x-4 items-center">
         <img
-          src={userImage}
+          src="/image/user-placeholder.jpg"
           alt="User profile"
           className="w-16 h-16 rounded-full object-cover"
         />
-        <div className="text-white font-bold">{userName}</div>
+        <div className="text-white font-bold">DogGo Admin</div>
         <button>
             <FontAwesomeIcon icon={faSignOut} className="h-5 w-5 text-white"/>
         </button>

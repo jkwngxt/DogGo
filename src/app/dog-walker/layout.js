@@ -24,10 +24,14 @@ const notoSansThai = Noto_Sans_Thai({
 
 export default function RootLayout({ children }) {
   const [userRole, setUserRole] = useState(null);
+  const [name, setName] = useState(null)
 
   useEffect(() => {
     // Fetch user role from sessionStorage only on client side
     const role = sessionStorage.getItem("userRole");
+    setUserRole(role);
+
+    const name = localStorage.getItem("name");
     setUserRole(role);
   }, []);
 
@@ -36,7 +40,8 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${notoSansThai.variable} font-auto antialiased`}
       >
-        <DogWalkerNav/>
+        <DogWalkerNav
+        userName = {name || "Dog walker"}/>
         {children}
       </body>
     </html>

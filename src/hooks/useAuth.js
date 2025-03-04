@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 export const useAuth = () => {
     const [user, setUser] = useState(null);
     const router = useRouter();
+    const [name, setName] = useState(null);
 
     useEffect(() => {
         const role = sessionStorage.getItem("userRole");
@@ -23,13 +24,16 @@ export const useAuth = () => {
             });
 
             const data = await response.json();
-
+            console.log(data)
             if (!response.ok) {
                 return { success: false, message: data.message || "Invalid username or password." };
             }
 
             sessionStorage.setItem("userRole", data.user.role);
             setUser(data.user.role);
+
+            localStorage.setItem("name",data.user.name);
+            setName(data.user.name)
 
             // Redirect ตาม role
             switch (data.user.role) {
@@ -47,9 +51,6 @@ export const useAuth = () => {
                 case "customer":
                     router.push("/pet-owner/homepage");
                     break;
-                case "serviceProvider":
-                    router.push("/service-provider/homepage");
-                    break;
                 default:
                     return { success: false, message: "Unknown role." };
             }
@@ -66,5 +67,5 @@ export const useAuth = () => {
         router.push("/login");
     };
 
-    return { user, login, logout };
+    return { user, login, logout, name };
 };
