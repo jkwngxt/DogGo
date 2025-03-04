@@ -11,7 +11,7 @@ function serializeBigInt(obj) {
     }));
 }
 
-export async function POST(request) {
+export async function GET(request) {
     try {
         const { user, response } = await authenticateRequest(request);
         if (response) return response;

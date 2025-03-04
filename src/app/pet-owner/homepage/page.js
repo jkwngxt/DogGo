@@ -14,9 +14,8 @@ export default function page() {
     try {
         setIsLoading(true);
         const response = await fetch("/api/walking-service/service-detail", {
-            method: "POST",
+            method: "GET",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({})
         });
 
         if (!response.ok) {
