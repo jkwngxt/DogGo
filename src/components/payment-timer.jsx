@@ -33,6 +33,8 @@ const PaymentTimer = ({ total }) => {
             timerRef.current = null;
             // เมื่อเวลาหมด ให้ลบข้อมูลการจองจาก sessionStorage
             sessionStorage.removeItem('bookingData');
+            sessionStorage.removeItem('selectedDogWalker');
+            sessionStorage.removeItem('walkingServiceSearch');
             return 0;
           }
           return prev - 1;
@@ -72,6 +74,8 @@ const PaymentTimer = ({ total }) => {
       }
 
       sessionStorage.removeItem('bookingData');
+      sessionStorage.removeItem('selectedDogWalker');
+      sessionStorage.removeItem('walkingServiceSearch');
       setMessage("เวลาในการชำระเงินหมดลง การจองถูกยกเลิก");
       setShowErrorDialog(true);
     }
@@ -231,6 +235,8 @@ const PaymentTimer = ({ total }) => {
 
         // ลบข้อมูลการจองจาก sessionStorage เมื่อการชำระเงินเสร็จสิ้น
         sessionStorage.removeItem('bookingData');
+        sessionStorage.removeItem('selectedDogWalker');
+        sessionStorage.removeItem('walkingServiceSearch');
         // สามารถเก็บข้อมูลการค้นหาไว้เผื่อกรณีที่ต้องการจองเพิ่ม
         // sessionStorage.removeItem('walkingServiceSearch');
 
@@ -303,6 +309,8 @@ const PaymentTimer = ({ total }) => {
     setShowErrorDialog(false);
     // ลบข้อมูลการจองจาก sessionStorage เมื่อเกิดข้อผิดพลาด
     sessionStorage.removeItem('bookingData');
+    sessionStorage.removeItem('selectedDogWalker');
+    sessionStorage.removeItem('walkingServiceSearch');
     // Redirect to home page when error dialog is closed
     router.push("/pet-owner/walking-service");
   };
@@ -374,6 +382,8 @@ const PaymentTimer = ({ total }) => {
                     }
                     // ลบข้อมูลการจองจาก sessionStorage เมื่อผู้ใช้ยกเลิก
                     sessionStorage.removeItem('bookingData');
+                    sessionStorage.removeItem('selectedDogWalker');
+                    sessionStorage.removeItem('walkingServiceSearch');
                     // ปิด payment dialog
                     setShowPaymentDialog(false);
                     // แสดง error dialog
