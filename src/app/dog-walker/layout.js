@@ -32,7 +32,7 @@ export default function RootLayout({ children }) {
     setUserRole(role);
 
     const name = localStorage.getItem("name");
-    setUserRole(role);
+    setName(name);
   }, []);
 
   return (
@@ -41,7 +41,7 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} ${notoSansThai.variable} font-auto antialiased`}
       >
         <DogWalkerNav
-        userName = {name || "Dog walker"}/>
+        userName = {name}/>
         {children}
       </body>
     </html>
