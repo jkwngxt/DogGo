@@ -141,7 +141,7 @@ const PaymentTimer = ({ total }) => {
 
       const data = await response.json();
 
-      if (response.ok && data.success) {
+      if (response.ok) {
         // Booking successful - open payment dialog
         setBookingData(data);
 
@@ -165,6 +165,7 @@ const PaymentTimer = ({ total }) => {
           setMessage(`พนักงานพาสุนัขเดินคนนี้มีการจองในช่วงเวลาที่คุณเลือกแล้ว กรุณาเลือกช่วงเวลาอื่น`);
         } else {
           // Unexpected error
+          console.log(data)
           setMessage(`การจองล้มเหลว: ${data.message || 'กรุณาทำรายการใหม่อีกครั้ง'}`);
         }
         setShowErrorDialog(true);
@@ -208,7 +209,9 @@ const PaymentTimer = ({ total }) => {
 
       const data = await response.json();
 
-      if (response.ok && data.success) {
+      console.log(data);
+
+      if (response.ok) {
         setShowPaymentDialog(false); // Close payment dialog
 
         // ดึงข้อมูลการจองจาก localStorage

@@ -7,13 +7,17 @@ import { Button } from "@/components/ui/button";
 import Reviews from "@/components/review";
 import React, { useEffect, useState } from "react";
 import ClientDogSelector from "@/components/client-dog";
-import { notFound, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/components/loading";
 import ConfirmationDialogs from "@/components/confirmation-dialogs";
 
 export default function DogWalker({ params }) {
+  // Always put hooks at the top level
   const router = useRouter();
+  const unwrappedParams = React.use(params);
+  const dwId = parseInt(unwrappedParams.dwId);
   const searchParams = useSearchParams();
+
   const [dogWalkerData, setDogWalkerData] = useState(null);
   const [userDogs, setUserDogs] = useState([]);
   const [loading, setIsLoading] = useState(true);
@@ -23,17 +27,13 @@ export default function DogWalker({ params }) {
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [message, setMessage] = useState("");
 
-  // ดึงข้อมูลจาก URL
-  const unwrappedParams = React.use(params);
-  const dwId = parseInt(unwrappedParams.dwId);
-
+  // Get search parameters
   const startTimeSearch = searchParams.get('startTime') ? parseInt(searchParams.get('startTime')) : 0;
   const endTimeSearch = searchParams.get('endTime') ? parseInt(searchParams.get('endTime')) : 0;
   const rawDateSearch = searchParams.get('date') || null;
 
-  // ตรวจสอบว่ามีข้อมูลการค้นหาครบถ้วนหรือไม่
+  // Validate search parameters
   const validateSearchParams = () => {
-    // ดึงข้อมูลจาก sessionStorage เพื่อยืนยันความถูกต้อง
     const searchDataStr = sessionStorage.getItem('walkingServiceSearch');
 
     if (!searchDataStr) return false;
@@ -41,7 +41,6 @@ export default function DogWalker({ params }) {
     try {
       const searchData = JSON.parse(searchDataStr);
 
-      // ตรวจสอบว่าข้อมูลใน URL ตรงกับข้อมูลใน sessionStorage
       return (
           searchData.startTimeInt === startTimeSearch &&
           searchData.endTimeInt === endTimeSearch &&
@@ -57,7 +56,7 @@ export default function DogWalker({ params }) {
       try {
         setIsLoading(true);
 
-        // ตรวจสอบความถูกต้องของข้อมูลการค้นหา
+        // Validate search parameters
         if (!validateSearchParams()) {
           setMessage("ข้อมูลการค้นหาไม่ถูกต้อง กรุณาทำรายการใหม่");
           setShowErrorDialog(true);
@@ -91,7 +90,7 @@ export default function DogWalker({ params }) {
           setUserZone(data.userZone);
           setCanBook(data.canBook);
 
-          // บันทึกข้อมูล Dog Walker ลงใน sessionStorage
+          // Store dog walker data in sessionStorage
           sessionStorage.setItem('selectedDogWalker', JSON.stringify({
             id: data.dogWalkers.id,
             name: data.dogWalkers.name,
@@ -120,16 +119,40 @@ export default function DogWalker({ params }) {
     router.push('/pet-owner/walking-service');
   };
 
+  const handleBack = () => {
+    try {
+      if (window.history.length > 1) {
+        router.back();
+      } else {
+        router.push("/pet-owner/walking-service");
+      }
+    } catch (error) {
+      window.location.href = "/pet-owner/walking-service";
+    }
+  };
+
+  // Helper function to get image path
+  const getImagePath = (picPath) => {
+    if (!picPath) return "/image/user-placeholder.jpg";
+    if (picPath.startsWith('http')) return picPath;
+
+    const normalizedPath = picPath.startsWith('/') ? picPath.slice(1) : picPath;
+    return `/api/images/${normalizedPath}`;
+  };
+
+  // Handle loading state
   if (loading) {
     return <Loading />;
   }
 
+  // Handle error state
   if (error || !dogWalkerData) {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen">
-          <h1 className="text-2xl text-red-500 mb-4">ไม่พบข้อมูล Dog Walker</h1>
-          <Button onClick={() => router.push('/pet-owner/walking-service')}>กลับสู่หน้าค้นหา</Button>
-        </div>
+        <ConfirmationDialogs
+            showErrorDialog={true}
+            message="มีบางอย่างผิดพลาด กรุณาทำรายการอีกครั้ง"
+            onErrorClose={() => router.push('/pet-owner/walking-service')}
+        />
     );
   }
 
@@ -142,33 +165,7 @@ export default function DogWalker({ params }) {
     avatar: "/image/user-placeholder.jpg", // Default avatar for now
   })) : [];
 
-  // ใช้ API Route เพื่อเรียกรูปภาพ
-  const getImagePath = (picPath) => {
-    if (!picPath) return "/image/user-placeholder.jpg";
-    if (picPath.startsWith('http')) return picPath;
-
-    // ตัด / ข้างหน้าออกถ้ามี
-    const normalizedPath = picPath.startsWith('/') ? picPath.slice(1) : picPath;
-
-    // ใช้ API Route
-    return `/api/images/${normalizedPath}`;
-  };
-
   const imgPath = getImagePath(dogWalkerData.pic);
-
-  const handleBack = () => {
-    try {
-      // ใช้ window.history เพื่อตรวจสอบว่ามีหน้าก่อนหน้าหรือไม่
-      if (window.history.length > 1) {
-        router.back();
-      } else {
-        router.push("/pet-owner/walking-service");
-      }
-    } catch (error) {
-      // หากเกิดข้อผิดพลาดใดๆ ให้ใช้ window.location แทน
-      window.location.href = "/pet-owner/walking-service";
-    }
-  };
 
   return (
       <>
