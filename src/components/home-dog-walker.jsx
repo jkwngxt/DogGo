@@ -25,9 +25,9 @@ const HomeDogWalker = ({
   const getImagePath = (picPath) => {
     if (!picPath) return "/image/user-placeholder.jpg";
     if (picPath.startsWith('http')) return picPath;
-    if (picPath.startsWith('/')) return picPath;
 
-    return `/api/images/${picPath}`;
+    const normalizedPath = picPath.startsWith('/') ? picPath.slice(1) : picPath;
+    return `/api/images/${normalizedPath}`;
   };
 
   return (
