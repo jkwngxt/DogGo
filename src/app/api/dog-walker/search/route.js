@@ -12,6 +12,14 @@ export async function POST(request) {
         const body = await request.json();
         const { date, startTimeInt, endTimeInt } = body;
 
+        // ตรวจสอบความถูกต้องของข้อมูล
+        if (!date || !startTimeInt || !endTimeInt) {
+            return NextResponse.json(
+                { success: false, message: 'ข้อมูลไม่ครบถ้วน กรุณาระบุวันที่และเวลาให้ครบถ้วน' },
+                { status: 400 }
+            );
+        }
+
         // Define constants
         const START_TIME = 9; // 9:00 AM is the first slot
 

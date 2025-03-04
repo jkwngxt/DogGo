@@ -7,36 +7,64 @@ import { Button } from "@/components/ui/button";
 import Reviews from "@/components/review";
 import React, { useEffect, useState } from "react";
 import ClientDogSelector from "@/components/client-dog";
-import { notFound, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Loading from "@/components/loading";
+import ConfirmationDialogs from "@/components/confirmation-dialogs";
 
 export default function DogWalker({ params }) {
+  // Always put hooks at the top level
   const router = useRouter();
+  const unwrappedParams = React.use(params);
+  const dwId = parseInt(unwrappedParams.dwId);
   const searchParams = useSearchParams();
+
   const [dogWalkerData, setDogWalkerData] = useState(null);
   const [userDogs, setUserDogs] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userZone, setUserZone] = useState(null);
   const [canBook, setCanBook] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [message, setMessage] = useState("");
 
-  // Use React.use to unwrap the params Promise
-  // ตัวอย่าง route http://localhost:3000/pet-owner/dog-walker/1?startTime=15&endTime=18&date=2025-02-24
-  const unwrappedParams = React.use(params);
-  const dwId = parseInt(unwrappedParams.dwId);
-
+  // Get search parameters
   const startTimeSearch = searchParams.get('startTime') ? parseInt(searchParams.get('startTime')) : 0;
   const endTimeSearch = searchParams.get('endTime') ? parseInt(searchParams.get('endTime')) : 0;
-
-  // Get the date from URL and format it with timezone information
   const rawDateSearch = searchParams.get('date') || null;
 
-  // Convert the date string to a Date object with timezone information
+  // Validate search parameters
+  const validateSearchParams = () => {
+    const searchDataStr = sessionStorage.getItem('walkingServiceSearch');
+
+    if (!searchDataStr) return false;
+
+    try {
+      const searchData = JSON.parse(searchDataStr);
+
+      return (
+          searchData.startTimeInt === startTimeSearch &&
+          searchData.endTimeInt === endTimeSearch &&
+          searchData.date === rawDateSearch
+      );
+    } catch (error) {
+      return false;
+    }
+  };
 
   useEffect(() => {
     const fetchDogWalkerData = async () => {
       try {
-        setLoading(true);
+        setIsLoading(true);
+
+        // Validate search parameters
+        if (!validateSearchParams()) {
+          setMessage("ข้อมูลการค้นหาไม่ถูกต้อง กรุณาทำรายการใหม่");
+          setShowErrorDialog(true);
+          setCanBook(false);
+          setIsLoading(false);
+          return;
+        }
+
         const response = await fetch('/api/dog-walker/read-review', {
           method: 'POST',
           headers: {
@@ -51,7 +79,8 @@ export default function DogWalker({ params }) {
         });
 
         if (!response.ok) {
-          notFound();
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to fetch dog walker data');
         }
 
         const data = await response.json();
@@ -60,14 +89,23 @@ export default function DogWalker({ params }) {
           setUserDogs(data.dogs);
           setUserZone(data.userZone);
           setCanBook(data.canBook);
+
+          // Store dog walker data in sessionStorage
+          sessionStorage.setItem('selectedDogWalker', JSON.stringify({
+            id: data.dogWalkers.id,
+            name: data.dogWalkers.name,
+            tel: data.dogWalkers.tel || 'ไม่ระบุ'
+          }));
         } else {
           throw new Error(data.message || 'Failed to fetch dog walker data');
         }
       } catch (err) {
         setError(err.message);
         console.error('Error fetching dog walker data:', err);
+        setMessage(err.message || "ไม่สามารถดึงข้อมูล Dog Walker ได้");
+        setShowErrorDialog(true);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -76,14 +114,46 @@ export default function DogWalker({ params }) {
     }
   }, [dwId, startTimeSearch, endTimeSearch, rawDateSearch]);
 
+  const handleDialogClose = () => {
+    setShowErrorDialog(false);
+    router.push('/pet-owner/walking-service');
+  };
+
+  const handleBack = () => {
+    try {
+      if (window.history.length > 1) {
+        router.back();
+      } else {
+        router.push("/pet-owner/walking-service");
+      }
+    } catch (error) {
+      window.location.href = "/pet-owner/walking-service";
+    }
+  };
+
+  // Helper function to get image path
+  const getImagePath = (picPath) => {
+    if (!picPath) return "/image/user-placeholder.jpg";
+    if (picPath.startsWith('http')) return picPath;
+
+    const normalizedPath = picPath.startsWith('/') ? picPath.slice(1) : picPath;
+    return `/api/images/${normalizedPath}`;
+  };
+
+  // Handle loading state
   if (loading) {
-    return (
-        <Loading />
-    );
+    return <Loading />;
   }
 
+  // Handle error state
   if (error || !dogWalkerData) {
-    notFound();
+    return (
+        <ConfirmationDialogs
+            showErrorDialog={true}
+            message="มีบางอย่างผิดพลาด กรุณาทำรายการอีกครั้ง"
+            onErrorClose={() => router.push('/pet-owner/walking-service')}
+        />
+    );
   }
 
   // Prepare and format the reviews
@@ -95,33 +165,7 @@ export default function DogWalker({ params }) {
     avatar: "/image/user-placeholder.jpg", // Default avatar for now
   })) : [];
 
-  // ใช้ API Route เพื่อเรียกรูปภาพ - เส้นทางรูปภาพจะถูกกำหนดที่นี่
-  const getImagePath = (picPath) => {
-    if (!picPath) return "/image/user-placeholder.jpg";
-    if (picPath.startsWith('http')) return picPath;
-
-    // ตัด / ข้างหน้าออกถ้ามี
-    const normalizedPath = picPath.startsWith('/') ? picPath.slice(1) : picPath;
-
-    // ใช้ API Route
-    return `/api/images/${normalizedPath}`;
-  };
-
   const imgPath = getImagePath(dogWalkerData.pic);
-
-  const handleBack = () => {
-    try {
-      // ใช้ window.history เพื่อตรวจสอบว่ามีหน้าก่อนหน้าหรือไม่
-      if (window.history.length > 1) {
-        router.back();
-      } else {
-        router.push("/");
-      }
-    } catch (error) {
-      // หากเกิดข้อผิดพลาดใดๆ ให้ใช้ window.location แทน
-      window.location.href = "/";
-    }
-  };
 
   return (
       <>
@@ -168,7 +212,7 @@ export default function DogWalker({ params }) {
                   <div className="space-y-2">
                     <div className="flex space-x-2">
                       <span className="font-bold">เบอร์โทรติดต่อ:</span>
-                      <span>{dogWalkerData.tel}</span>
+                      <span>{dogWalkerData.tel || 'ไม่ระบุ'}</span>
                     </div>
                   </div>
                 </div>
@@ -186,17 +230,15 @@ export default function DogWalker({ params }) {
                           dogWalker={{
                             id: dwId,
                             name: dogWalkerData.name,
-                            tel: dogWalkerData.tel
+                            tel: dogWalkerData.tel || 'ไม่ระบุ'
                           }}
                       />
                   ) : (
                       <div className="opacity-50 pointer-events-none">
-                        <ClientDogSelector dogs={[]} />
+                        <Button disabled>เลือก</Button>
                       </div>
                   )}
-                  <Button variant="destructive"
-                          onClick={handleBack}
-                  >
+                  <Button variant="destructive" onClick={handleBack}>
                     ยกเลิก
                   </Button>
                 </div>
@@ -208,11 +250,16 @@ export default function DogWalker({ params }) {
                         <p className="text-blue-800 mt-1">ท่านอยู่นอกเขตที่ dog walker ให้บริการ</p>
                     ) : null
                 )}
-
               </div>
             </Card>
           </div>
         </div>
+
+        <ConfirmationDialogs
+            showErrorDialog={showErrorDialog}
+            message={message}
+            onErrorClose={handleDialogClose}
+        />
       </>
   );
 }
