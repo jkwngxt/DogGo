@@ -122,41 +122,6 @@ export default function page() {
             )}
           </Card>
         </div>
-
-        <div className="w-9/12">
-          <h1 className="text-left text-3xl font-bold text-gray-900 mb-4">
-            คูปองของฉัน
-          </h1>
-          <Card className="p-6 h-auto space-y-4">
-            {/* Add your coupon content here */}
-            <CouponCard
-              c_id="CP2314587"
-              sp_name="JA Pet 1"
-              s_name="ตัดขนสัตว์แบบพิเศษ"
-              s_type="กรูมมิ่ง ตัดแต่งขน"
-              s_price={500}
-              c_status="ใช้"
-            />
-
-            <CouponCard
-              c_id="CP2314587"
-              sp_name="JA Pet 1"
-              s_name="ตัดขนสัตว์แบบพิเศษ"
-              s_type="กรูมมิ่ง ตัดแต่งขน"
-              s_price={500}
-              c_status="รีวิว"
-            />
-
-            <CouponCard
-              c_id="CP2314587"
-              sp_name="JA Pet 1"
-              s_name="ตัดขนสัตว์แบบพิเศษ"
-              s_type="กรูมมิ่ง ตัดแต่งขน"
-              s_price={500}
-              c_status="สำเร็จ"
-            />
-          </Card>
-        </div>
       </div>
     </div>
   );
