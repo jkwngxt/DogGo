@@ -165,6 +165,7 @@ export default function WalkingService() {
                               userImage={walker.pic || "/image/user-placeholder.jpg"}
                               dw_name={walker.name}
                               dw_zone={Array.isArray(walker.zone) ? walker.zone.join(', ') : walker.zone}
+                              dw_tel={walker.tel}
                               rating={walker.meanRating?.toFixed(1) || "0.0"}
                               ratingCount={walker.ratingCount || 0}
                               onSelect={() => handleSelectDogWalker(walker.id)}

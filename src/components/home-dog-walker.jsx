@@ -17,7 +17,24 @@ const HomeDogWalker = ({
                            onSelect
                        }) => {
     // Default phone number if not provided
-    dw_tel = dw_tel ? dw_tel : "000-000-0000";
+    dw_tel = dw_tel ? dw_tel : "0000000000";
+
+    const formatPhoneNumber = (phoneNumber) => {
+        // Remove all non-digit characters
+        const cleaned = ('' + phoneNumber).replace(/\D/g, '');
+
+        // Check if the input is valid
+        if (cleaned.length < 9 || cleaned.length > 10) return phoneNumber;
+
+        // Format according to the length of the number
+        if (cleaned.length === 10) {
+            return cleaned.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+        } else if (cleaned.length === 9) {
+            return cleaned.replace(/(\d{2})(\d{3})(\d{4})/, '$1-$2-$3');
+        }
+
+        return phoneNumber;
+    };
 
     // Function to handle image errors
     const handleImageError = (e) => {
@@ -42,7 +59,7 @@ const HomeDogWalker = ({
                     <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
                         <img
                             src={getImagePath(userImage)}
-                            alt={`${dw_name} profile`}
+                            alt={`${dw_name.trim()} profile`}
                             className="w-full h-full object-cover"
                             onError={handleImageError}
                         />
@@ -55,14 +72,14 @@ const HomeDogWalker = ({
                 {/* Middle section - Service areas */}
                 <div className="text-gray-600 w-1/4 min-w-0 px-2">
                     <div className="truncate">
-                        {dw_zone}
+                        {dw_zone.trim()}
                     </div>
                 </div>
 
                 {/* Phone number section - moved more to the right */}
                 <div className="text-gray-600 w-1/5 text-right pr-10 min-w-0">
                     <div className="truncate">
-                        {dw_tel}
+                        {formatPhoneNumber(dw_tel.trim())}
                     </div>
                 </div>
 
@@ -72,7 +89,7 @@ const HomeDogWalker = ({
                     <div className="flex items-center w-32 justify-end mr-4">
                         <FontAwesomeIcon icon={faStar} className="h-5 w-5 text-yellow-400 mr-1"/>
                         <span className="font-medium">{rating}</span>
-                        <span className="text-sm text-gray-500 ml-1">({ratingCount*100})</span>
+                        <span className="text-sm text-gray-500 ml-1">({ratingCount})</span>
                     </div>
 
                     {/* Button in fixed position */}
