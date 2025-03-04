@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Noto_Sans_Thai } from "next/font/google";
 
@@ -23,12 +24,20 @@ const notoSansThai = Noto_Sans_Thai({
 });
 
 export default function RootLayout({ children }) {
+  const [name, setName] = useState(null)
+
+  useEffect(() => {
+      const name = localStorage.getItem("name");
+      setName(name);
+    }, []);
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${notoSansThai.variable} font-auto antialiased`}
       >
-        <PetOwnerNav/>
+        <PetOwnerNav
+        userName={name}/>
         {children}
       </body>
     </html>
