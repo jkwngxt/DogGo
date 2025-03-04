@@ -7,6 +7,7 @@ export const useAuth = () => {
     const [user, setUser] = useState(null);
     const router = useRouter();
     const [name, setName] = useState(null);
+    const [id, setId] = useState(null);
 
     useEffect(() => {
         const role = sessionStorage.getItem("userRole");
@@ -34,6 +35,9 @@ export const useAuth = () => {
 
             localStorage.setItem("name",data.user.name);
             setName(data.user.name)
+
+            localStorage.setItem("id",data.user.Id);
+            setId(data.user.Id)
 
             // Redirect ตาม role
             switch (data.user.role) {
@@ -67,5 +71,5 @@ export const useAuth = () => {
         router.push("/login");
     };
 
-    return { user, login, logout, name };
+    return { user, login, logout, name, id };
 };
