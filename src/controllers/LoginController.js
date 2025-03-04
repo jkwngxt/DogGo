@@ -69,6 +69,7 @@ export class LoginController {
                 tel: user.tel,
                 address: user.address,
                 zone: user.zone,
+                status: role==="dogWalker" ? user.status:-1,
                 role
             };
 

@@ -34,10 +34,15 @@ export const useAuth = () => {
             // Redirect ตาม role
             switch (data.user.role) {
                 case "dogWalker":
-                    router.push("/dog-walker/homepage");
+                    if (data.user.status===0) {
+                        router.push("/dog-walker/set-zone"); // edit to real setzone path
+                    }
+                    else {
+                        router.push("/dog-walker/workpage");
+                    }
                     break;
                 case "admin":
-                    router.push("/admin/admin-dog-walker/sign-up");
+                    router.push("/admin/walker-register");
                     break;
                 case "customer":
                     router.push("/pet-owner/homepage");
