@@ -49,23 +49,6 @@ const AdminNav = ({ userImage, userName}) => {
           className="w-16 h-16 rounded-full object-cover"
         />
         <div className="text-white font-bold">{userName}</div>
-        <NavigationMenu>
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Services</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid gap-3 p-2 md:w-[50px] lg:w-[150px] ]">
-                  <ListItem href="/doc" title="Customer"/>
-                  <ListItem href="/docs/installation" title="Dog Walker"/>
-                  <ListItem
-                    href="/docs/primitives/typography"
-                    title="Service Provider"
-                  />
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
         <button>
             <FontAwesomeIcon icon={faSignOut} className="h-5 w-5 text-white"/>
         </button>

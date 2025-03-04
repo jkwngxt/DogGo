@@ -13,10 +13,10 @@ const DogTable = ({dogs}) => {
         </thead>
         <tbody>
           {dogs.map((dog,index) => (
-            <tr key={dog.d_id} className="border-b">
+            <tr key={index} className="border-b">
               <td className="py-3 px-4">{index+1}</td>
-              <td className="py-3 px-4">{dog.d_name}</td>
-              <td className="py-3 px-4">{dog.d_breed}</td>
+              <td className="py-3 px-4">{dog.name}</td>
+              <td className="py-3 px-4">{dog.breed}</td>
             </tr>
           ))}
         </tbody>

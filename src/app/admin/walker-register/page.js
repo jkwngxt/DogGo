@@ -109,6 +109,7 @@ const SignUpPage = () => {
   const handleDialogClose = () => {
     setShowSuccessDialog(false);
     setShowErrorDialog(false);
+    window.location.reload();
   };
   return (
     <>

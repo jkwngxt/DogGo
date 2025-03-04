@@ -42,7 +42,7 @@ export const useAuth = () => {
                     }
                     break;
                 case "admin":
-                    router.push("/admin/admin-dog-walker/sign-up");
+                    router.push("/admin/walker-register");
                     break;
                 case "customer":
                     router.push("/pet-owner/homepage");
