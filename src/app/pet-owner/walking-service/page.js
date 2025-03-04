@@ -163,7 +163,7 @@ export default function WalkingService() {
                               key={index}
                               id={walker.id}
                               userImage={walker.pic || "/image/user-placeholder.jpg"}
-                              dw_username={walker.name}
+                              dw_name={walker.name}
                               dw_zone={Array.isArray(walker.zone) ? walker.zone.join(', ') : walker.zone}
                               rating={walker.meanRating?.toFixed(1) || "0.0"}
                               ratingCount={walker.ratingCount || 0}
