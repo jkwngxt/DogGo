@@ -115,6 +115,8 @@ export const authenticateRequest = async (request, allowedRoles = []) => {
         };
     }
 
+    console.log(user)
+
     // ตรวจสอบสิทธิ์
     if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
         return {
