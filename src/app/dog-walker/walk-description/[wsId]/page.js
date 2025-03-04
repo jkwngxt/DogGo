@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import DogTable from "@/components/dog-table";
 import Loading from "@/components/loading";
-
+import WalkerWalkConfirmation from "@/components/walker-walk-confirmation";
 
 export default function DogWalkDescription({ params }) {
   
@@ -77,10 +77,14 @@ export default function DogWalkDescription({ params }) {
     endTime: serviceInfo.service.endHour + (":00")|| "N/A",
     dw_tel: serviceInfo.dw.tel || "N/A",
     dogs: serviceInfo.service.dogs || [],
+    ws_status: serviceInfo.service.status || null, // fetching walking service status
   };
 
   // Format the date from ws_date
   const formattedDate = formatDate(info.ws_date);
+
+  // Check if the service status is 202 (Awaiting Response)
+  const canModifyService = info.ws_status === 202;
 
   return (
     <div className="p-4 space-y-4">
@@ -149,6 +153,14 @@ export default function DogWalkDescription({ params }) {
               <span className="font-bold">รายการสุนัข</span>
               <DogTable dogs={info.dogs} />
             </div>
+
+            {/* Button Section - Hide buttons if status is not 202 */}
+            {canModifyService && (
+              <div className="flex flex-row space-x-4 justify-center">
+                <WalkerWalkConfirmation type="รับงาน" wsId={wsId} />
+                <WalkerWalkConfirmation type="ปฏิเสธ" wsId={wsId} />
+              </div>
+            )}
           </div>
         </Card>
       </div>
