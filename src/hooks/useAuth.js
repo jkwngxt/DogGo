@@ -36,8 +36,8 @@ export const useAuth = () => {
             localStorage.setItem("name",data.user.name);
             setName(data.user.name)
 
-            localStorage.setItem("id",data.user.Id);
-            setId(data.user.Id)
+            localStorage.setItem("id",data.user.id);
+            setId(data.user.id)
 
             // Redirect ตาม role
             switch (data.user.role) {
@@ -67,7 +67,11 @@ export const useAuth = () => {
 
     const logout = () => {
         sessionStorage.removeItem("userRole");
+        localStorage.removeItem("name");
+        localStorage.removeItem("id");
         setUser(null);
+        setName(null);
+        setId(null);
         router.push("/login");
     };
 
