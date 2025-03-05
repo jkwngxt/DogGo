@@ -7,6 +7,7 @@ export default function NoWSFound({ wantBg = true }) {
         className={`flex flex-col justify-center items-center min-h-screen p-4 transform -translate-y-10 ${
                 wantBg ? "bg: #FFF8CC" : ""
             }`}>
+                
             <div className="mb-6 ">
                 <Image src={"/image/logo.svg"} alt={"logo"} width={200} height={200} />
             </div>
