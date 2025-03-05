@@ -8,14 +8,14 @@ import { useRouter } from "next/navigation";
 const WorkDescription = ({ id, po_username, ws_date, startTime, endTime, po_tel, ws_status}) => {
   const router = useRouter();
 
-  const handleClick = () => {
+  const handleCardClick = () => {
     router.push(`/dog-walker/walk-description/${id}`);
   };
 
   // if 204: completed show 'สิ้นสุด'
 
   return (
-      <Card className="max-w-full mx px-4" onClick={handleClick}>
+      <Card className="max-w-full mx px-4" onClick={handleCardClick}>
         <CardHeader className="grid grid-cols-5 gap-4 items-center">
           <div>{po_username}</div>
           <div>{ws_date}</div>

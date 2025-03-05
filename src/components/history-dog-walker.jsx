@@ -3,8 +3,6 @@
 import * as React from "react";
 import { useRouter } from "next/navigation"; // Use next/router for navigation
 import { Card, CardHeader } from "@/components/ui/card";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "./ui/button";
 import OwnerWalkConfirmation from "./owner-walk-confirmation";
 
@@ -22,7 +20,7 @@ const HistoryDogWalker = ({
   const [status, setStatus] = React.useState(ws_status);
 
   const handleCardClick = () => {
-    router.push("/pet-owner/walk-description");
+    router.push(`/dog-walker/walk-description/${walkingServiceId}`);
   };
 
   const handleButtonClick = (e) => {

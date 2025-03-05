@@ -120,7 +120,8 @@ export class FetchWSController {
                     dogs: dogs.map(dog => ({
                         name: dog.name,
                         breed: dog.breed
-                    }))
+                    })),
+                    userRole: walkingService.dogWalker.role
                 },
                 dw: {
                     name: walkingService.dogWalker.name,
