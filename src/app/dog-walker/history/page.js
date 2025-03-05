@@ -6,7 +6,7 @@ import React from "react";
 import WorkDescription from "@/components/work-description";
 import { Label } from "@/components/ui/label";
 import Loading from "@/components/loading";
-import NoWSFound from "@/components/no-ws-found"
+import NoHistoryFound from "@/components/no-history-found";
 
 export default function DogWalkerWorkPage() {
   const [walkingServices, setWalkingServices] = React.useState([]);
@@ -52,7 +52,7 @@ export default function DogWalkerWorkPage() {
           };
         
             const formattedServices = data.services
-              .filter(service => service.status === 202) // filter only status 202: awaiting response
+              .filter(service => service.status === 203|| service.status === 204) // 203: accepted, 204: completed
               .map((service) => ({
               id: service.serviceId || service.id,
               userName: service.userName || "Unknown",
@@ -60,6 +60,7 @@ export default function DogWalkerWorkPage() {
               startHour: formatTime(service.startHour),
               endHour: formatTime(service.endHour),
               userTel: formatTel(service.userTel) || "Unknown",
+              wsStatus: service.status
             }));
 
             setWalkingServices(formattedServices);
@@ -84,7 +85,7 @@ export default function DogWalkerWorkPage() {
   if (error) return <p className="p-2 text-red-600">Error: {error}</p>;
 
   if (walkingServices.length === 0) {
-    return <NoWSFound />;
+    return <NoHistoryFound />;
   }
 
   return (
@@ -102,6 +103,7 @@ export default function DogWalkerWorkPage() {
             startTime={service.startHour} 
             endTime={service.endHour}  
             po_tel={service.userTel}
+            ws_status={service.wsStatus}
           />
         ))}
         </div>
