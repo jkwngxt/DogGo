@@ -40,7 +40,18 @@ export default function DogWalkerWorkPage() {
             const formatTime = (time) => {
               const pad = (num) => String(num).padStart(2, "0");
               return `${pad(time)}:00`;
+            };
+
+            const formatTel = (tel) => {
+              const strTel = String(tel).replace(/\D/g, ""); // remove non-numeric characters
+          
+              if (strTel.length === 10) {
+                  return `${strTel.slice(0, 3)}-${strTel.slice(3, 6)}-${strTel.slice(6)}`;
+              }
+          
+              return tel; // return original if not 10 digits
           };
+          
 
             const formattedServices = data.services
               .filter(service => service.status === 202) // filter only status 202: awaiting response
@@ -50,7 +61,7 @@ export default function DogWalkerWorkPage() {
               wsDate: formatDate(service.serviceDate || service.date),
               startHour: formatTime(service.startHour),
               endHour: formatTime(service.endHour),
-              userTel: service.userTel || "Unknown",
+              userTel: formatTel(service.userTel) || "Unknown",
             }));
 
             setWalkingServices(formattedServices);
