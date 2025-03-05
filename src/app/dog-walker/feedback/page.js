@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState ,useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import Review from "@/components/review";
 import { Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import Loading from '@/components/loading';
+import Loading from "@/components/loading";
 
 // const feedbackData = {
 //   averageRating: 4.6,
@@ -46,25 +46,27 @@ const FeedbackPage = () => {
   const [error, setError] = useState(null);
   const [data, setData] = useState(null);
 
-useEffect(() => {
+  useEffect(() => {
     const fetchReviews = async () => {
       try {
         setLoading(true);
-        setError(null); 
-  
+        setError(null);
+
         const response = await fetch(`/api/dog-walker/feedback`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
         });
-  
-        const data = await response.json(); 
-  
-        if (!data.success) { 
-          setError(data.message || "An error occurred while loading the reviews.");
+
+        const data = await response.json();
+
+        if (!data.success) {
+          setError(
+            data.message || "An error occurred while loading the reviews."
+          );
         }
-  
+
         console.log(data);
         setData(data);
       } catch (err) {
@@ -74,74 +76,80 @@ useEffect(() => {
         setLoading(false);
       }
     };
-  
+
     fetchReviews();
   }, []);
 
-   if (loading) return <Loading/>
-    
+  if (loading) return <Loading />;
+
   if (error) return <p className="p-2 text-red-600">Error: {error}</p>;
 
   // Prepare and format the reviews
-  const reviewData = data.dogWalkers.reviews ? data.dogWalkers.reviews.map((review, index) => ({
-    r_id: index + 1,
-    u_username: review.username || '',
-    rating: review.rating,
-    r_text: review.text || '',
-    avatar: "/image/user-placeholder.jpg", // Default avatar for now
-  })) : [];
+  const reviewData = data.dogWalkers.reviews
+    ? data.dogWalkers.reviews.map((review, index) => ({
+        r_id: index + 1,
+        u_username: review.username || "",
+        rating: review.rating,
+        r_text: review.text || "",
+        avatar: "/image/user-placeholder.jpg", // Default avatar for now
+      }))
+    : [];
 
   const feedbackData = {
     meanRating: data.dogWalkers.meanRating,
     ratingDistribution: data.dogWalkers.ratingDistribution,
     reviews: reviewData,
-    ratingCount: data.dogWalkers.ratingCount
-  }
-
+    ratingCount: data.dogWalkers.ratingCount,
+  };
 
   return (
     <div className="min-h-screen bg-yellow-100 p-6">
       <div className="max-w-3xl mx-auto">
-
-        <div className='grid grid-cols-2'>
+        <div className="grid grid-cols-2">
           {/* Header */}
           <div className="flex items-center gap-4">
             <Star size={100} className="fill-yellow-400 text-yellow-400" />
-            <div className="text-3xl font-bold">{feedbackData.meanRating} จาก 5</div>
+            <div className="text-3xl font-bold">
+              {feedbackData.meanRating} จาก 5
+            </div>
           </div>
 
           {/* Rating Breakdown */}
           <div className="mt-4 space-y-2">
-  {[5, 4, 3, 2, 1].map((rating) => {
-    const percentage = (feedbackData.ratingDistribution[rating] / feedbackData.ratingCount) * 100;
-
-    return (
-      <div key={rating} className="grid grid-cols-[4rem_1fr_3rem] items-center gap-2">
-        <span className="font-semibold text-lg">{rating} ดาว</span>
-        <div className="w-full h-5 bg-gray-300 border border-black rounded-md">
-          <div
-            className="h-full bg-white border-black rounded-md"
-            style={{ width: `${percentage}%` }}
-          />
+            {[5, 4, 3, 2, 1].map((rating) => {
+              const count = feedbackData.ratingDistribution[rating] || 0;
+              const percentage =
+                feedbackData.ratingCount > 0
+                  ? (count / feedbackData.ratingCount) * 100
+                  : 0;
+              return (
+                <div
+                  key={rating}
+                  className="grid grid-cols-[4rem_1fr_3rem] items-center gap-2"
+                >
+                  <span className="font-semibold text-lg">{rating} ดาว</span>
+                  <div className="w-full h-5 bg-gray-300 border border-black rounded-md">
+                    <div
+                      className="h-full bg-white border-black rounded-md"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                  <span className="font-semibold text-right">
+                    {percentage.toFixed(0)}%
+                  </span>
+                </div>
+              );
+            })}
+          </div>
         </div>
-        <span className="font-semibold text-right">{percentage.toFixed(0)}%</span>
-      </div>
-    );
-  })}
-</div>
-
-
-        </div>
-        
 
         {/* Reviews Component */}
-        <div className='mt-4'>
+        <div className="mt-4">
           <Label className="font-semibold text-2xl">Feedback ที่ได้รับ</Label>
         </div>
         <Card className="mt-4 border-black shadow-md">
           <Review reviewData={feedbackData.reviews} />
         </Card>
-          
       </div>
     </div>
   );
