@@ -60,6 +60,7 @@ export default function DogWalkerWorkPage() {
               startHour: formatTime(service.startHour),
               endHour: formatTime(service.endHour),
               userTel: formatTel(service.userTel) || "Unknown",
+              wsStatus: service.status
             }));
 
             setWalkingServices(formattedServices);
@@ -102,6 +103,7 @@ export default function DogWalkerWorkPage() {
             startTime={service.startHour} 
             endTime={service.endHour}  
             po_tel={service.userTel}
+            ws_status={service.wsStatus}
           />
         ))}
         </div>
