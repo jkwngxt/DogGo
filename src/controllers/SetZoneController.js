@@ -1,4 +1,3 @@
-// set service area for dog walker
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
