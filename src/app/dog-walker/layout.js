@@ -34,28 +34,12 @@ export default function RootLayout({ children }) {
 
     const name = localStorage.getItem("name");
     setName(name);
-
+    
     const id = localStorage.getItem("id");
     if (id) {
       const imgPath = `/api/images/dog-walkers/images/${id}.jpg`;
-
-      // Check if the image exists before setting it
-      fetch(imgPath)
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error("Image not found");
-          }
-          return res.blob();
-        })
-        .then((blob) => {
-          setImage(URL.createObjectURL(blob));
-        })
-        .catch(() => {
-          setImage("/image/user-placeholder.jpg"); // Fallback image
-        });
-    } else {
-      setImage("/image/user-placeholder.jpg"); // If no ID, use placeholder
-    }
+      setImage(imgPath)
+    } 
   }, []);
 
   return (
