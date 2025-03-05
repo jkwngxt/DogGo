@@ -12,7 +12,8 @@ import {
 } from "@/components/ui/dialog";
 import ConfirmationDialogs from "./confirmation-dialogs";
 
-const PaymentTimer = ({ total }) => {
+// เพิ่ม prop bookingInfo เพื่อรับข้อมูลจาก Billing component
+const PaymentTimer = ({ total, bookingInfo }) => {
   const router = useRouter();
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -86,53 +87,14 @@ const PaymentTimer = ({ total }) => {
     setIsLoading(true);
 
     try {
-      // ดึงข้อมูลจาก sessionStorage
-      const bookingDataStr = sessionStorage.getItem('bookingData');
-      const searchDataStr = sessionStorage.getItem('walkingServiceSearch');
-
-      // ตรวจสอบว่ามีข้อมูลครบถ้วนหรือไม่
-      if (!bookingDataStr || !searchDataStr) {
+      // ตรวจสอบความถูกต้องของข้อมูลการจองที่ได้รับจาก props
+      if (!bookingInfo || !bookingInfo.dogWalkerId || !bookingInfo.startTimeInt ||
+          !bookingInfo.endTimeInt || !bookingInfo.date ||
+          !Array.isArray(bookingInfo.dogIds) || bookingInfo.dogIds.length === 0) {
         setMessage("ข้อมูลการจองไม่ถูกต้อง กรุณาทำรายการใหม่อีกครั้ง");
         setShowErrorDialog(true);
         return;
       }
-
-      const bookingInfo = JSON.parse(bookingDataStr);
-      const searchInfo = JSON.parse(searchDataStr);
-
-      // ตรวจสอบความถูกต้องของข้อมูล - เทียบระหว่าง booking กับ search
-      if (bookingInfo.date !== searchInfo.date ||
-          bookingInfo.startTime !== searchInfo.startTimeInt ||
-          bookingInfo.endTime !== searchInfo.endTimeInt) {
-        setMessage("ข้อมูลการจองไม่สอดคล้องกับการค้นหา กรุณาทำรายการใหม่อีกครั้ง");
-        setShowErrorDialog(true);
-        return;
-      }
-
-      // ตรวจสอบความถูกต้องของข้อมูลการจอง
-      if (!bookingInfo.dwId || !bookingInfo.startTime || !bookingInfo.endTime ||
-          !bookingInfo.date || !Array.isArray(bookingInfo.dogIds) || bookingInfo.dogIds.length === 0) {
-        setMessage("ข้อมูลการจองไม่ถูกต้อง กรุณาทำรายการใหม่อีกครั้ง");
-        setShowErrorDialog(true);
-        return;
-      }
-
-      // เตรียมข้อมูลสำหรับส่ง API
-      const dwId = bookingInfo.dwId;
-      const date = bookingInfo.date;
-      const startTime = parseInt(bookingInfo.startTime);
-      const endTime = parseInt(bookingInfo.endTime);
-      const dogIds = bookingInfo.dogIds || [];
-
-      // Prepare request body
-      const requestBody = {
-        dogWalkerId: parseInt(dwId),
-        date: date,
-        startTimeInt: startTime,
-        endTimeInt: endTime,
-        dogIds: dogIds,
-        price: total
-      };
 
       // Make API call to book dog walker
       const response = await fetch('/api/user/booking-dw', {
@@ -140,20 +102,31 @@ const PaymentTimer = ({ total }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestBody),
+        body: JSON.stringify(bookingInfo),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        // Booking successful - open payment dialog
-        setBookingData(data);
+        // ใช้ข้อมูลที่ได้จาก API
+        setBookingData({
+          billingId: data.billingId,
+          walkingServiceId: data.walkingServiceId,
+          amount: data.amount || total
+        });
 
-        // เก็บข้อมูลการจองลง localStorage เพื่อใช้ในภายหลัง
+        // สร้างข้อมูลผลลัพธ์การจองจาก API response และ bookingInfo
         const bookingResult = {
-          ...bookingInfo,
+          dogWalkerId: bookingInfo.dogWalkerId,
+          date: bookingInfo.date,
+          startTime: bookingInfo.startTimeInt,
+          endTime: bookingInfo.endTimeInt,
+          dogIds: bookingInfo.dogIds,
+          dogNames: bookingInfo.dogNames || [],
           walkingServiceId: data.walkingServiceId,
           billingId: data.billingId,
+          total: data.amount || total,
+          dwName: bookingInfo.dogWalkerName,
           bookingTimestamp: new Date().toISOString()
         };
 
@@ -170,7 +143,7 @@ const PaymentTimer = ({ total }) => {
         } else {
           // Unexpected error
           console.log(data)
-          setMessage(`การจองล้มเหลว: ${data.message || 'กรุณาทำรายการใหม่อีกครั้ง'}`);
+          setMessage(`การจองล้มเหลว: ${data.error || 'กรุณาทำรายการใหม่อีกครั้ง'}`);
         }
         setShowErrorDialog(true);
       }
@@ -194,11 +167,14 @@ const PaymentTimer = ({ total }) => {
     setIsConfirmingPayment(true);
 
     try {
+      // ใช้ข้อมูลจาก API (bookingData)
+      const paymentAmount = bookingData.amount || total;
+
       // Create payment confirmation request
       const paymentConfirmation = {
         userId: null, // Will be filled by the backend from JWT
         billingId: bookingData.billingId,
-        amount: total,
+        amount: paymentAmount,
         confirmed: true
       };
 
@@ -237,8 +213,6 @@ const PaymentTimer = ({ total }) => {
         sessionStorage.removeItem('bookingData');
         sessionStorage.removeItem('selectedDogWalker');
         sessionStorage.removeItem('walkingServiceSearch');
-        // สามารถเก็บข้อมูลการค้นหาไว้เผื่อกรณีที่ต้องการจองเพิ่ม
-        // sessionStorage.removeItem('walkingServiceSearch');
 
         // Show success message after payment confirmation
         setMessage("การชำระเงินเสร็จสิ้น อยู่ระหว่างการยืนยันจาก Dog Walker");
@@ -355,7 +329,9 @@ const PaymentTimer = ({ total }) => {
                 alt="qr-code"
             />
             <DialogHeader className="flex items-center">
-              <DialogTitle>{total} บาท</DialogTitle>
+              <DialogTitle>
+                {bookingData && bookingData.amount ? bookingData.amount : total} บาท
+              </DialogTitle>
               <DialogDescription className="text-sm text-black">
                 ชื่อบัญชี: บริษัท DogGo Thailand
               </DialogDescription>

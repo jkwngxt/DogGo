@@ -59,7 +59,7 @@ const HomeDogWalker = ({
                     <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
                         <img
                             src={getImagePath(userImage)}
-                            alt={`${dw_name.trim()} profile`}
+                            alt={`${dw_name} profile`}
                             className="w-full h-full object-cover"
                             onError={handleImageError}
                         />
@@ -72,14 +72,14 @@ const HomeDogWalker = ({
                 {/* Middle section - Service areas */}
                 <div className="text-gray-600 w-1/4 min-w-0 px-2">
                     <div className="truncate">
-                        {dw_zone.trim()}
+                        {dw_zone}
                     </div>
                 </div>
 
                 {/* Phone number section - moved more to the right */}
                 <div className="text-gray-600 w-1/5 text-right pr-10 min-w-0">
                     <div className="truncate">
-                        {formatPhoneNumber(dw_tel.trim())}
+                        {formatPhoneNumber(dw_tel)}
                     </div>
                 </div>
 

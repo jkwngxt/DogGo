@@ -26,7 +26,6 @@ import DogWalkerAdminCard from "@/components/dog-walker-admin-card";
 import PetOwnerNav from "@/components/nav-bar/nav-pet-owner";
 import DogWalkerNav from "@/components/nav-bar/nav-dog-walker";
 import WorkDescription from "@/components/work-description";
-import ServiceProviderNav from "@/components/nav-bar/nav-service-provider";
 import AdminNav from "@/components/nav-bar/nav-admin";
 import HomeDogWalker from "@/components/home-dog-walker";
 import SelectDateTime from "@/components/select-datetime";
@@ -39,7 +38,6 @@ export default function Home() {
       <div className="flex flex-row">
         <Link href="/pet-owner/homepage">Pet Owner</Link>
         <Link href="/dog-walker/workpage">Dog Walker</Link>
-        <Link href="/admin/admin-service-provider">Admin</Link>
       </div>
       <div className="flex flex-row">
         <Button>Primary Button</Button>
@@ -98,11 +96,6 @@ export default function Home() {
       <DogWalkerNav
         userImage="/image/user-placeholder.jpg"
         userName="Dog Walker"
-      />
-
-      <ServiceProviderNav
-        userImage="/image/user-placeholder.jpg"
-        userName="Service Provider"
       />
 
       <AdminNav userImage="/image/user-placeholder.jpg" userName="Admin" />
