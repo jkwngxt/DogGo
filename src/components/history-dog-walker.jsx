@@ -73,11 +73,12 @@ const HistoryDogWalker = ({
   return (
     <Card className="max-w-full cursor-pointer" onClick={handleCardClick}>
       <CardHeader className="grid grid-cols-5 items-center gap-4">
+      <div className="flex justify-center">
         <img
           src={userImage}
           alt="User profile"
           className="w-12 h-12 rounded-full object-cover"
-        />
+        /></div>
         <div className="w-28 text-center">{dw_username}</div>
         <div className="w-28 text-center">{ws_date}</div>
         <div className="w-28 flex justify-center space-x-1">
