@@ -5,8 +5,9 @@ import path from 'path';
 
 export async function GET(request, { params }) {
     try {
-        // รับ path จาก URL
-        const filePath = params.path.join('/');
+        // Ensure params is awaited before accessing the path property
+        const pathArray = await params.path;
+        const filePath = pathArray.join('/');
 
         // สร้างเส้นทางเต็มไปยังไฟล์
         // process.cwd() จะทำงานที่นี่เพราะเป็น server-side
@@ -43,6 +44,8 @@ export async function GET(request, { params }) {
             },
         });
     } catch (error) {
+        console.error('Image loading error:', error);
+
         // ถ้าไม่พบไฟล์
         if (error.code === 'ENOENT') {
             return new NextResponse('Image not found', { status: 404 });
