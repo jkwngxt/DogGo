@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import HistoryDogWalker from "@/components/history-dog-walker";
 import CouponCard from "@/components/coupon-card";
 
-export default function page() {
+export default function PetOwnerHomePage() {
   const [walkingServices, setWalkingServices] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
@@ -60,7 +60,7 @@ export default function page() {
     } finally {
         setIsLoading(false);
     }
-};
+  };
   
   React.useEffect(() => {
     fetchWalkingServices();

@@ -1,60 +1,99 @@
+// งานที่ pet owner จ่ายเงินแล้ว รอให้ dog walker กดรับ-ปฏิเสธ 
+
+"use client";
+
 import React from "react";
 import WorkDescription from "@/components/work-description";
 import { Label } from "@/components/ui/label";
+import Loading from "@/components/loading";
 
-const allWork = [
-  {
-    dw_username: "Pet Owner 1",
-    startTime: "10:00",
-    endTime: "12:00",
-    dw_tel: "091-234-5678",
-    ws_status: 0,
-  },
-  {
-    dw_username: "Pet Owner 2",
-    startTime: "10:00",
-    endTime: "12:00",
-    dw_tel: "092-345-6789",
-    ws_status: 0,
-  },
-  {
-    dw_username: "Pet Owner 3",
-    startTime: "11:00",
-    endTime: "13:00",
-    dw_tel: "093-456-7890",
-    ws_status: 0,
-  },
-  {
-    dw_username: "Pet Owner 4",
-    startTime: "11:00",
-    endTime: "13:00",
-    dw_tel: "094-567-8901",
-    ws_status: 0,
-  },
-];
+export default function DogWalkerWorkPage() {
+  const [walkingServices, setWalkingServices] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
 
-const DogWalkerWorkPage = () => {
+  const fetchWalkingServices = async () => {
+    try {
+        setIsLoading(true);
+        const response = await fetch("/api/walking-service/service-detail", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch walking services: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Full API Response:", JSON.stringify(data, null, 2));
+
+        if (data.success && Array.isArray(data.services)) {
+            const formatDate = (dateString) => {
+                const date = new Date(dateString);
+                const day = String(date.getDate()).padStart(2, "0");
+                const month = String(date.getMonth() + 1).padStart(2, "0");
+                const year = String(date.getFullYear());
+                return `${day}/${month}/${year}`;
+            };
+
+            const formatTime = (time) => {
+              const pad = (num) => String(num).padStart(2, "0");
+              return `${pad(time)}:00`;
+          };
+
+            const formattedServices = data.services
+              .filter(service => service.status === 202) // filter only status 202: awaiting response
+              .map((service) => ({
+              id: service.serviceId || service.id,
+              userName: service.userName || "Unknown",
+              wsDate: formatDate(service.serviceDate || service.date),
+              startHour: formatTime(service.startHour),
+              endHour: formatTime(service.endHour),
+              userTel: service.userTel || "Unknown",
+            }));
+
+            setWalkingServices(formattedServices);
+        } else {
+            console.error("Unexpected API Response Structure:", data);
+            setError("Invalid data format received from API");
+        }
+    } catch (error) {
+        console.error("Error fetching walking services:", error);
+        setError("Failed to load walking services. Please try again later.");
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchWalkingServices();
+  }, []);
+
+  if (isLoading) return <Loading />;
+    
+  if (error) return <p className="p-2 text-red-600">Error: {error}</p>;
+
+
+
   return (
     <div className="min-h-screen bg-yellow-100 p-6">
       <div className="max-w-3xl mx-auto mt-4">
         <Label className="text-3xl font-semibold">งานของฉัน</Label>
         {/* Work List using WorkDescription */}
         <div className="mt-4 space-y-2 font-semibold">
-          {allWork.map((work, index) => (
-            <WorkDescription
-              key={index}
-              dw_username={work.dw_username}
-              startTime={work.startTime}
-              endTime={work.endTime}
-              dw_tel={work.dw_tel}
-              ws_status={work.ws_status}
-              source="walkpage"
-            />
-          ))}
+        {walkingServices.map((service, index) => (
+          <WorkDescription
+            key={service.id || index}
+            id={service.id}
+            po_username={service.userName}
+            ws_date={service.wsDate}
+            startTime={service.startHour} 
+            endTime={service.endHour}  
+            po_tel={service.userTel}
+          />
+        ))}
         </div>
       </div>
     </div>
   );
-};
-
-export default DogWalkerWorkPage;
+}

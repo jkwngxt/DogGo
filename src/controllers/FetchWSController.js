@@ -58,6 +58,7 @@ export class FetchWSController {
                     walkerName: service.dogWalker.name,
                     walkerTel: service.dogWalker.tel,
                     userName: service.user.name,
+                    userTel: service.user.tel,
                     isReview: service.review !== null,
                 };
             });
