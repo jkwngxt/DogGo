@@ -33,6 +33,12 @@ const LoginPage = () => {
         }
     };
 
+    const handleKeyPress = (event) => {
+        if (event.key === "Enter") {
+            handleLogin();
+        }
+    };
+
     return (
         <div className="flex justify-center items-center min-h-screen bg-[#FFF8D6]">
             <div className="relative flex flex-col items-center p-8 bg-[#2668E3] rounded-2xl shadow-lg w-80">
@@ -56,6 +62,7 @@ const LoginPage = () => {
                     placeholder="Password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={handleKeyPress} // press enter to login
                     className="w-full p-2 mt-5 border rounded-md shadow-md shadow-[#0f4099] placeholder:text-black"
                 />
                 <button 
