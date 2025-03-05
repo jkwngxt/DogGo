@@ -25,7 +25,7 @@ export async function GET(request) {
 // post submit a review
 export async function POST(request) {
     try {
-        const { user, response } = await authenticateRequest(request)
+        const { user, response } = await authenticateRequest(request, ['customer'])
         if (response) return response;
 
         const reviewData = await request.json();
