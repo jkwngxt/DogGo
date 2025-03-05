@@ -36,9 +36,26 @@ export default function RootLayout({ children }) {
     setName(name);
 
     const id = localStorage.getItem("id");
-    const imgPath = `/api/images/dog-walkers/images/${id}.jpg`;
+    if (id) {
+      const imgPath = `/api/images/dog-walkers/images/${id}.jpg`;
 
-    setImage(imgPath);
+      // Check if the image exists before setting it
+      fetch(imgPath)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Image not found");
+          }
+          return res.blob();
+        })
+        .then((blob) => {
+          setImage(URL.createObjectURL(blob));
+        })
+        .catch(() => {
+          setImage("/image/user-placeholder.jpg"); // Fallback image
+        });
+    } else {
+      setImage("/image/user-placeholder.jpg"); // If no ID, use placeholder
+    }
   }, []);
 
   return (
