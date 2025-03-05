@@ -7,6 +7,11 @@ export class ReviewDWController {
 
     async getReviewableWalkingService(userId) {
         try {
+            if (!userId) {
+                console.error("Error: userId is missing or authentication failed");
+                return { success: false, message: "User authentication failed" };
+            }
+
             const walkingServices = await this.prisma.walkingService.findMany({
                 where: {
                     userId: userId,
@@ -31,29 +36,28 @@ export class ReviewDWController {
                 return { success: false, message: "User authentication failed" };
             }
 
-            if (!rating || rating<1 || rating>5) {
-                return { success: false, message: "Rating must be between 1 to 5"};
-            }
-
-            // check if the service exists & belongs to the user
-            const walkingService = await this.prisma.walkingService.findUnique({
-                where: { id: walkingServiceId },
-                select: { userId: true, review: true }
+            const userWalkingServices = await this.prisma.walkingService.findMany({
+                where: {
+                    userId: userId,  
+                    status: 204,  // completed 
+                    review: { is: null }  // services that haven't been reviewed
+                },
+                select: { id: true }
             });
-
-            if (!walkingService) {
-                console.error("Error: Invalid service ID!");
-                return { success: false, message: "Invalid service ID" };
-            }
     
-            if (walkingService.userId !== userId) {
-                console.error(`Service belongs to user ${walkingService.userId}, but request from ${userId}`);
-                return { success: false, message: "Unauthorized access" };
-            }
+            // check if walkingServiceId belongs to userId
+            const matchingService = userWalkingServices.find(service => service.id === walkingServiceId);
 
-            if (walkingService.review) {
-                console.error("Error: This service has already been reviewed!");
-                return { success: false, message: "This service has already been reviewed" };
+            if (!matchingService) {
+                console.error(`Unauthorized Review: User (${userId}) try to review service (${walkingServiceId}), but allowed:`, userWalkingServices.map(s => s.id));
+                return { 
+                    success: false, 
+                    message: "Unauthorized access or service not found",
+                    details: {
+                        requestedServiceId: walkingServiceId,
+                        allowedServices: userWalkingServices.map(s => s.id)
+                    }
+                };
             }
 
             // create new review
