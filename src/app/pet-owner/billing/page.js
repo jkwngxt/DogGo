@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import Loading from "@/components/loading";
 
 export default function Billing() {
   const router = useRouter();
@@ -27,61 +28,103 @@ export default function Billing() {
   });
 
   const [showInvalidDataDialog, setShowInvalidDataDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Protect from direct URL access - secure session check
+    const validateSession = () => {
+      try {
+        // Check for valid walkingServiceSearch session data
+        const searchDataStr = sessionStorage.getItem('walkingServiceSearch');
+        if (!searchDataStr) return false;
+
+        // Check for valid bookingData session data
+        const bookingDataStr = sessionStorage.getItem('bookingData');
+        if (!bookingDataStr) return false;
+
+        const bookingData = JSON.parse(bookingDataStr);
+        const searchData = JSON.parse(searchDataStr);
+
+        // Validate that booking data matches search data
+        return (
+            bookingData.date === searchData.date &&
+            bookingData.startTime === searchData.startTimeInt &&
+            bookingData.endTime === searchData.endTimeInt
+        );
+      } catch (error) {
+        console.error('Error validating session data:', error);
+        return false;
+      }
+    };
+
     // ดึงข้อมูลจาก sessionStorage แทนการใช้ URL parameters
-    const bookingDataStr = sessionStorage.getItem('bookingData');
+    const loadBookingData = () => {
+      const bookingDataStr = sessionStorage.getItem('bookingData');
 
-    if (!bookingDataStr) {
-      // ถ้าไม่มีข้อมูลใน sessionStorage แสดงว่าผู้ใช้อาจเข้ามาโดยตรง
-      setShowInvalidDataDialog(true);
-      return;
-    }
-
-    try {
-      const bookingData = JSON.parse(bookingDataStr);
-
-      // ตรวจสอบว่าข้อมูลครบถ้วนและถูกต้องหรือไม่
-      if (!bookingData.dwId || !bookingData.startTime || !bookingData.endTime ||
-          !bookingData.date || !Array.isArray(bookingData.dogIds) || bookingData.dogIds.length === 0 ||
-          !Array.isArray(bookingData.dogNames) || bookingData.dogNames.length === 0) {
-        console.error('Invalid booking data structure');
+      if (!bookingDataStr || !validateSession()) {
+        // ถ้าไม่มีข้อมูลใน sessionStorage หรือข้อมูลไม่ตรงกัน แสดงว่าผู้ใช้อาจเข้ามาโดยตรง
         setShowInvalidDataDialog(true);
-        return;
+        setIsLoading(false);
+        return false;
       }
 
-      // Calculate total (250 per hour per dog)
-      const hours = bookingData.startTime && bookingData.endTime
-          ? (parseInt(bookingData.endTime) - parseInt(bookingData.startTime))
-          : 0;
+      try {
+        const bookingData = JSON.parse(bookingDataStr);
 
-      if (hours <= 0) {
-        console.error('Invalid time range');
+        // ตรวจสอบว่าข้อมูลครบถ้วนและถูกต้องหรือไม่
+        if (!bookingData.dwId || !bookingData.startTime || !bookingData.endTime ||
+            !bookingData.date || !Array.isArray(bookingData.dogIds) || bookingData.dogIds.length === 0 ||
+            !Array.isArray(bookingData.dogNames) || bookingData.dogNames.length === 0) {
+          console.error('Invalid booking data structure');
+          setShowInvalidDataDialog(true);
+          setIsLoading(false);
+          return false;
+        }
+
+        // Calculate total if not present (250 per hour per dog)
+        let total = bookingData.totalPrice;
+        if (!total) {
+          const hours = bookingData.startTime && bookingData.endTime
+              ? (parseInt(bookingData.endTime) - parseInt(bookingData.startTime))
+              : 0;
+
+          if (hours <= 0) {
+            console.error('Invalid time range');
+            setShowInvalidDataDialog(true);
+            setIsLoading(false);
+            return false;
+          }
+
+          total = hours * 250 * bookingData.dogIds.length;
+        }
+
+        // Format start and end times to display as HH:00
+        const formattedStartTime = bookingData.startTime ? `${bookingData.startTime}:00` : "";
+        const formattedEndTime = bookingData.endTime ? `${bookingData.endTime}:00` : "";
+
+        // Update state with the retrieved information
+        setInfo({
+          userImage: "/image/user-placeholder.jpg",
+          dw_username: bookingData.dwName || "",
+          ws_date: bookingData.date || "",
+          startTime: formattedStartTime,
+          endTime: formattedEndTime,
+          dw_tel: bookingData.dwTel || "",
+          total: total,
+          dogs: bookingData.dogNames || [],
+        });
+
+        setIsLoading(false);
+        return true;
+      } catch (error) {
+        console.error('Error parsing booking data:', error);
         setShowInvalidDataDialog(true);
-        return;
+        setIsLoading(false);
+        return false;
       }
+    };
 
-      const total = hours * 250 * bookingData.dogIds.length;
-
-      // Format start and end times to display as HH:00
-      const formattedStartTime = bookingData.startTime ? `${bookingData.startTime}:00` : "";
-      const formattedEndTime = bookingData.endTime ? `${bookingData.endTime}:00` : "";
-
-      // Update state with the retrieved information
-      setInfo({
-        userImage: "/image/user-placeholder.jpg",
-        dw_username: bookingData.dwName || "",
-        ws_date: bookingData.date || "",
-        startTime: formattedStartTime,
-        endTime: formattedEndTime,
-        dw_tel: bookingData.dwTel || "",
-        total: total,
-        dogs: bookingData.dogNames || [],
-      });
-    } catch (error) {
-      console.error('Error parsing booking data:', error);
-      setShowInvalidDataDialog(true);
-    }
+    loadBookingData();
   }, [router]);
 
   const formatDate = (dateString) => {
@@ -116,6 +159,10 @@ export default function Billing() {
     // นำผู้ใช้กลับไปหน้า home
     router.push('/pet-owner/walking-service');
   };
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
       <div className="p-4 space-y-4">

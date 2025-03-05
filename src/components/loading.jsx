@@ -1,10 +1,12 @@
 import React from "react";
 import Image from "next/image";
 
-export default function Loading() {
+export default function Loading({ wantBg = true }) {
     return (
         <div
-            className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-b from-blue-50 to-white p-4">
+            className={`flex flex-col justify-center items-center min-h-screen p-4 ${
+                wantBg ? "bg-gradient-to-b from-blue-50 to-white" : ""
+            }`}>
             <div className="mb-6 animate-bounce">
                 <Image src={"/image/logo.svg"} alt={"logo"} width={200} height={200} />
             </div>

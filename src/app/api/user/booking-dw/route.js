@@ -49,7 +49,6 @@ export async function POST(request) {
 
         const bookDogWalkerController = new BookDogWalkerController();
         const result = await bookDogWalkerController.bookDogWalker(data);
-
         if (!result.error) {
             return NextResponse.json(result, { status: 200 });
         }
