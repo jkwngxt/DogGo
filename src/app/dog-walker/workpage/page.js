@@ -6,6 +6,7 @@ import React from "react";
 import WorkDescription from "@/components/work-description";
 import { Label } from "@/components/ui/label";
 import Loading from "@/components/loading";
+import NoWSFound from "@/components/no-ws-found"
 
 export default function DogWalkerWorkPage() {
   const [walkingServices, setWalkingServices] = React.useState([]);
@@ -73,7 +74,9 @@ export default function DogWalkerWorkPage() {
     
   if (error) return <p className="p-2 text-red-600">Error: {error}</p>;
 
-
+  if (walkingServices.length === 0) {
+    return <NoWSFound />;
+  }
 
   return (
     <div className="min-h-screen bg-yellow-100 p-6">
