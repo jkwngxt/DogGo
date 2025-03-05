@@ -48,11 +48,9 @@ export default function DogWalkerWorkPage() {
               if (strTel.length === 10) {
                   return `${strTel.slice(0, 3)}-${strTel.slice(3, 6)}-${strTel.slice(6)}`;
               }
-          
               return tel; // return original if not 10 digits
           };
-          
-
+        
             const formattedServices = data.services
               .filter(service => service.status === 202) // filter only status 202: awaiting response
               .map((service) => ({
