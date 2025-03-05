@@ -124,7 +124,7 @@ useEffect(() => {
             style={{ width: `${percentage}%` }}
           />
         </div>
-        <span className="font-semibold text-right">{percentage.toFixed(1)}%</span>
+        <span className="font-semibold text-right">{percentage.toFixed(0)}%</span>
       </div>
     );
   })}
