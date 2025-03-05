@@ -59,7 +59,13 @@ const Reviews = ({ reviewData }) => {
           </div>
         ))}
 
-        {filteredReviews.length === 0 && (
+        {!reviewData.length && (
+          <div className="text-center py-8 text-gray-500">
+          ไม่มีรีวิว
+        </div>
+        )}
+
+        {reviewData.length > 0 && filteredReviews.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             ไม่มีรีวิว {selectedRating} ดาว
           </div>
