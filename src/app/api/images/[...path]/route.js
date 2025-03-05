@@ -43,8 +43,6 @@ export async function GET(request, { params }) {
             },
         });
     } catch (error) {
-        console.error('Error serving image:', error);
-
         // ถ้าไม่พบไฟล์
         if (error.code === 'ENOENT') {
             return new NextResponse('Image not found', { status: 404 });
