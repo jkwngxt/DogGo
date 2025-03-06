@@ -75,7 +75,7 @@ export class FetchWSController {
         }
     }
 
-    async getWSDetail(id) {
+    async getWSDetail(id, user) {
         try {
             const walkingService = await this.prisma.walkingService.findUnique({
                 where: { id: parseInt(id) },
@@ -108,6 +108,8 @@ export class FetchWSController {
             const startHour = START_TIME + walkingService.time[0] - 1;
             const endHour = START_TIME + walkingService.time[walkingService.time.length - 1];
 
+            const currentUserRole = user?.role;
+
             // Format the response according to the image requirements
             return {
                 success: true,
@@ -121,7 +123,6 @@ export class FetchWSController {
                         name: dog.name,
                         breed: dog.breed
                     })),
-                    userRole: walkingService.dogWalker.role
                 },
                 dw: {
                     name: walkingService.dogWalker.name,
@@ -132,7 +133,8 @@ export class FetchWSController {
                     tel: walkingService.user.tel,
                     zone: walkingService.user.zone,
                     address: walkingService.user.address
-                }
+                },
+                currentUserRole: currentUserRole
             };
         } catch (error) {
             return {

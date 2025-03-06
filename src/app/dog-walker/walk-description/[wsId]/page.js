@@ -78,7 +78,7 @@ export default function DogWalkDescription({ params }) {
     dw_tel: serviceInfo.dw.tel || "N/A",
     dogs: serviceInfo.service.dogs || [],
     ws_status: serviceInfo.service.status || null, // fetching walking service status
-    user_role: serviceInfo.service.userRole
+    user_role: serviceInfo.currentUserRole
   };
 
   // Format the date from ws_date
