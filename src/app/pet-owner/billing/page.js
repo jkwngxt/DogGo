@@ -27,6 +27,9 @@ export default function Billing() {
     dogs: [],
   });
 
+  // เพิ่มข้อมูลสำหรับส่งให้ PaymentTimer
+  const [paymentInfo, setPaymentInfo] = useState(null);
+
   const [showInvalidDataDialog, setShowInvalidDataDialog] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -60,6 +63,7 @@ export default function Billing() {
     // ดึงข้อมูลจาก sessionStorage แทนการใช้ URL parameters
     const loadBookingData = () => {
       const bookingDataStr = sessionStorage.getItem('bookingData');
+      const searchDataStr = sessionStorage.getItem('walkingServiceSearch');
 
       if (!bookingDataStr || !validateSession()) {
         // ถ้าไม่มีข้อมูลใน sessionStorage หรือข้อมูลไม่ตรงกัน แสดงว่าผู้ใช้อาจเข้ามาโดยตรง
@@ -70,6 +74,7 @@ export default function Billing() {
 
       try {
         const bookingData = JSON.parse(bookingDataStr);
+        const searchData = searchDataStr ? JSON.parse(searchDataStr) : null;
 
         // ตรวจสอบว่าข้อมูลครบถ้วนและถูกต้องหรือไม่
         if (!bookingData.dwId || !bookingData.startTime || !bookingData.endTime ||
@@ -112,6 +117,18 @@ export default function Billing() {
           dw_tel: bookingData.dwTel || "",
           total: total,
           dogs: bookingData.dogNames || [],
+        });
+
+        // เตรียมข้อมูลสำหรับส่งให้ PaymentTimer
+        setPaymentInfo({
+          dogWalkerId: parseInt(bookingData.dwId),
+          date: bookingData.date,
+          startTimeInt: parseInt(bookingData.startTime),
+          endTimeInt: parseInt(bookingData.endTime),
+          dogIds: bookingData.dogIds,
+          price: total,
+          dogWalkerName: bookingData.dwName,
+          dogNames: bookingData.dogNames
         });
 
         setIsLoading(false);
@@ -234,7 +251,12 @@ export default function Billing() {
 
             {/* Button Section (Pinned at Bottom) */}
             <div className="flex flex-row space-x-4 justify-center">
-              <PaymentTimer total={info.total} />
+              {paymentInfo && (
+                  <PaymentTimer
+                      total={info.total}
+                      bookingInfo={paymentInfo}
+                  />
+              )}
               <Button variant="destructive" onClick={handleCancel}>ยกเลิก</Button>
             </div>
           </Card>

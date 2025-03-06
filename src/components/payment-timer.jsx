@@ -19,6 +19,7 @@ const PaymentTimer = ({ total, bookingInfo }) => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [message, setMessage] = useState("");
+  const [dialogTitle, setDialogTitle] = useState(""); // เพิ่ม state เก็บหัวข้อ dialog
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
   const [bookingData, setBookingData] = useState(null);
@@ -77,7 +78,10 @@ const PaymentTimer = ({ total, bookingInfo }) => {
       sessionStorage.removeItem('bookingData');
       sessionStorage.removeItem('selectedDogWalker');
       sessionStorage.removeItem('walkingServiceSearch');
-      setMessage("เวลาในการชำระเงินหมดลง การจองถูกยกเลิก");
+
+      // ปรับปรุงข้อความและหัวข้อให้สุภาพ
+      setDialogTitle("เวลาชำระเงินหมดลง");
+      setMessage("ขออภัย เวลาในการชำระเงินได้หมดลงแล้ว การจองของท่านถูกยกเลิกโดยอัตโนมัติ กรุณาทำรายการใหม่อีกครั้ง");
       setShowErrorDialog(true);
     }
   }, [timeLeft, showPaymentDialog, bookingData]);
@@ -91,7 +95,8 @@ const PaymentTimer = ({ total, bookingInfo }) => {
       if (!bookingInfo || !bookingInfo.dogWalkerId || !bookingInfo.startTimeInt ||
           !bookingInfo.endTimeInt || !bookingInfo.date ||
           !Array.isArray(bookingInfo.dogIds) || bookingInfo.dogIds.length === 0) {
-        setMessage("ข้อมูลการจองไม่ถูกต้อง กรุณาทำรายการใหม่อีกครั้ง");
+        setDialogTitle("ข้อมูลไม่ครบถ้วน");
+        setMessage("ขออภัย ข้อมูลการจองไม่ครบถ้วน กรุณาตรวจสอบและทำรายการใหม่อีกครั้ง");
         setShowErrorDialog(true);
         return;
       }
@@ -139,17 +144,20 @@ const PaymentTimer = ({ total, bookingInfo }) => {
         // Booking failed - show appropriate error message
         if (data.altFlow) {
           // This is a controlled error from our backend (like time slot conflict)
-          setMessage(`พนักงานพาสุนัขเดินคนนี้มีการจองในช่วงเวลาที่คุณเลือกแล้ว กรุณาเลือกช่วงเวลาอื่น`);
+          setDialogTitle("ช่วงเวลาไม่ว่าง");
+          setMessage(`ขออภัย พนักงานพาสุนัขเดินท่านนี้มีการจองในช่วงเวลาที่ท่านเลือกแล้ว กรุณาเลือกช่วงเวลาอื่น หรือพนักงานท่านอื่น`);
         } else {
           // Unexpected error
           console.log(data)
-          setMessage(`การจองล้มเหลว: ${data.error || 'กรุณาทำรายการใหม่อีกครั้ง'}`);
+          setDialogTitle("เกิดข้อผิดพลาด");
+          setMessage(`ขออภัย เกิดข้อผิดพลาดในการจอง: ${data.error || 'กรุณาลองใหม่อีกครั้งในภายหลัง'}`);
         }
         setShowErrorDialog(true);
       }
     } catch (error) {
       console.error("Error during booking process:", error);
-      setMessage("การจองล้มเหลว กรุณาทำรายการใหม่อีกครั้ง");
+      setDialogTitle("เกิดข้อผิดพลาด");
+      setMessage("ขออภัย เกิดข้อผิดพลาดในการเชื่อมต่อกับระบบ กรุณาลองใหม่อีกครั้งในภายหลัง");
       setShowErrorDialog(true);
     } finally {
       setIsLoading(false);
@@ -158,7 +166,8 @@ const PaymentTimer = ({ total, bookingInfo }) => {
 
   const handleConfirmClick = async () => {
     if (!bookingData || !bookingData.billingId) {
-      setMessage("ข้อมูลการชำระเงินไม่ถูกต้อง กรุณาทำรายการใหม่อีกครั้ง");
+      setDialogTitle("ข้อมูลไม่ถูกต้อง");
+      setMessage("ขออภัย ข้อมูลการชำระเงินไม่ถูกต้อง กรุณาทำรายการใหม่อีกครั้ง");
       setShowErrorDialog(true);
       setShowPaymentDialog(false);
       return;
@@ -194,33 +203,15 @@ const PaymentTimer = ({ total, bookingInfo }) => {
       if (response.ok) {
         setShowPaymentDialog(false); // Close payment dialog
 
-        // ดึงข้อมูลการจองจาก localStorage
-        const bookingResultStr = localStorage.getItem('lastBookingResult');
-        const bookingResult = bookingResultStr ? JSON.parse(bookingResultStr) : null;
-
-        // อัพเดทสถานะการชำระเงินใน localStorage
-        if (bookingResult) {
-          const updatedBookingResult = {
-            ...bookingResult,
-            paymentStatus: 'completed',
-            paymentTimestamp: new Date().toISOString()
-          };
-
-          localStorage.setItem('lastBookingResult', JSON.stringify(updatedBookingResult));
-        }
-
-        // ลบข้อมูลการจองจาก sessionStorage เมื่อการชำระเงินเสร็จสิ้น
-        sessionStorage.removeItem('bookingData');
-        sessionStorage.removeItem('selectedDogWalker');
-        sessionStorage.removeItem('walkingServiceSearch');
-
         // Show success message after payment confirmation
-        setMessage("การชำระเงินเสร็จสิ้น อยู่ระหว่างการยืนยันจาก Dog Walker");
+        setDialogTitle("ชำระเงินสำเร็จ");
+        setMessage("การชำระเงินสำเร็จเรียบร้อยแล้ว ขณะนี้อยู่ระหว่างการยืนยันจากพนักงานพาสุนัขเดิน ขอบคุณที่ใช้บริการของเรา");
         setShowSuccessDialog(true);
       } else {
         // Payment confirmation failed
         setShowPaymentDialog(false);
-        setMessage("ไม่สามารถติดต่อกับระบบชำระเงินได้");
+        setDialogTitle("ชำระเงินไม่สำเร็จ");
+        setMessage("ขออภัย ไม่สามารถยืนยันการชำระเงินได้ในขณะนี้ กรุณาลองใหม่อีกครั้งในภายหลัง");
 
         // Cancel the booking if payment confirmation fails
         if (bookingData && bookingData.walkingServiceId) {
@@ -232,7 +223,8 @@ const PaymentTimer = ({ total, bookingInfo }) => {
     } catch (error) {
       console.error("Error during payment confirmation:", error);
       setShowPaymentDialog(false);
-      setMessage("ไม่สามารถติดต่อกับระบบชำระเงินได้");
+      setDialogTitle("เกิดข้อผิดพลาด");
+      setMessage("ขออภัย เกิดข้อผิดพลาดในการเชื่อมต่อกับระบบชำระเงิน กรุณาลองใหม่อีกครั้งในภายหลัง");
 
       // Cancel the booking if payment confirmation throws an error
       if (bookingData && bookingData.walkingServiceId) {
@@ -249,18 +241,6 @@ const PaymentTimer = ({ total, bookingInfo }) => {
   const cancelBooking = async (walkingServiceId) => {
     try {
       // อัพเดทสถานะการยกเลิกใน localStorage
-      const bookingResultStr = localStorage.getItem('lastBookingResult');
-      if (bookingResultStr) {
-        const bookingResult = JSON.parse(bookingResultStr);
-        const updatedBookingResult = {
-          ...bookingResult,
-          paymentStatus: 'cancelled',
-          cancelTimestamp: new Date().toISOString()
-        };
-
-        localStorage.setItem('lastBookingResult', JSON.stringify(updatedBookingResult));
-      }
-
       const response = await fetch('/api/walking-service/change-status', {
         method: 'PUT',
         headers: {
@@ -271,7 +251,6 @@ const PaymentTimer = ({ total, bookingInfo }) => {
           "walkingServiceId": walkingServiceId,
         }),
       });
-
       return response.ok;
     } catch (error) {
       console.error("Error cancelling booking:", error);
@@ -330,7 +309,7 @@ const PaymentTimer = ({ total, bookingInfo }) => {
             />
             <DialogHeader className="flex items-center">
               <DialogTitle>
-                {bookingData && bookingData.amount ? bookingData.amount : total} บาท
+                กรุณาชำระเงิน {bookingData && bookingData.amount ? bookingData.amount : total} บาท
               </DialogTitle>
               <DialogDescription className="text-sm text-black">
                 ชื่อบัญชี: บริษัท DogGo Thailand
@@ -347,7 +326,7 @@ const PaymentTimer = ({ total, bookingInfo }) => {
                   onClick={handleConfirmClick}
                   disabled={isConfirmingPayment}
               >
-                {isConfirmingPayment ? "กำลังยืนยัน..." : "เสร็จสิ้น"}
+                {isConfirmingPayment ? "กำลังยืนยัน..." : "ยืนยันการชำระเงิน"}
               </Button>
               <Button
                   variant="destructive"
@@ -363,11 +342,12 @@ const PaymentTimer = ({ total, bookingInfo }) => {
                     // ปิด payment dialog
                     setShowPaymentDialog(false);
                     // แสดง error dialog
-                    setMessage("การชำระเงินล้มเหลว การจองของคุณถูกยกเลิก");
+                    setDialogTitle("ยกเลิกการจอง");
+                    setMessage("การจองของท่านถูกยกเลิกเรียบร้อยแล้ว ขอบคุณที่แจ้งให้เราทราบ");
                     setShowErrorDialog(true);
                   }}
               >
-                ยกเลิก
+                ยกเลิกการจอง
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -378,6 +358,7 @@ const PaymentTimer = ({ total, bookingInfo }) => {
             showSuccessDialog={showSuccessDialog}
             showErrorDialog={showErrorDialog}
             message={message}
+            title={dialogTitle} // ส่งหัวข้อ dialog ไปยัง ConfirmationDialogs
             onSuccessClose={handleSuccessDialogClose}
             onErrorClose={handleErrorDialogClose}
         />
