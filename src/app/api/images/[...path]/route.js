@@ -6,7 +6,8 @@ import path from 'path';
 export async function GET(request, { params }) {
     try {
         // Ensure params is awaited before accessing the path property
-        const pathArray = await params.path;
+        const { params } = context;
+        const pathArray = Array.isArray(params.path) ? params.path : [params.path];
         const filePath = pathArray.join('/');
 
         // สร้างเส้นทางเต็มไปยังไฟล์
