@@ -31,7 +31,7 @@ const UserForm = ({
 
     return (
         <>
-            <Label className="text-center text-3xl font-bold mb-2 mt-3">
+            <Label className="text-center text-3xl font-bold mb-5 mt-3">
                 Sign Up - ข้อมูลส่วนตัว
             </Label>
             <Card className="w-9/12 max-w-screen-md bg-white p-6 shadow-lg">

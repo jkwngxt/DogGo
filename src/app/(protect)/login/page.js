@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import logoSVG from "/public/image/logo.svg"; 
@@ -62,7 +61,7 @@ const LoginPage = () => {
                     placeholder="Username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full p-2 mt-4 border rounded-md shadow-md shadow-[#0f4099] placeholder:text-black"
+                    className="text-sm font-medium w-full p-2 mt-4 border rounded-md shadow-md shadow-[#0f4099] placeholder:text-black"
                 />
                 <input
                     type="password"
@@ -70,7 +69,7 @@ const LoginPage = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     onKeyDown={handleKeyPress} // press enter to login
-                    className="w-full p-2 mt-5 border rounded-md shadow-md shadow-[#0f4099] placeholder:text-black"
+                    className="text-sm font-medium w-full p-2 mt-5 border rounded-md shadow-md shadow-[#0f4099] placeholder:text-black"
                 />
                 <button 
                     onClick={handleLogin}
@@ -82,10 +81,21 @@ const LoginPage = () => {
                     {isLoading ? "Logging in..." : "LOGIN"}
                 </button>
 
-                {/* Sign Up Link */}
-                <p className="mt-6 mr-1 text-xs font-semibold text-black">
+                {/* Sign Up Link 
+                <p className="mt-6 mr-1 text-sm font-semibold text-black">
                     Don’t have an account? <Link href="/register" className="font-semibold text-white">Sign Up</Link>
-                </p>
+                </p> 
+                {/* Sign Up Link with Improved Styling */}
+                <div className="mt-8 text-sm font-semibold text-black flex items-center">
+                    <span>Don't have an account?</span>
+                    <Link 
+                    href="/register" 
+                    className="font-bold text-white hover:text-[#FFC74A] ml-2 relative group"
+                    >
+                    Sign Up
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#FFC74A] group-hover:w-full transition-all duration-300"></span>
+                    </Link>
+                </div>
             </div>
             {/* Error Message - Placed Under the Card */}
             {errorMessage && (
