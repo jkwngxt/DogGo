@@ -3,7 +3,6 @@
 import * as React from "react";
 import { Card } from "@/components/ui/card";
 import HistoryDogWalker from "@/components/history-dog-walker";
-import CouponCard from "@/components/coupon-card";
 
 export default function PetOwnerHomePage() {
   const [walkingServices, setWalkingServices] = React.useState([]);
@@ -104,7 +103,7 @@ export default function PetOwnerHomePage() {
               walkingServices.map((service, index) => (
                 <HistoryDogWalker
                 key={index}
-                userImage={service.userImage}
+                userImage={service.pic || "/image/user-placeholder.jpg"}
                 dw_username={service.dw_username}
                 ws_date={service.ws_date}
                 timeRange={service.timeRange}

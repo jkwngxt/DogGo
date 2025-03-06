@@ -78,6 +78,7 @@ export default function DogWalkDescription({ params }) {
     dw_tel: serviceInfo.dw.tel || "N/A",
     dogs: serviceInfo.service.dogs || [],
     ws_status: serviceInfo.service.status || null, // fetching walking service status
+    user_role: serviceInfo.service.userRole
   };
 
   // Format the date from ws_date
@@ -154,8 +155,8 @@ export default function DogWalkDescription({ params }) {
               <DogTable dogs={info.dogs} />
             </div>
 
-            {/* Button Section - Hide buttons if status is not 202 */}
-            {canModifyService && (
+            {/* Button Section - Hide buttons if status is not 202 & only dogWalker can see this */}
+            {canModifyService && info.user_role === "dogWalker" && (
               <div className="flex flex-row space-x-4 justify-center">
                 <WalkerWalkConfirmation type="รับงาน" wsId={wsId} />
                 <WalkerWalkConfirmation type="ปฏิเสธ" wsId={wsId} />
