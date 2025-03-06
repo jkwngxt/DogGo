@@ -21,6 +21,13 @@ const LoginPage = () => {
     const handleLogin = async () => {
         setIsLoading(true);
         setErrorMessage(""); 
+
+        if (!username.trim() || !password.trim()) {
+            setErrorMessage("Username and password are required.");
+            setIsLoading(false); // stop loading state
+            return; // exit function
+        }
+
         try {
             const result = await login(username, password);
             if (!result.success) {
@@ -40,15 +47,15 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="flex justify-center items-center min-h-screen bg-[#FFF8D6]">
+        <div className="flex flex-col justify-center items-center min-h-screen bg-[#FFF8D6]">
+            {/* Login Card */}
             <div className="relative flex flex-col items-center p-8 bg-[#2668E3] rounded-2xl shadow-lg w-80">
                 {/* Logo */}
                 <div className="absolute -top-24 ml-14 flex flex-col items-center">
                     <Image src={logoSVG} alt="Logo" width={250} height={250} />
                 </div>
                 
-                <Label className="text-5xl font-semibold text-white mb-9 mt-4">Login</Label>
-                {errorMessage && <p className="text-red-500 text-sm mb-4">{errorMessage}</p>}
+                <Label className="text-5xl font-bold text-white mb-9 mt-4">Login</Label>
 
                 <input
                     type="text"
@@ -80,6 +87,10 @@ const LoginPage = () => {
                     Don’t have an account? <Link href="/register" className="font-semibold text-white">Sign Up</Link>
                 </p>
             </div>
+            {/* Error Message - Placed Under the Card */}
+            {errorMessage && (
+                <p className="text-[#FF0000] text-m mt-6">{errorMessage}</p>
+            )}
         </div>
     );
 };
