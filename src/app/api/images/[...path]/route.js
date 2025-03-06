@@ -6,8 +6,7 @@ import path from 'path';
 export async function GET(request, { params }) {
     try {
         // Ensure params is awaited before accessing the path property
-        const { params } = context;
-        const pathArray = Array.isArray(params.path) ? params.path : [params.path];
+        const pathArray = await params.path;
         const filePath = pathArray.join('/');
 
         // สร้างเส้นทางเต็มไปยังไฟล์
@@ -45,6 +44,7 @@ export async function GET(request, { params }) {
             },
         });
     } catch (error) {
+        console.error('Image loading error:', error);
 
         // ถ้าไม่พบไฟล์
         if (error.code === 'ENOENT') {
