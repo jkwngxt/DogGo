@@ -156,6 +156,7 @@ model Billing {
 
   walkingService   WalkingService? @relation(fields: [walkingServiceId], references: [id])
   walkingServiceId Int?            @unique @map("ws_id")
+  deadline         DateTime        @default(dbgenerated("NOW() + interval '10 minutes'")) @map("ws_deadline")
 
   @@map("billing")
 }
