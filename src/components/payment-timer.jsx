@@ -23,38 +23,82 @@ const PaymentTimer = ({ total, bookingInfo }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
   const [bookingData, setBookingData] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes (600 seconds)
+  const [timeLeft, setTimeLeft] = useState(999999); // เริ่มต้นที่ค่าสูงๆ แทนที่จะเป็น 0
   const timerRef = useRef(null);
 
   useEffect(() => {
-    if (showPaymentDialog && !timerRef.current) {
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
+    console.log("Timer useEffect triggered");
+    console.log("showPaymentDialog:", showPaymentDialog);
+    console.log("timerRef.current:", timerRef.current);
+    console.log("bookingData:", bookingData);
+
+    if (showPaymentDialog && !timerRef.current && bookingData && bookingData.deadline) {
+      console.log("Creating timer with deadline:", bookingData.deadline);
+
+      // สร้างฟังก์ชันอัพเดท timeLeft
+      const updateTimeLeft = () => {
+        try {
+          // ตรวจสอบว่ามี deadline หรือไม่
+          if (!bookingData.deadline) {
+            console.warn('No deadline available');
+            return;
+          }
+
+          // แปลง deadline string จาก ISO format ให้เป็น Date object
+          const deadlineTime = new Date(bookingData.deadline).getTime();
+          const currentTime = new Date().getTime();
+
+          console.log(`Current time: ${new Date(currentTime).toISOString()}`);
+          console.log(`Deadline: ${new Date(deadlineTime).toISOString()}`);
+
+          // คำนวณเวลาที่เหลือเป็นวินาที - แก้ไขตรงนี้ ต้องหารด้วย 1000
+          const diffMs = deadlineTime - currentTime;
+          const diffSeconds = Math.max(0, Math.floor(diffMs / 1000));
+
+          console.log(`Time difference (ms): ${diffMs}`);
+          console.log(`Time difference (seconds): ${diffSeconds}`);
+
+          setTimeLeft(diffSeconds);
+
+          if (diffSeconds <= 0) {
+            console.warn('Time expired - clearing timer');
             clearInterval(timerRef.current);
             timerRef.current = null;
             // เมื่อเวลาหมด ให้ลบข้อมูลการจองจาก sessionStorage
             sessionStorage.removeItem('bookingData');
             sessionStorage.removeItem('selectedDogWalker');
             sessionStorage.removeItem('walkingServiceSearch');
-            return 0;
           }
-          return prev - 1;
-        });
-      }, 1000);
+        } catch (error) {
+          console.error('Error calculating time left:', error);
+          // กรณีมีข้อผิดพลาดในการคำนวณเวลา ให้ใช้เวลาเป็น 0
+          setTimeLeft(0);
+        }
+      };
+
+      // อัพเดทค่าเวลาทันที
+      updateTimeLeft();
+
+      // ตั้ง interval เพื่ออัพเดทเวลาทุกวินาที
+      timerRef.current = setInterval(updateTimeLeft, 1000);
+      console.log("Timer interval created");
     }
 
     return () => {
       if (timerRef.current) {
+        console.log("Cleaning up timer interval");
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
     };
-  }, [showPaymentDialog]);
+  }, [showPaymentDialog, bookingData]);
 
   // เพิ่ม effect ที่จะจัดการเมื่อเวลาหมด
   useEffect(() => {
+    console.log(`timeLeft changed: ${timeLeft}`);
+
     if (timeLeft === 0 && showPaymentDialog) {
+      console.log("Timer expired - closing payment dialog");
       setShowPaymentDialog(false);
 
       // Cancel the booking on the server when timer expires
@@ -88,13 +132,17 @@ const PaymentTimer = ({ total, bookingInfo }) => {
 
   // Function to handle payment button click and make the booking API call
   const handlePaymentClick = async () => {
+    console.log("Payment button clicked");
     setIsLoading(true);
 
     try {
       // ตรวจสอบความถูกต้องของข้อมูลการจองที่ได้รับจาก props
+      console.log("Booking info:", bookingInfo);
+
       if (!bookingInfo || !bookingInfo.dogWalkerId || !bookingInfo.startTimeInt ||
           !bookingInfo.endTimeInt || !bookingInfo.date ||
           !Array.isArray(bookingInfo.dogIds) || bookingInfo.dogIds.length === 0) {
+        console.error("Invalid booking info", bookingInfo);
         setDialogTitle("ข้อมูลไม่ครบถ้วน");
         setMessage("ขออภัย ข้อมูลการจองไม่ครบถ้วน กรุณาตรวจสอบและทำรายการใหม่อีกครั้ง");
         setShowErrorDialog(true);
@@ -102,6 +150,7 @@ const PaymentTimer = ({ total, bookingInfo }) => {
       }
 
       // Make API call to book dog walker
+      console.log("Sending booking request:", JSON.stringify(bookingInfo));
       const response = await fetch('/api/user/booking-dw', {
         method: 'POST',
         headers: {
@@ -111,16 +160,23 @@ const PaymentTimer = ({ total, bookingInfo }) => {
       });
 
       const data = await response.json();
+      console.log("Booking API response:", data);
 
       if (response.ok) {
-        // ใช้ข้อมูลที่ได้จาก API
+        // เก็บข้อมูลจาก API response
+        console.log("Booking successful:", data);
+
+        // เก็บข้อมูลการจอง
         setBookingData({
           billingId: data.billingId,
           walkingServiceId: data.walkingServiceId,
-          amount: data.amount || total
+          amount: data.amount || total,
+          deadline: data.deadline // เก็บ deadline จาก API response
         });
 
-        // สร้างข้อมูลผลลัพธ์การจองจาก API response และ bookingInfo
+        console.log("Set booking data with deadline:", data.deadline);
+
+        // สร้างข้อมูลผลลัพธ์การจองสำหรับเก็บใน localStorage
         const bookingResult = {
           dogWalkerId: bookingInfo.dogWalkerId,
           date: bookingInfo.date,
@@ -132,16 +188,17 @@ const PaymentTimer = ({ total, bookingInfo }) => {
           billingId: data.billingId,
           total: data.amount || total,
           dwName: bookingInfo.dogWalkerName,
-          bookingTimestamp: new Date().toISOString()
+          bookingTimestamp: new Date().toISOString(),
+          deadline: data.deadline
         };
 
         localStorage.setItem('lastBookingResult', JSON.stringify(bookingResult));
-
         setShowPaymentDialog(true);
-        // รีเซ็ตเวลาเมื่อแสดง dialog
-        setTimeLeft(600);
+        console.log("Payment dialog opened");
+
       } else {
         // Booking failed - show appropriate error message
+        console.error("Booking failed:", data);
         if (data.altFlow) {
           // This is a controlled error from our backend (like time slot conflict)
           setDialogTitle("ช่วงเวลาไม่ว่าง");
@@ -165,7 +222,9 @@ const PaymentTimer = ({ total, bookingInfo }) => {
   };
 
   const handleConfirmClick = async () => {
+    console.log("Confirm payment clicked");
     if (!bookingData || !bookingData.billingId) {
+      console.error("Invalid booking data for payment confirmation", bookingData);
       setDialogTitle("ข้อมูลไม่ถูกต้อง");
       setMessage("ขออภัย ข้อมูลการชำระเงินไม่ถูกต้อง กรุณาทำรายการใหม่อีกครั้ง");
       setShowErrorDialog(true);
@@ -178,6 +237,7 @@ const PaymentTimer = ({ total, bookingInfo }) => {
     try {
       // ใช้ข้อมูลจาก API (bookingData)
       const paymentAmount = bookingData.amount || total;
+      console.log("Confirming payment for amount:", paymentAmount);
 
       // Create payment confirmation request
       const paymentConfirmation = {
@@ -188,6 +248,7 @@ const PaymentTimer = ({ total, bookingInfo }) => {
       };
 
       // Send payment confirmation to the backend
+      console.log("Sending payment confirmation:", paymentConfirmation);
       const response = await fetch('/api/walking-service/payment', {
         method: 'POST',
         headers: {
@@ -197,10 +258,10 @@ const PaymentTimer = ({ total, bookingInfo }) => {
       });
 
       const data = await response.json();
-
-      console.log(data);
+      console.log("Payment confirmation response:", data);
 
       if (response.ok) {
+        console.log("Payment confirmation successful");
         setShowPaymentDialog(false); // Close payment dialog
 
         // Show success message after payment confirmation
@@ -209,6 +270,7 @@ const PaymentTimer = ({ total, bookingInfo }) => {
         setShowSuccessDialog(true);
       } else {
         // Payment confirmation failed
+        console.error("Payment confirmation failed:", data);
         setShowPaymentDialog(false);
         setDialogTitle("ชำระเงินไม่สำเร็จ");
         setMessage("ขออภัย ไม่สามารถยืนยันการชำระเงินได้ในขณะนี้ กรุณาลองใหม่อีกครั้งในภายหลัง");
@@ -239,6 +301,7 @@ const PaymentTimer = ({ total, bookingInfo }) => {
 
   // Function to cancel the booking when timer expires or other cancellation events
   const cancelBooking = async (walkingServiceId) => {
+    console.log("Cancelling booking:", walkingServiceId);
     try {
       // อัพเดทสถานะการยกเลิกใน localStorage
       const response = await fetch('/api/walking-service/change-status', {
@@ -251,6 +314,7 @@ const PaymentTimer = ({ total, bookingInfo }) => {
           "walkingServiceId": walkingServiceId,
         }),
       });
+      console.log("Booking cancellation response:", response.ok);
       return response.ok;
     } catch (error) {
       console.error("Error cancelling booking:", error);
@@ -259,6 +323,7 @@ const PaymentTimer = ({ total, bookingInfo }) => {
   };
 
   const handleErrorDialogClose = () => {
+    console.log("Error dialog closed");
     setShowErrorDialog(false);
     // ลบข้อมูลการจองจาก sessionStorage เมื่อเกิดข้อผิดพลาด
     sessionStorage.removeItem('bookingData');
@@ -269,24 +334,64 @@ const PaymentTimer = ({ total, bookingInfo }) => {
   };
 
   const handleSuccessDialogClose = () => {
+    console.log("Success dialog closed");
     setShowSuccessDialog(false);
 
     // ดึงข้อมูลการจองล่าสุดจาก localStorage
     const bookingResultStr = localStorage.getItem('lastBookingResult');
     const bookingResult = bookingResultStr ? JSON.parse(bookingResultStr) : null;
+    console.log("Last booking result:", bookingResult);
 
     // Redirect to dashboard after successful payment
     if (bookingResult && bookingResult.walkingServiceId) {
+      console.log("Redirecting to walk description:", bookingResult.walkingServiceId);
       router.push(`/pet-owner/walk-description?wId=${bookingResult.walkingServiceId}`);
     } else {
+      console.log("Redirecting to walking service");
       router.push("/pet-owner/walking-service");
     }
   };
 
   const formatTime = (seconds) => {
+    console.log(`Formatting time: ${seconds} seconds`);
+
+    if (seconds <= 0) {
+      console.log("Time is zero or negative");
+      return "0:00";
+    }
+
     const minutes = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${minutes}:${secs.toString().padStart(2, "0")}`;
+    const formattedTime = `${minutes}:${secs.toString().padStart(2, "0")}`;
+    console.log(`Formatted time: ${formattedTime}`);
+    return formattedTime;
+  };
+
+  // ฟังก์ชันแสดงผลเวลา deadline ในรูปแบบที่เหมาะสม
+  const formatDeadlineTime = () => {
+    if (bookingData && bookingData.deadline) {
+      try {
+        // แปลง deadline string จาก ISO format ให้เป็น Date object
+        const deadlineDate = new Date(bookingData.deadline);
+        console.log("Formatting deadline:", deadlineDate);
+
+        // ฟอร์แมตเวลาเป็นรูปแบบของไทย
+        const options = {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        };
+
+        // ใช้ Intl.DateTimeFormat เพื่อแปลงเวลาให้เป็นรูปแบบของไทย
+        const formattedTime = new Intl.DateTimeFormat('th-TH', options).format(deadlineDate) + ' น.';
+        console.log("Formatted deadline time:", formattedTime);
+        return formattedTime;
+      } catch (error) {
+        console.error('Error formatting deadline:', error);
+        return "";
+      }
+    }
+    return "";
   };
 
   return (
@@ -315,11 +420,11 @@ const PaymentTimer = ({ total, bookingInfo }) => {
                 ชื่อบัญชี: บริษัท DogGo Thailand
               </DialogDescription>
               <DialogDescription className="text-md text-black">
-                โปรดชำระเงินภายใน
+                โปรดชำระเงินภายในเวลา {formatDeadlineTime()}
               </DialogDescription>
             </DialogHeader>
             <div className="flex justify-center text-2xl font-bold">
-              {formatTime(timeLeft)} นาที
+              เหลือเวลา {formatTime(timeLeft)}
             </div>
             <DialogFooter className="sm:justify-center">
               <Button
@@ -331,6 +436,7 @@ const PaymentTimer = ({ total, bookingInfo }) => {
               <Button
                   variant="destructive"
                   onClick={() => {
+                    console.log("Cancel booking button clicked");
                     // Cancel the booking when user manually cancels
                     if (bookingData && bookingData.walkingServiceId) {
                       cancelBooking(bookingData.walkingServiceId);
