@@ -105,9 +105,11 @@ const WalkerWalkConfirmation = ({ type, wsId }) => {
       <Dialog open={showFirstDialog} onOpenChange={setShowFirstDialog}>
         <DialogTrigger asChild>
           {type === "รับงาน" ? (
-            <Button disabled={loading}>รับงาน</Button>
+            <Button className="font-semibold text-lg p-5"
+            disabled={loading}>รับงาน</Button>
           ) : (
-            <Button variant="destructive" disabled={loading}>ปฏิเสธ</Button>
+            <Button className="font-semibold text-lg p-5"
+            variant="destructive" disabled={loading}>ปฏิเสธ</Button>
           )}
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
