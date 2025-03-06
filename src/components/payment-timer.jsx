@@ -409,7 +409,7 @@ const PaymentTimer = ({ total, bookingInfo }) => {
         <Dialog open={showPaymentDialog} onOpenChange={setShowPaymentDialog}>
           <DialogContent className="sm:max-w-md flex flex-col items-center">
             <img
-                src="/image/payment-qr.png"
+                src="/image/payment-qr-crop.png"
                 alt="qr-code"
             />
             <DialogHeader className="flex items-center">
@@ -428,6 +428,7 @@ const PaymentTimer = ({ total, bookingInfo }) => {
             </div>
             <DialogFooter className="sm:justify-center">
               <Button
+                  className={"w-32"}
                   onClick={handleConfirmClick}
                   disabled={isConfirmingPayment}
               >
@@ -435,6 +436,7 @@ const PaymentTimer = ({ total, bookingInfo }) => {
               </Button>
               <Button
                   variant="destructive"
+                  className={"w-32"}
                   onClick={() => {
                     console.log("Cancel booking button clicked");
                     // Cancel the booking when user manually cancels
