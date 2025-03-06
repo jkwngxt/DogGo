@@ -3,8 +3,6 @@
 import * as React from "react";
 import { useRouter } from "next/navigation"; // Use next/router for navigation
 import { Card, CardHeader } from "@/components/ui/card";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "./ui/button";
 import OwnerWalkConfirmation from "./owner-walk-confirmation";
 
@@ -22,7 +20,7 @@ const HistoryDogWalker = ({
   const [status, setStatus] = React.useState(ws_status);
 
   const handleCardClick = () => {
-    router.push("/pet-owner/walk-description");
+    router.push(`/dog-walker/walk-description/${walkingServiceId}`);
   };
 
   const handleButtonClick = (e) => {
@@ -75,11 +73,12 @@ const HistoryDogWalker = ({
   return (
     <Card className="max-w-full cursor-pointer" onClick={handleCardClick}>
       <CardHeader className="grid grid-cols-5 items-center gap-4">
+      <div className="flex justify-left">
         <img
           src={userImage}
           alt="User profile"
           className="w-12 h-12 rounded-full object-cover"
-        />
+        /></div>
         <div className="w-28 text-center">{dw_username}</div>
         <div className="w-28 text-center">{ws_date}</div>
         <div className="w-28 flex justify-center space-x-1">

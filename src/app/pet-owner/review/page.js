@@ -55,7 +55,7 @@ export default function Review() {
       return;
     }
 
-    if (rating > 0) {
+    if (rating > 0 && rating < 6) {
       try {
         const response = await fetch("/api/dog-walker/review", {
           method: "POST",
