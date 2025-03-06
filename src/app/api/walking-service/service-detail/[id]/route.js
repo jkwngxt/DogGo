@@ -32,7 +32,7 @@ export async function GET(request, context) {
             );
         }
 
-        const result = await wsController.getWSDetail(serviceId);
+        const result = await wsController.getWSDetail(serviceId, user);
         return NextResponse.json(result);
     } catch (error) {
         console.error('Error in walking service detail route:', error);
