@@ -1,4 +1,3 @@
-// File: app/api/user/booking-dw/route.js
 import { NextResponse } from 'next/server';
 import { BookDogWalkerController } from '@/controllers/BookDogWalkerController';
 import { authenticateRequest } from '@/utils/jwt';
@@ -12,15 +11,7 @@ export async function POST(request) {
         if (response) return response;
 
         const body = await request.json();
-
         const { date, startTimeInt, endTimeInt, dogIds, dogWalkerId, price } = body;
-
-        if (!date || !startTimeInt || !endTimeInt || !dogIds || !dogWalkerId || !price) {
-            return NextResponse.json({
-                error: "Dog walker is already booked for the requested time slots.",
-                altFlow: true},
-                { status: 400 });
-        }
 
         // Define constants
         const START_TIME = 9; // 9:00 AM is the first slot
@@ -51,6 +42,7 @@ export async function POST(request) {
 
         const bookDogWalkerController = new BookDogWalkerController();
         const result = await bookDogWalkerController.bookDogWalker(data);
+
         if (!result.error) {
             return NextResponse.json(result, { status: 200 });
         }

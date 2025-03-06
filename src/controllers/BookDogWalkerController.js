@@ -15,7 +15,6 @@ export class BookDogWalkerController {
                 return { error: "dogIds must be an array." };
             }
 
-
             const dateOnly = date.toISOString().split('T')[0];
 
             // Check availability using Prisma query builder
@@ -32,15 +31,59 @@ export class BookDogWalkerController {
                     status: {
                         notIn: [210, 220] // Excluding certain status codes
                     }
+                },
+                include: {
+                    billing: true // Include the related billing
                 }
             });
 
-            // If there's a conflict, return an error
+            // If there's a conflict
             if (conflictingService) {
-                return {
-                    error: "Dog walker is already booked for the requested time slots.",
-                    altFlow: true
-                };
+                // If it's a different user, return error
+                if (conflictingService.userId !== userId) {
+                    return {
+                        error: "Dog walker is already booked for the requested time slots.",
+                        altFlow: true
+                    };
+                }
+
+                // If it's the same user, return existing booking info
+                if (conflictingService.billing) {
+                    // แปลง deadline เป็น ISO string เพื่อให้ client อ่านค่าได้ถูกต้อง
+                    const deadline = conflictingService.billing.deadline
+                        ? conflictingService.billing.deadline.toISOString()
+                        : null;
+
+                    return {
+                        message: "You have already booked this dog walker for these time slots.",
+                        billingId: conflictingService.billing.id,
+                        walkingServiceId: conflictingService.id,
+                        amount: conflictingService.price.toString(),
+                        deadline: deadline
+                    };
+                } else {
+                    // In case the conflicting service doesn't have a billing for some reason
+                    const billing = await prisma.billing.findFirst({
+                        where: {
+                            walkingServiceId: conflictingService.id
+                        }
+                    });
+
+                    if (billing) {
+                        // แปลง deadline เป็น ISO string เพื่อให้ client อ่านค่าได้ถูกต้อง
+                        const deadline = billing.deadline
+                            ? billing.deadline.toISOString()
+                            : null;
+
+                        return {
+                            message: "You have already booked this dog walker for these time slots.",
+                            billingId: billing.id,
+                            walkingServiceId: conflictingService.id,
+                            amount: conflictingService.price.toString(),
+                            deadline: deadline
+                        };
+                    }
+                }
             }
 
             // If no conflict, proceed with booking
@@ -67,10 +110,26 @@ export class BookDogWalkerController {
                 }
             });
 
+            // ดึงข้อมูล billing หลังจากสร้างเพื่อให้ได้ค่า deadline ที่ถูกต้อง
+            const createdBilling = await prisma.billing.findUnique({
+                where: {
+                    id: billing.id
+                }
+            });
+
+            // แปลง deadline เป็น ISO string เพื่อให้ client อ่านค่าได้ถูกต้อง
+            const deadline = createdBilling && createdBilling.deadline
+                ? createdBilling.deadline.toISOString()
+                : null;
+
+            console.log(deadline);
+
             return {
                 message: "Booking successful",
                 billingId: billing.id,
-                walkingServiceId: walkingService.id
+                walkingServiceId: walkingService.id,
+                amount: price.toString(),
+                deadline: deadline
             };
 
         } catch (error) {
