@@ -26,7 +26,7 @@ export default function RootLayout({ children }) {
   const [userRole, setUserRole] = useState(null);
   const [name, setName] = useState(null);
   const [image, setImage] = useState(null);
-  
+
   useEffect(() => {
     // Fetch user role from sessionStorage only on client side
     const role = sessionStorage.getItem("userRole");
@@ -34,24 +34,20 @@ export default function RootLayout({ children }) {
 
     const name = localStorage.getItem("name");
     setName(name);
-    
+
     const id = localStorage.getItem("id");
     if (id) {
       const imgPath = `/api/images/dog-walkers/images/${id}.jpg`;
       setImage(imgPath)
-    } 
+    }
   }, []);
 
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${notoSansThai.variable} font-auto antialiased`}
-      >
-        <DogWalkerNav
-        userName = {name}
-        userImage = {image}/>
-        {children}
-      </body>
-    </html>
+    <>
+      <DogWalkerNav
+        userName={name}
+        userImage={image} />
+      {children}
+    </>
   );
 }
