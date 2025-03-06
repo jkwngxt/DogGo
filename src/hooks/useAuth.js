@@ -38,6 +38,10 @@ export const useAuth = () => {
             localStorage.setItem("id",data.user.id);
             setId(data.user.id)
 
+            // Dispatch a custom event for auth state change
+            window.dispatchEvent(new Event('authStateChange'));
+            window.dispatchEvent(new Event('storage'));
+
             // Redirect ตาม role
             switch (data.user.role) {
                 case "dogWalker":
@@ -71,6 +75,10 @@ export const useAuth = () => {
         setUser(null);
         setName(null);
         setId(null);
+
+        window.dispatchEvent(new Event('authStateChange'));
+        window.dispatchEvent(new Event('storage'));
+
         router.push("/login");
     };
 
