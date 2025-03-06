@@ -41,7 +41,7 @@ const DogForm = ({
 
     return (
         <>
-            <Label className="text-center text-3xl font-bold mb-2 mt-3">
+            <Label className="text-center text-3xl font-bold mb-5 mt-3">
                 Sign Up - ข้อมูลสุนัข
             </Label>
             <Card className="w-9/12 h-auto bg-white p-6 shadow-lg">
