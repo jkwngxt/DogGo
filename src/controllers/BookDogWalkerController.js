@@ -122,8 +122,6 @@ export class BookDogWalkerController {
                 ? createdBilling.deadline.toISOString()
                 : null;
 
-            console.log(deadline);
-
             return {
                 message: "Booking successful",
                 billingId: billing.id,

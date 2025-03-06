@@ -9,7 +9,7 @@ export async function updateExpiredWalkingServices() {
         // ค้นหา WalkingService ที่มีสถานะ 201 และมีการเชื่อมโยงกับ Billing ที่หมดอายุ
 
         const expiredServices = await prisma.$queryRaw`
-            SELECT ws.*, b.*
+            SELECT ws."ws_id"
             FROM "walking_service" ws
             JOIN "billing" b ON ws."ws_id" = b."ws_id"
             WHERE ws."ws_status" = 201
@@ -23,8 +23,8 @@ export async function updateExpiredWalkingServices() {
         if (changeStatusCtrl && expiredServices.length > 0) {
             for (const service of expiredServices) {
                 // เรียกใช้ controller สำหรับเปลี่ยนสถานะ
-                await changeStatusCtrl.changeWSStatusController( 210, service.id,);
-                console.log(`Updated walking service ID ${service.id} to cancelled status (210).`);
+                await changeStatusCtrl.changeWSStatusController( 210, service.ws_id,);
+                console.log(`Updated walking service ID ${service.ws_id} to cancelled status (210).`);
             }
         } else if (expiredServices.length > 0) {
             console.warn('ChangeStatusController not provided, skipping status updates.');

@@ -34,7 +34,6 @@ export const usePayment = ({ total, bookingInfo }) => {
     // ฟังก์ชันคำนวณเวลา countdown
     useEffect(() => {
         if (showPaymentDialog && !timerRef.current && bookingData && bookingData.deadline) {
-            console.log("Creating timer with deadline:", bookingData.deadline);
 
             const updateTimeLeft = () => {
                 try {
@@ -159,7 +158,7 @@ export const usePayment = ({ total, bookingInfo }) => {
             } else {
                 if (data.altFlow) {
                     setDialogTitle("ช่วงเวลาไม่ว่าง");
-                    setMessage(`ขออภัย พนักงานพาสุนัขเดินท่านนี้มีการจองในช่วงเวลาที่ท่านเลือกแล้ว กรุณาเลือกช่วงเวลาอื่น หรือพนักงานท่านอื่น`);
+                    setMessage(`ขออภัย Dog Walker ท่านนี้มีการจองในช่วงเวลาที่ท่านเลือกแล้ว กรุณาเลือกช่วงเวลาอื่น หรือพนักงานท่านอื่น`);
                 } else {
                     setDialogTitle("เกิดข้อผิดพลาด");
                     setMessage(`ขออภัย เกิดข้อผิดพลาดในการจอง: ${data.error || 'กรุณาลองใหม่อีกครั้งในภายหลัง'}`);
@@ -209,7 +208,7 @@ export const usePayment = ({ total, bookingInfo }) => {
             if (response.ok) {
                 setShowPaymentDialog(false);
                 setDialogTitle("ชำระเงินสำเร็จ");
-                setMessage("การชำระเงินสำเร็จเรียบร้อยแล้ว ขณะนี้อยู่ระหว่างการยืนยันจากพนักงานพาสุนัขเดิน ขอบคุณที่ใช้บริการของเรา");
+                setMessage("การชำระเงินสำเร็จเรียบร้อยแล้ว ขณะนี้อยู่ระหว่างการยืนยันจาก Dog Walker ขอบคุณที่ใช้บริการของเรา");
                 setShowSuccessDialog(true);
             } else {
                 setShowPaymentDialog(false);
@@ -271,13 +270,9 @@ export const usePayment = ({ total, bookingInfo }) => {
         setShowSuccessDialog(false);
 
         const bookingResultStr = localStorage.getItem('lastBookingResult');
-        const bookingResult = bookingResultStr ? JSON.parse(bookingResultStr) : null;
+        bookingResultStr ? JSON.parse(bookingResultStr) : null;
 
-        if (bookingResult && bookingResult.walkingServiceId) {
-            router.push(`/pet-owner/walk-description?wId=${bookingResult.walkingServiceId}`);
-        } else {
-            router.push("/pet-owner/walking-service");
-        }
+        router.push("/pet-owner/walking-service");
     };
 
     // ฟังก์ชันยกเลิกการจองโดยผู้ใช้
