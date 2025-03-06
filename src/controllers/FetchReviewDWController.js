@@ -120,6 +120,7 @@ export class FetchReviewDWController {
 
             // Check availability
             let dbCanBook = canBook;
+            let isBookedStatus = null;
 
             if (canBook) {
                 // ใช้ startsWith เพื่อเปรียบเทียบเฉพาะวันที่ (YYYY-MM-DD)
@@ -142,7 +143,12 @@ export class FetchReviewDWController {
                     }
                 });
 
+
                 dbCanBook = !conflictingServices;
+
+                if (!dbCanBook && conflictingServices.userId === userId) {
+                    isBookedStatus = conflictingServices.status;
+                }
             }
 
             // Format reviews and filter out null text reviews
@@ -159,6 +165,7 @@ export class FetchReviewDWController {
             return {
                 success: true,
                 canBook: dbCanBook,
+                isBooked: isBookedStatus,
                 dogWalkers: {
                     id: dogWalker.id,
                     name: dogWalker.name,
@@ -181,4 +188,5 @@ export class FetchReviewDWController {
             };
         }
     }
+
 }
