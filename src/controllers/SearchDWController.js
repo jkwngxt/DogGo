@@ -57,6 +57,7 @@ export class SearchDWController {
                 pic: true,
                 address: true,
                 zone: true,
+                tel: true,
                 services: {
                     where: {
                         date: {
@@ -120,6 +121,7 @@ export class SearchDWController {
                     pic: dw.pic,
                     address: dw.address,
                     zone: dw.zone,
+                    tel: dw.tel,
                     meanRating: parseFloat(meanRating.toFixed(2)),
                     ratingCount: ratings.length
                 };

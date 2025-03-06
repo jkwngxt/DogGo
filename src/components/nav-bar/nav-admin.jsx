@@ -2,16 +2,12 @@
 
 import React from "react";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
   NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignOut } from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from "@/hooks/useAuth";
 
 const ListItem = React.forwardRef(
   ({ className, title, children, ...props }, ref) => {
@@ -38,35 +34,19 @@ const ListItem = React.forwardRef(
 
 ListItem.displayName = "ListItem";
 
-const AdminNav = ({ userImage, userName}) => {
+const AdminNav = () => {
+  const { logout } = useAuth();
   return (
     <div className="flex px-10 bg-[#2668E3] justify-between">
       <img className="w-20 h-20" src="/image/logo.svg" alt="dog go logo" />
       <div className="flex flex-row space-x-4 items-center">
         <img
-          src={userImage}
+          src="/image/user-placeholder.jpg"
           alt="User profile"
           className="w-16 h-16 rounded-full object-cover"
         />
-        <div className="text-white font-bold">{userName}</div>
-        <NavigationMenu>
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Services</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid gap-3 p-2 md:w-[50px] lg:w-[150px] ]">
-                  <ListItem href="/doc" title="Customer"/>
-                  <ListItem href="/docs/installation" title="Dog Walker"/>
-                  <ListItem
-                    href="/docs/primitives/typography"
-                    title="Service Provider"
-                  />
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
-        <button>
+        <div className="text-white font-bold">DogGo Admin</div>
+        <button onClick={logout}>
             <FontAwesomeIcon icon={faSignOut} className="h-5 w-5 text-white"/>
         </button>
       </div>

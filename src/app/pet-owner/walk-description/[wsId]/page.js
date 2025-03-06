@@ -1,45 +1,87 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import WalkerWalkConfirmation from "@/components/walker-walk-confirmation";
 import DogTable from "@/components/dog-table";
-
-export default function DogWalkDescription() {
-  const info = {
-    pet_owner: "Pet Owner 1",
-    dw_zone: "บางรัก",
-    u_address: "7/222 แขวงอรุณอมรินทร์ เขตบางรัก กรุงเทพมหานคร 10700",
-    u_tel: "0121234567",
-    dw_username: "Dog Walker 1",
-    ws_date: "2025-02-19",
-    startTime: "10:00",
-    endTime: "12:00",
-    dw_tel: "5551234567",
-    dogs: [
-      {
-        d_id: 1,
-        d_name: "มะลิ",
-        d_breed: "บางแก้ว",
-      },
-      {
-        d_id: 2,
-        d_name: "ลัคกี้",
-        d_breed: "ชิวาวา",
-      },
-      {
-        d_id: 3,
-        d_name: "บ๊อบ",
-        d_breed: "โกลเด้นรีทรีฟเวอร์",
-      },
-    ],
-  };
+import Loading from "@/components/loading";
 
 
+export default function DogWalkDescription({ params }) {
+  
   const formatDate = (dateString) => {
-    const [year, month, day] = dateString.split("-");
-    return `${day}/${month}/${year}`;
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    return date.toLocaleDateString('th-TH', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
+  const unwrappedParams = React.use(params);
+  const wsId = parseInt(unwrappedParams.wsId);
+
+  const [serviceInfo, setServiceInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchServiceDetails = async () => {
+      if (!wsId) {
+        setError("Missing service ID.");
+        setLoading(false);
+        return;
+      }
+  
+      try {
+        setLoading(true);
+        setError(null); 
+  
+        const response = await fetch(`/api/walking-service/service-detail/${wsId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+  
+        const data = await response.json(); 
+  
+        if (!data.success) { 
+          setError(data.message || "An error occurred while loading the service details.");
+        }
+  
+        setServiceInfo(data);
+      } catch (err) {
+        console.error("Error fetching walking service details:", err);
+        setError(err.message || "An error occurred while loading the service details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchServiceDetails();
+  }, [wsId]);
+  
+  if (loading) return <Loading />;
+  
+  if (error) return <p className="p-2 text-red-600">Error: {error}</p>;
+
+  const info = {
+    pet_owner: serviceInfo.user.name || "N/A",
+    dw_zone: serviceInfo.user.zone || "N/A",
+    u_address: serviceInfo.user.address || "N/A",
+    u_tel: serviceInfo.user.tel || "N/A",
+    dw_username: serviceInfo.dw.name || "N/A",
+    ws_date: serviceInfo.service.date || "N/A",
+    startTime: serviceInfo.service.startTime + (":00")|| "N/A",
+    endTime: serviceInfo.service.endHour + (":00")|| "N/A",
+    dw_tel: serviceInfo.dw.tel || "N/A",
+    dogs: serviceInfo.service.dogs || [],
+  };
+
+  // Format the date from ws_date
   const formattedDate = formatDate(info.ws_date);
+
   return (
     <div className="p-4 space-y-4">
       <div className="flex flex-col px-10 items-center">
@@ -55,8 +97,8 @@ export default function DogWalkDescription() {
             <div className="flex justify-between w-[60%] px-10">
               <div className="space-y-2">
                 <div className="flex space-x-2">
-                  <span className="font-bold">ชื่อพนักงาน:</span>
-                  <span>{info.dw_username}</span>
+                  <span className="font-bold">ชื่อลูกค้า:</span>
+                  <span>{info.pet_owner}</span>
                 </div>
                 <div className="flex space-x-2">
                   <span className="font-bold">เขตที่อยู่:</span>
@@ -71,11 +113,10 @@ export default function DogWalkDescription() {
                 <div className="flex space-x-2">
                   <span className="font-bold">วันที่:</span>
                   <span>{formattedDate}</span>
-                  <div className="flex-row space-x-1"></div>
                 </div>
                 <div className="flex space-x-2">
                   <span className="font-bold">เวลาที่จอง:</span>
-                  <div className="flex-row space-x-1">
+                  <div className="flex space-x-1">
                     <span>{info.startTime}</span>
                     <span>-</span>
                     <span>{info.endTime}</span>
@@ -83,7 +124,7 @@ export default function DogWalkDescription() {
                 </div>
                 <div className="flex space-x-2">
                   <span className="font-bold">เบอร์โทรติดต่อ:</span>
-                  <span>{info.dw_tel}</span>
+                  <span>{info.u_tel}</span>
                 </div>
               </div>
             </div>

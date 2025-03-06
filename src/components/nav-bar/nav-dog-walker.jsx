@@ -10,44 +10,47 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignOut } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSignOut } from "@fortawesome/free-solid-svg-icons";
+import { useAuth } from "@/hooks/useAuth";
 
-const ListItem = React.forwardRef(
-  ({ className, title, children, ...props }, ref) => {
-    return (
-      <li>
-        <NavigationMenuLink asChild>
-          <a
-            ref={ref}
-            className={`block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground ${
-              className || ""
-            }`}
-            {...props}
-          >
-            <div className="text-sm font-medium leading-none">{title}</div>
-            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-              {children}
-            </p>
-          </a>
-        </NavigationMenuLink>
-      </li>
-    );
-  }
-);
+const ListItem = React.forwardRef(({ className, title, children, ...props }, ref) => {
+  return (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={`block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground ${
+            className || ""
+          }`}
+          {...props}
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  );
+});
 
 ListItem.displayName = "ListItem";
 
-const DogWalkerNav = ({ userImage, userName}) => {
+const DogWalkerNav = ({ userImage, userName }) => {
+  const { logout } = useAuth(); // Call useAuth inside the component
+
   return (
     <div className="flex px-10 bg-[#2668E3] justify-between">
       <img className="w-20 h-20" src="/image/logo.svg" alt="dog go logo" />
       <div className="flex flex-row space-x-4 items-center">
-        <img
-          src={userImage}
-          alt="User profile"
-          className="w-16 h-16 rounded-full object-cover"
-        />
+        <img src={userImage} 
+        alt="User profile" 
+        className="w-16 h-16 rounded-full object-cover"
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src = "/image/user-placeholder.jpg";
+        }} />
         <div className="text-white font-bold">{userName}</div>
         <NavigationMenu>
           <NavigationMenuList>
@@ -55,19 +58,16 @@ const DogWalkerNav = ({ userImage, userName}) => {
               <NavigationMenuTrigger>Services</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid gap-3 p-2 md:w-[50px] lg:w-[150px] ]">
-                  <ListItem href="/dog-walker/workpage" title="รับงาน"/>
-                  <ListItem href="/dog-walker/history" title="ประวัติการรับงาน"/>
-                  <ListItem
-                    href="/dog-walker/feedback"
-                    title="Feedback"
-                  />
+                  <ListItem href="/dog-walker/workpage" title="รับงาน" />
+                  <ListItem href="/dog-walker/history" title="ประวัติการรับงาน" />
+                  <ListItem href="/dog-walker/feedback" title="Feedback" />
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
-        <button>
-            <FontAwesomeIcon icon={faSignOut} className="h-5 w-5 text-white"/>
+        <button onClick={logout}>
+          <FontAwesomeIcon icon={faSignOut} className="h-5 w-5 text-white" />
         </button>
       </div>
     </div>

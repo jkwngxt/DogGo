@@ -3,9 +3,8 @@
 import * as React from "react";
 import { Card } from "@/components/ui/card";
 import HistoryDogWalker from "@/components/history-dog-walker";
-import CouponCard from "@/components/coupon-card";
 
-export default function page() {
+export default function PetOwnerHomePage() {
   const [walkingServices, setWalkingServices] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
@@ -14,9 +13,8 @@ export default function page() {
     try {
         setIsLoading(true);
         const response = await fetch("/api/walking-service/service-detail", {
-            method: "POST",
+            method: "GET",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({})
         });
 
         if (!response.ok) {
@@ -61,7 +59,7 @@ export default function page() {
     } finally {
         setIsLoading(false);
     }
-};
+  };
   
   React.useEffect(() => {
     fetchWalkingServices();
@@ -105,7 +103,7 @@ export default function page() {
               walkingServices.map((service, index) => (
                 <HistoryDogWalker
                 key={index}
-                userImage={service.userImage}
+                userImage={service.pic || "/image/user-placeholder.jpg"}
                 dw_username={service.dw_username}
                 ws_date={service.ws_date}
                 timeRange={service.timeRange}
@@ -120,41 +118,6 @@ export default function page() {
                 ไม่พบรายการบริการจูงสุนัข
               </div>
             )}
-          </Card>
-        </div>
-
-        <div className="w-9/12">
-          <h1 className="text-left text-3xl font-bold text-gray-900 mb-4">
-            คูปองของฉัน
-          </h1>
-          <Card className="p-6 h-auto space-y-4">
-            {/* Add your coupon content here */}
-            <CouponCard
-              c_id="CP2314587"
-              sp_name="JA Pet 1"
-              s_name="ตัดขนสัตว์แบบพิเศษ"
-              s_type="กรูมมิ่ง ตัดแต่งขน"
-              s_price={500}
-              c_status="ใช้"
-            />
-
-            <CouponCard
-              c_id="CP2314587"
-              sp_name="JA Pet 1"
-              s_name="ตัดขนสัตว์แบบพิเศษ"
-              s_type="กรูมมิ่ง ตัดแต่งขน"
-              s_price={500}
-              c_status="รีวิว"
-            />
-
-            <CouponCard
-              c_id="CP2314587"
-              sp_name="JA Pet 1"
-              s_name="ตัดขนสัตว์แบบพิเศษ"
-              s_type="กรูมมิ่ง ตัดแต่งขน"
-              s_price={500}
-              c_status="สำเร็จ"
-            />
           </Card>
         </div>
       </div>

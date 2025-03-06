@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Noto_Sans_Thai } from "next/font/google";
 
@@ -7,13 +8,13 @@ import "../globals.css";
 import PetOwnerNav from "@/components/nav-bar/nav-pet-owner";
 
 const geistSans = Geist({
-    variable: "--font-geist-sans",
-    subsets: ["latin"],
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
-    subsets: ["latin"],
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 const notoSansThai = Noto_Sans_Thai({
@@ -23,15 +24,19 @@ const notoSansThai = Noto_Sans_Thai({
 });
 
 export default function RootLayout({ children }) {
+  const [name, setName] = useState(null)
+
+  useEffect(() => {
+    const name = localStorage.getItem("name");
+    setName(name);
+  }, []);
+
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${notoSansThai.variable} font-auto antialiased`}
-      >
-        <PetOwnerNav/>
-        {children}
-      </body>
-    </html>
+    <>
+      <PetOwnerNav
+        userName={name} />
+      {children}
+    </>
   );
 }
 

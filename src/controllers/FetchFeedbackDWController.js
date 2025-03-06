@@ -1,39 +1,12 @@
 import { PrismaClient } from '@prisma/client';
 
-export class FetchReviewDWController {
+export class FetchFeedbackDWController {
     constructor(prismaClient = new PrismaClient()) {
         this.prisma = prismaClient;
     }
 
-    async getReviewByDwId(userId, dwId, startTimeInt, endTimeInt, date) {
+    async getFeedbackByDwId(dwId) {
         try {
-            // Define constants
-            const START_TIME = 9; // 9:00 AM is the first slot
-            const END_TIME = 18;  // 6:00 PM is the last slot
-
-            // Check time range validity
-            let canBook = true;
-            let timeSlots = [];
-
-            // Validate time range (9-18)
-            if (startTimeInt < START_TIME || startTimeInt > END_TIME ||
-                endTimeInt < START_TIME || endTimeInt > END_TIME ||
-                endTimeInt < startTimeInt
-            ) {
-                canBook = false;
-            } else {
-                // Calculate slot indices
-                let start = startTimeInt - START_TIME + 1;
-                let end = endTimeInt - START_TIME + 1;
-
-                // Generate array of slots
-                timeSlots = [];
-                for (let i = start; i < end; i++) {
-                    timeSlots.push(i);
-                }
-            }
-
-
             // Fetch dog walker data
             const dogWalker = await this.prisma.dogWalker.findUnique({
                 where: {
@@ -54,27 +27,6 @@ export class FetchReviewDWController {
                     message: 'dog walker not found',
                 };
             }
-
-            // Fetch user zone
-            const user = await this.prisma.user.findUnique({
-                where: {
-                    id: userId
-                },
-                select: {
-                    zone: true
-                }
-            });
-
-            // Fetch user's dogs
-            const dogs = await this.prisma.dog.findMany({
-                where: {
-                    ownerId: userId
-                },
-                select: {
-                    id: true,
-                    name: true
-                }
-            });
 
             // Get relevant services for this dog walker
             const relevantServices = await this.prisma.walkingService.findMany({
@@ -111,45 +63,29 @@ export class FetchReviewDWController {
 
             // Calculate rating summary
             const reviewsWithRating = reviews.filter(review => review.rating !== null);
+
+            // Count reviews for each rating value (1-5)
+            const ratingCounts = {
+                1: 0,
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0
+            };
+
+            reviewsWithRating.forEach(review => {
+                if (review.rating >= 1 && review.rating <= 5) {
+                    ratingCounts[review.rating]++;
+                }
+            });
+
             const ratingStats = {
                 mean_rating: reviewsWithRating.length > 0
                     ? reviewsWithRating.reduce((sum, review) => sum + review.rating, 0) / reviewsWithRating.length
                     : 0,
-                rating_count: reviewsWithRating.length
+                rating_count: reviewsWithRating.length,
+                rating_distribution: ratingCounts
             };
-
-            // Check availability
-            let dbCanBook = canBook;
-            let isBookedStatus = null;
-
-            if (canBook) {
-                // ใช้ startsWith เพื่อเปรียบเทียบเฉพาะวันที่ (YYYY-MM-DD)
-                const dateOnly = date.toISOString().split('T')[0]; // เช่น "2025-03-03" จาก DateTime object
-
-                const conflictingServices = await this.prisma.walkingService.findFirst({
-                    where: {
-                        dogWalkerId: dwId,
-                        // เปรียบเทียบเฉพาะวันที่โดยใช้ startsWith
-                        date: {
-                            gte: new Date(`${dateOnly}T00:00:00.000Z`),
-                            lt: new Date(`${dateOnly}T23:59:59.999Z`)
-                        },
-                        time: {
-                            hasSome: timeSlots
-                        },
-                        status: {
-                            notIn: [210, 220]
-                        }
-                    }
-                });
-
-
-                dbCanBook = !conflictingServices;
-
-                if (!dbCanBook && conflictingServices.userId === userId) {
-                    isBookedStatus = conflictingServices.status;
-                }
-            }
 
             // Format reviews and filter out null text reviews
             const formattedReviews = reviews
@@ -164,8 +100,6 @@ export class FetchReviewDWController {
 
             return {
                 success: true,
-                canBook: dbCanBook,
-                isBooked: isBookedStatus,
                 dogWalkers: {
                     id: dogWalker.id,
                     name: dogWalker.name,
@@ -174,10 +108,9 @@ export class FetchReviewDWController {
                     zone: dogWalker.zone,
                     meanRating: parseFloat(ratingStats.mean_rating.toFixed(2)),
                     ratingCount: ratingStats.rating_count,
+                    ratingDistribution: ratingStats.rating_distribution,
                     reviews: formattedReviews
                 },
-                dogs: dogs || [],
-                userZone: user ? user.zone : null
             };
 
         } catch (error) {
@@ -188,5 +121,4 @@ export class FetchReviewDWController {
             };
         }
     }
-
 }

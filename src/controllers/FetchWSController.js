@@ -9,9 +9,7 @@ export class FetchWSController {
         try {
             let walkingServices;
 
-            if (role.toLowerCase() === "dog" +
-                "23" +
-                "walker") {
+            if (role.toLowerCase() === "dogwalker") {
                 walkingServices = await this.prisma.walkingService.findMany({
                     where: { dogWalkerId: id },
                     include: {
@@ -58,7 +56,9 @@ export class FetchWSController {
                     endHour: endHour,
                     status: service.status,
                     walkerName: service.dogWalker.name,
+                    walkerTel: service.dogWalker.tel,
                     userName: service.user.name,
+                    userTel: service.user.tel,
                     isReview: service.review !== null,
                 };
             });
@@ -120,7 +120,8 @@ export class FetchWSController {
                     dogs: dogs.map(dog => ({
                         name: dog.name,
                         breed: dog.breed
-                    }))
+                    })),
+                    userRole: walkingService.dogWalker.role
                 },
                 dw: {
                     name: walkingService.dogWalker.name,

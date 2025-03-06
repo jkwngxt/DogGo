@@ -55,28 +55,6 @@ export const verifyTokenDirect = async (token) => {
         return null;
     }
 };
-
-/**
- * สร้าง JWT token
- * @param {object} payload - ข้อมูลที่จะเข้ารหัส
- * @returns {Promise<string>} JWT token
- */
-export const signToken = async (payload) => {
-    try {
-        // กำหนดเวลาหมดอายุเป็น 1 วัน
-        const jwt = await new jose.SignJWT(payload)
-            .setProtectedHeader({ alg: 'HS256' })
-            .setIssuedAt()
-            .setExpirationTime('1 day')  // กำหนดค่าตายตัวแทนการใช้พารามิเตอร์
-            .sign(SECRET);
-
-        return jwt;
-    } catch (error) {
-        console.error("Token signing failed:", error);
-        throw error;
-    }
-};
-
 /**
  * Middleware สำหรับตรวจสอบการเข้าถึง API ของ Next.js
  * หมายเหตุ: ฟังก์ชันนี้ไม่สามารถใช้ PrismaClient ได้ ตรวจสอบเฉพาะ token เท่านั้น

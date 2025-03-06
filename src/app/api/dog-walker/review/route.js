@@ -11,7 +11,7 @@ export async function GET(request) {
         const { user, response } = await authenticateRequest(request);
         if (response) return response;
 
-        const result = await reviewDWController.getReviewableWalkingService(user.id);
+        const result = await reviewDWController.getReviewableWalkingService(user.userId);
         return NextResponse.json(result, { status: result.success ? 200:400 });
     } catch (error) {
         console.error("Error fetching reviewable walking services:", error);
@@ -25,7 +25,7 @@ export async function GET(request) {
 // post submit a review
 export async function POST(request) {
     try {
-        const { user, response } = await authenticateRequest(request)
+        const { user, response } = await authenticateRequest(request, ['customer'])
         if (response) return response;
 
         const reviewData = await request.json();

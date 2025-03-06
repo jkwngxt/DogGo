@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { FetchWSController } from "@/controllers/FetchWSController";
 import {authenticateRequest} from "@/utils/jwt";
+import {updateExpiredWalkingServices} from "@/utils/expire-billing";
 
 function serializeBigInt(obj) {
     return JSON.parse(JSON.stringify(obj, (key, value) => {
@@ -11,10 +12,12 @@ function serializeBigInt(obj) {
     }));
 }
 
-export async function POST(request) {
+export async function GET(request) {
     try {
         const { user, response } = await authenticateRequest(request);
         if (response) return response;
+
+        await updateExpiredWalkingServices()
 
         let role = user.role;
         let id = user.userId

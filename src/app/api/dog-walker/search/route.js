@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { SearchDWController } from "@/controllers/SearchDWController";
 import { authenticateRequest } from '@/utils/jwt';
+import {updateExpiredWalkingServices} from "@/utils/expire-billing";
 
 export async function POST(request) {
     try {
@@ -11,6 +12,14 @@ export async function POST(request) {
 
         const body = await request.json();
         const { date, startTimeInt, endTimeInt } = body;
+
+        // ตรวจสอบความถูกต้องของข้อมูล
+        if (!date || !startTimeInt || !endTimeInt) {
+            return NextResponse.json(
+                { success: false, message: 'ข้อมูลไม่ครบถ้วน กรุณาระบุวันที่และเวลาให้ครบถ้วน' },
+                { status: 400 }
+            );
+        }
 
         // Define constants
         const START_TIME = 9; // 9:00 AM is the first slot
@@ -31,6 +40,7 @@ export async function POST(request) {
 
         const searchDWController = new SearchDWController();
 
+        await updateExpiredWalkingServices()
         const result = await searchDWController.searchDogWalkers(dateSearch, timeSlots, user.userId);
 
         return NextResponse.json(result);

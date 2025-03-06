@@ -12,6 +12,7 @@ import {
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignOut } from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from "@/hooks/useAuth";
 
 const ListItem = React.forwardRef(
   ({ className, title, children, ...props }, ref) => {
@@ -38,13 +39,14 @@ const ListItem = React.forwardRef(
 
 ListItem.displayName = "ListItem";
 
-const PetOwnerNav = ({ userImage, userName}) => {
+const PetOwnerNav = ({ userName }) => {
+  const { logout } = useAuth();
   return (
     <div className="flex px-10 bg-[#2668E3] justify-between">
       <img className="w-20 h-20" src="/image/logo.svg" alt="dog go logo" />
       <div className="flex flex-row space-x-4 items-center">
         <img
-          src={userImage}
+          src="/image/user-placeholder.jpg"
           alt="User profile"
           className="w-16 h-16 rounded-full object-cover"
         />
@@ -62,7 +64,7 @@ const PetOwnerNav = ({ userImage, userName}) => {
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
-        <button>
+        <button onClick={logout}>
             <FontAwesomeIcon icon={faSignOut} className="h-5 w-5 text-white"/>
         </button>
       </div>
