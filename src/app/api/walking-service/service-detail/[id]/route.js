@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { FetchWSController } from '@/controllers/FetchWSController';
 import { authenticateRequest } from "@/utils/jwt";
+import {updateExpiredWalkingServices} from "@/utils/expire-billing";
 
 const wsController = new FetchWSController();
 
@@ -12,6 +13,8 @@ export async function GET(request, context) {
         // Await the params object
         const params = await context.params;
         const id = params.id;
+
+        await updateExpiredWalkingServices()
 
         if (!id) {
             return NextResponse.json(

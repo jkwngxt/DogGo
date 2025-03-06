@@ -2,9 +2,11 @@
 import { NextResponse } from 'next/server';
 import { BookDogWalkerController } from '@/controllers/BookDogWalkerController';
 import { authenticateRequest } from '@/utils/jwt';
+import {updateExpiredWalkingServices} from "@/utils/expire-billing";
 
 export async function POST(request) {
     try {
+        await updateExpiredWalkingServices()
         // only customer account can see this
         const { user, response } = await authenticateRequest(request, ['customer']);
         if (response) return response;

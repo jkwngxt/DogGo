@@ -44,7 +44,6 @@ export async function GET(request, { params }) {
             },
         });
     } catch (error) {
-        console.error('Image loading error:', error);
 
         // ถ้าไม่พบไฟล์
         if (error.code === 'ENOENT') {

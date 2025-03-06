@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { SearchDWController } from "@/controllers/SearchDWController";
 import { authenticateRequest } from '@/utils/jwt';
+import {updateExpiredWalkingServices} from "@/utils/expire-billing";
 
 export async function POST(request) {
     try {
@@ -39,6 +40,7 @@ export async function POST(request) {
 
         const searchDWController = new SearchDWController();
 
+        await updateExpiredWalkingServices()
         const result = await searchDWController.searchDogWalkers(dateSearch, timeSlots, user.userId);
 
         return NextResponse.json(result);
