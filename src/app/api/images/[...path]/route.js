@@ -9,6 +9,8 @@ export async function GET(request, { params }) {
         const pathArray = await params.path;
         const filePath = pathArray.join('/');
 
+        console.log("filePath " + filePath)
+
         // สร้างเส้นทางเต็มไปยังไฟล์
         // process.cwd() จะทำงานที่นี่เพราะเป็น server-side
         const fullPath = path.join(process.cwd(), 'data', filePath);

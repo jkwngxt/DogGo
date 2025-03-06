@@ -1,15 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
-/**
- * Custom hook สำหรับการจัดการการชำระเงิน
- * @param {Object} options - ข้อมูลที่จำเป็นสำหรับการชำระเงิน
- * @param {number} options.total - จำนวนเงินทั้งหมด
- * @param {Object} options.bookingInfo - ข้อมูลการจอง
- * @returns {Object} - State และฟังก์ชันสำหรับการจัดการการชำระเงิน
- */
 export const usePayment = ({ total, bookingInfo }) => {
     const router = useRouter();
 
@@ -31,10 +24,33 @@ export const usePayment = ({ total, bookingInfo }) => {
     const [timeLeft, setTimeLeft] = useState(999999);
     const timerRef = useRef(null);
 
-    // ฟังก์ชันคำนวณเวลา countdown
-    useEffect(() => {
-        if (showPaymentDialog && !timerRef.current && bookingData && bookingData.deadline) {
+    const cancelBooking = useCallback(async (walkingServiceId) => {
+        try {
+            const response = await fetch('/api/walking-service/change-status', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    "status": 210, // Cancelled status code
+                    "walkingServiceId": walkingServiceId,
+                }),
+            });
+            return response.ok;
+        } catch (error) {
+            console.error("Error cancelling booking:", error);
+            return false;
+        }
+    }, []);
 
+    const clearSessionData = useCallback(() => {
+        sessionStorage.removeItem('bookingData');
+        sessionStorage.removeItem('selectedDogWalker');
+        sessionStorage.removeItem('walkingServiceSearch');
+    }, []);
+
+    useEffect(() => {
+        if (showPaymentDialog && !timerRef.current && bookingData?.deadline) {
             const updateTimeLeft = () => {
                 try {
                     if (!bookingData.deadline) {
@@ -53,9 +69,7 @@ export const usePayment = ({ total, bookingInfo }) => {
                         console.warn('Time expired - clearing timer');
                         clearInterval(timerRef.current);
                         timerRef.current = null;
-                        sessionStorage.removeItem('bookingData');
-                        sessionStorage.removeItem('selectedDogWalker');
-                        sessionStorage.removeItem('walkingServiceSearch');
+                        clearSessionData();
                     }
                 } catch (error) {
                     console.error('Error calculating time left:', error);
@@ -73,17 +87,17 @@ export const usePayment = ({ total, bookingInfo }) => {
                 timerRef.current = null;
             }
         };
-    }, [showPaymentDialog, bookingData]);
+    }, [showPaymentDialog, bookingData, clearSessionData]);
 
-    // ฟังก์ชันจัดการเมื่อเวลาหมด
     useEffect(() => {
         if (timeLeft === 0 && showPaymentDialog) {
             setShowPaymentDialog(false);
 
-            if (bookingData && bookingData.walkingServiceId) {
+            if (bookingData?.walkingServiceId) {
                 cancelBooking(bookingData.walkingServiceId);
             }
 
+            // อัปเดตสถานะการจองใน localStorage
             const bookingResultStr = localStorage.getItem('lastBookingResult');
             if (bookingResultStr) {
                 const bookingResult = JSON.parse(bookingResultStr);
@@ -96,27 +110,60 @@ export const usePayment = ({ total, bookingInfo }) => {
                 localStorage.setItem('lastBookingResult', JSON.stringify(updatedBookingResult));
             }
 
-            sessionStorage.removeItem('bookingData');
-            sessionStorage.removeItem('selectedDogWalker');
-            sessionStorage.removeItem('walkingServiceSearch');
+            clearSessionData();
 
+            // แสดง dialog แจ้งเตือน
             setDialogTitle("เวลาชำระเงินหมดลง");
             setMessage("ขออภัย เวลาในการชำระเงินได้หมดลงแล้ว การจองของท่านถูกยกเลิกโดยอัตโนมัติ กรุณาทำรายการใหม่อีกครั้ง");
             setShowErrorDialog(true);
         }
-    }, [timeLeft, showPaymentDialog, bookingData]);
+    }, [timeLeft, showPaymentDialog, bookingData, cancelBooking, clearSessionData]);
 
-    // ฟังก์ชันเริ่มกระบวนการชำระเงิน
-    const handlePaymentClick = async () => {
+    const validateBookingInfo = useCallback(() => {
+        if (!bookingInfo ||
+            !bookingInfo.dogWalkerId ||
+            !bookingInfo.startTimeInt ||
+            !bookingInfo.endTimeInt ||
+            !bookingInfo.date ||
+            !Array.isArray(bookingInfo.dogIds) ||
+            bookingInfo.dogIds.length === 0) {
+
+            setDialogTitle("ข้อมูลไม่ครบถ้วน");
+            setMessage("ขออภัย ข้อมูลการจองไม่ครบถ้วน กรุณาตรวจสอบและทำรายการใหม่อีกครั้ง");
+            setShowErrorDialog(true);
+
+            return false;
+        }
+
+        return true;
+    }, [bookingInfo]);
+
+    const saveBookingResult = useCallback((data) => {
+        const bookingResult = {
+            dogWalkerId: bookingInfo.dogWalkerId,
+            date: bookingInfo.date,
+            startTime: bookingInfo.startTimeInt,
+            endTime: bookingInfo.endTimeInt,
+            dogIds: bookingInfo.dogIds,
+            dogNames: bookingInfo.dogNames || [],
+            walkingServiceId: data.walkingServiceId,
+            billingId: data.billingId,
+            total: data.amount || total,
+            dwName: bookingInfo.dogWalkerName,
+            bookingTimestamp: new Date().toISOString(),
+            deadline: data.deadline
+        };
+
+        localStorage.setItem('lastBookingResult', JSON.stringify(bookingResult));
+    }, [bookingInfo, total]);
+
+    const handlePaymentClick = useCallback(async () => {
         setIsLoading(true);
 
         try {
-            if (!bookingInfo || !bookingInfo.dogWalkerId || !bookingInfo.startTimeInt ||
-                !bookingInfo.endTimeInt || !bookingInfo.date ||
-                !Array.isArray(bookingInfo.dogIds) || bookingInfo.dogIds.length === 0) {
-                setDialogTitle("ข้อมูลไม่ครบถ้วน");
-                setMessage("ขออภัย ข้อมูลการจองไม่ครบถ้วน กรุณาตรวจสอบและทำรายการใหม่อีกครั้ง");
-                setShowErrorDialog(true);
+            // ตรวจสอบความถูกต้องของข้อมูลการจอง
+            if (!validateBookingInfo()) {
+                setIsLoading(false);
                 return;
             }
 
@@ -138,26 +185,11 @@ export const usePayment = ({ total, bookingInfo }) => {
                     deadline: data.deadline
                 });
 
-                const bookingResult = {
-                    dogWalkerId: bookingInfo.dogWalkerId,
-                    date: bookingInfo.date,
-                    startTime: bookingInfo.startTimeInt,
-                    endTime: bookingInfo.endTimeInt,
-                    dogIds: bookingInfo.dogIds,
-                    dogNames: bookingInfo.dogNames || [],
-                    walkingServiceId: data.walkingServiceId,
-                    billingId: data.billingId,
-                    total: data.amount || total,
-                    dwName: bookingInfo.dogWalkerName,
-                    bookingTimestamp: new Date().toISOString(),
-                    deadline: data.deadline
-                };
-
-                localStorage.setItem('lastBookingResult', JSON.stringify(bookingResult));
+                saveBookingResult(data);
                 setShowPaymentDialog(true);
             } else {
                 if (data.altFlow) {
-                    setDialogTitle("ช่วงเวลาไม่ว่าง");
+                    setDialogTitle("การจองไม่เสร็จ");
                     setMessage(`ขออภัย Dog Walker ท่านนี้มีการจองในช่วงเวลาที่ท่านเลือกแล้ว กรุณาเลือกช่วงเวลาอื่น หรือพนักงานท่านอื่น`);
                 } else {
                     setDialogTitle("เกิดข้อผิดพลาด");
@@ -172,11 +204,10 @@ export const usePayment = ({ total, bookingInfo }) => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [bookingInfo, total, validateBookingInfo, saveBookingResult]);
 
-    // ฟังก์ชันยืนยันการชำระเงิน
-    const handleConfirmClick = async () => {
-        if (!bookingData || !bookingData.billingId) {
+    const handleConfirmClick = useCallback(async () => {
+        if (!bookingData?.billingId) {
             setDialogTitle("ข้อมูลไม่ถูกต้อง");
             setMessage("ขออภัย ข้อมูลการชำระเงินไม่ถูกต้อง กรุณาทำรายการใหม่อีกครั้ง");
             setShowErrorDialog(true);
@@ -215,7 +246,7 @@ export const usePayment = ({ total, bookingInfo }) => {
                 setDialogTitle("ชำระเงินไม่สำเร็จ");
                 setMessage("ขออภัย ไม่สามารถยืนยันการชำระเงินได้ในขณะนี้ กรุณาลองใหม่อีกครั้งในภายหลัง");
 
-                if (bookingData && bookingData.walkingServiceId) {
+                if (bookingData?.walkingServiceId) {
                     await cancelBooking(bookingData.walkingServiceId);
                 }
 
@@ -226,7 +257,7 @@ export const usePayment = ({ total, bookingInfo }) => {
             setDialogTitle("เกิดข้อผิดพลาด");
             setMessage("ขออภัย เกิดข้อผิดพลาดในการเชื่อมต่อกับระบบชำระเงิน กรุณาลองใหม่อีกครั้งในภายหลัง");
 
-            if (bookingData && bookingData.walkingServiceId) {
+            if (bookingData?.walkingServiceId) {
                 await cancelBooking(bookingData.walkingServiceId);
             }
 
@@ -234,65 +265,33 @@ export const usePayment = ({ total, bookingInfo }) => {
         } finally {
             setIsConfirmingPayment(false);
         }
-    };
+    }, [bookingData, total, cancelBooking]);
 
-    // ฟังก์ชันยกเลิกการจอง
-    const cancelBooking = async (walkingServiceId) => {
-        try {
-            const response = await fetch('/api/walking-service/change-status', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    "status": 210, // Cancelled status code
-                    "walkingServiceId": walkingServiceId,
-                }),
-            });
-            return response.ok;
-        } catch (error) {
-            console.error("Error cancelling booking:", error);
-            return false;
-        }
-    };
-
-    // ฟังก์ชันจัดการปิด error dialog
-    const handleErrorDialogClose = () => {
+    const handleErrorDialogClose = useCallback(() => {
         setShowErrorDialog(false);
-        sessionStorage.removeItem('bookingData');
-        sessionStorage.removeItem('selectedDogWalker');
-        sessionStorage.removeItem('walkingServiceSearch');
+        clearSessionData();
         router.push("/pet-owner/walking-service");
-    };
+    }, [clearSessionData, router]);
 
-    // ฟังก์ชันจัดการปิด success dialog
-    const handleSuccessDialogClose = () => {
+    const handleSuccessDialogClose = useCallback(() => {
         setShowSuccessDialog(false);
-
-        const bookingResultStr = localStorage.getItem('lastBookingResult');
-        bookingResultStr ? JSON.parse(bookingResultStr) : null;
-
         router.push("/pet-owner/walking-service");
-    };
+    }, [router]);
 
-    // ฟังก์ชันยกเลิกการจองโดยผู้ใช้
-    const handleCancelBooking = () => {
-        if (bookingData && bookingData.walkingServiceId) {
+    const handleCancelBooking = useCallback(() => {
+        if (bookingData?.walkingServiceId) {
             cancelBooking(bookingData.walkingServiceId);
         }
 
-        sessionStorage.removeItem('bookingData');
-        sessionStorage.removeItem('selectedDogWalker');
-        sessionStorage.removeItem('walkingServiceSearch');
+        clearSessionData();
 
         setShowPaymentDialog(false);
         setDialogTitle("ยกเลิกการจอง");
-        setMessage("การจองของท่านถูกยกเลิกเรียบร้อยแล้ว ขอบคุณที่แจ้งให้เราทราบ");
+        setMessage("การชำระเงินถูกยกเลิก และระบบได้ยกเลิกการจองของท่านเรียบร้อยแล้ว ขอบคุณที่ใช้บริการ");
         setShowErrorDialog(true);
-    };
+    }, [bookingData, cancelBooking, clearSessionData]);
 
-    // ฟังก์ชันฟอร์แมตเวลาเป็น MM:SS
-    const formatTime = (seconds) => {
+    const formatTime = useCallback((seconds) => {
         if (seconds <= 0) {
             return "0:00";
         }
@@ -300,27 +299,25 @@ export const usePayment = ({ total, bookingInfo }) => {
         const minutes = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${minutes}:${secs.toString().padStart(2, "0")}`;
-    };
+    }, []);
 
-    // ฟังก์ชันฟอร์แมต deadline เป็นเวลาไทย
-    const formatDeadlineTime = () => {
-        if (bookingData && bookingData.deadline) {
-            try {
-                const deadlineDate = new Date(bookingData.deadline);
-                const options = {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false
-                };
+    const formatDeadlineTime = useCallback(() => {
+        if (!bookingData?.deadline) return "";
 
-                return new Intl.DateTimeFormat('th-TH', options).format(deadlineDate) + ' น.';
-            } catch (error) {
-                console.error('Error formatting deadline:', error);
-                return "";
-            }
+        try {
+            const deadlineDate = new Date(bookingData.deadline);
+            const options = {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            };
+
+            return new Intl.DateTimeFormat('th-TH', options).format(deadlineDate) + ' น.';
+        } catch (error) {
+            console.error('Error formatting deadline:', error);
+            return "";
         }
-        return "";
-    };
+    }, [bookingData]);
 
     return {
         // State variables

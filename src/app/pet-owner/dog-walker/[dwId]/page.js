@@ -26,7 +26,7 @@ export default function DogWalker({ params }) {
   const [canBook, setCanBook] = useState(false);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [message, setMessage] = useState("");
-
+  const [isBooked, setIsBooked] = useState(false);
   // Get search parameters
   const startTimeSearch = searchParams.get('startTime') ? parseInt(searchParams.get('startTime')) : 0;
   const endTimeSearch = searchParams.get('endTime') ? parseInt(searchParams.get('endTime')) : 0;
@@ -89,6 +89,7 @@ export default function DogWalker({ params }) {
           setUserDogs(data.dogs);
           setUserZone(data.userZone);
           setCanBook(data.canBook);
+          setIsBooked(data.isBooked !== null)
 
           // Store dog walker data in sessionStorage
           sessionStorage.setItem('selectedDogWalker', JSON.stringify({
@@ -165,8 +166,6 @@ export default function DogWalker({ params }) {
     avatar: "/image/user-placeholder.jpg", // Default avatar for now
   })) : [];
 
-  const imgPath = getImagePath(dogWalkerData.pic);
-
   return (
       <>
         <div className="p-4 space-y-4">
@@ -178,7 +177,7 @@ export default function DogWalker({ params }) {
             <Card className="w-[100%] sm:w-[60%] md:w-[60%] lg:w-[80%] p-6">
               <div className="flex flex-col space-y-2 items-center">
                 <img
-                    src={imgPath}
+                    src={getImagePath(dogWalkerData.pic)}
                     alt={`${dogWalkerData.name} profile`}
                     className="w-48 h-48 rounded-full object-cover"
                     onError={(e) => {
@@ -243,18 +242,21 @@ export default function DogWalker({ params }) {
                   </Button>
                 </div>
 
-                {!canBook ? (
-                    <p className="text-blue-800 mt-1">ท่านไม่ได้ค้นหา dog walker อย่างถูกต้อง กรุณาทำรายการในหน้าค้นหาอีกครั้ง</p>
-                ) : (
-                    userZone && Array.isArray(dogWalkerData.zone) && !dogWalkerData.zone.includes(userZone) ? (
-                        <p className="text-blue-800 mt-1">ท่านอยู่นอกเขตที่ dog walker ให้บริการ</p>
-                    ) : null
+                { isBooked ? (
+                    <p className="text-blue-800 mt-1">ท่านได้ทำรายการจองกับ Dog Walker คนนี้ในช่วงเวลานี้ไว้แล้ว</p>
+                ):(
+                    !canBook ? (
+                        <p className="text-blue-800 mt-1">ท่านไม่ได้ค้นหา Dog Walker อย่างถูกต้อง กรุณาทำรายการในหน้าค้นหาอีกครั้งเพื่อทำการจอง</p>
+                    ) : (
+                        userZone && Array.isArray(dogWalkerData.zone) && !dogWalkerData.zone.includes(userZone) ? (
+                            <p className="text-blue-800 mt-1">ท่านอยู่นอกเขตที่ Dog Walker ให้บริการ</p>
+                        ) : null
+                    )
                 )}
               </div>
             </Card>
           </div>
         </div>
-
         <ConfirmationDialogs
             showErrorDialog={showErrorDialog}
             message={message}

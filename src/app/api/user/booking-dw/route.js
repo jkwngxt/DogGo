@@ -11,6 +11,7 @@ export async function POST(request) {
         if (response) return response;
 
         const body = await request.json();
+        console.log(body);
         const { date, startTimeInt, endTimeInt, dogIds, dogWalkerId, price } = body;
 
         // Define constants
