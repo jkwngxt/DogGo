@@ -93,6 +93,32 @@ export class FetchWSController {
                 };
             }
 
+            // check if user can access or not
+            let hasAccess = false;
+            let currentUserRole = null;
+
+            if (user.role === 'admin') {
+                hasAccess = true;
+                currentUserRole = 'admin';
+            } 
+            // ถ้าเป็น customer ต้องตรวจสอบว่าเป็นเจ้าของ service (userId ตรงกับ user.id)
+            else if (user.role === 'customer' && walkingService.userId === user.userId) {
+                hasAccess = true;
+                currentUserRole = 'customer';
+            }
+            // ถ้าเป็น dogWalker ต้องตรวจสอบว่าเป็นผู้รับผิดชอบ service (dogWalkerId ตรงกับ user.id)
+            else if (user.role === 'dogWalker' && walkingService.dogWalkerId === user.userId) {
+                hasAccess = true;
+                currentUserRole = 'dogWalker';
+            }
+
+            if (!hasAccess) {
+                return { 
+                success: false, 
+                message: 'You do not have permission to view this walking service' 
+                };
+            }
+
             // Get dogs information based on ids stored in walking service
             const dogIds = walkingService.dogs;
             const dogs = await this.prisma.dog.findMany({
@@ -108,7 +134,7 @@ export class FetchWSController {
             const startHour = START_TIME + walkingService.time[0] - 1;
             const endHour = START_TIME + walkingService.time[walkingService.time.length - 1];
 
-            const currentUserRole = user?.role;
+            // const currentUserRole = user?.role;
 
             // Format the response according to the image requirements
             return {
