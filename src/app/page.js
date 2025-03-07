@@ -14,7 +14,7 @@ const FirstPage = () => {
     };
 
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-yellow-50">
+      <div className="flex flex-col justify-center items-center min-h-screen bg-[url('/image/first-page.png')] bg-cover bg-center">
         {/* Main Container with Subtle Animation */}
         <div className="bg-white shadow-xl rounded-3xl px-8 py-10 w-11/12 sm:w-3/5 md:w-1/2 lg:w-2/5 flex flex-col items-center transform transition duration-500 hover:scale-105">
           {/* Logo with Paw Print Background */}
