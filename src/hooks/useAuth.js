@@ -68,18 +68,34 @@ export const useAuth = () => {
         }
     };
 
-    const logout = () => {
-        sessionStorage.removeItem("userRole");
-        localStorage.removeItem("name");
-        localStorage.removeItem("id");
-        setUser(null);
-        setName(null);
-        setId(null);
+    const logout = async () => {
+        try {
+            // เรียก API route สำหรับการ logout เพื่อลบ token cookie ที่ server
+            const response = await fetch("/api/user/logout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+            });
 
-        window.dispatchEvent(new Event('authStateChange'));
-        window.dispatchEvent(new Event('storage'));
+            // ลบข้อมูลใน client-side storage
+            sessionStorage.removeItem("userRole");
+            localStorage.removeItem("name");
+            localStorage.removeItem("id");
+            setUser(null);
+            setName(null);
+            setId(null);
 
-        router.push("/login");
+            // Dispatch events
+            window.dispatchEvent(new Event('authStateChange'));
+            window.dispatchEvent(new Event('storage'));
+
+            // Redirect กลับไปยังหน้า login
+            router.push("/login");
+
+            return { success: true };
+        } catch (error) {
+            console.error("Logout error:", error);
+            return { success: false, message: "Failed to logout" };
+        }
     };
 
     return { user, login, logout, name, id };

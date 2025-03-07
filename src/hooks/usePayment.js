@@ -275,8 +275,8 @@ export const usePayment = ({ total, bookingInfo }) => {
 
     const handleSuccessDialogClose = useCallback(() => {
         setShowSuccessDialog(false);
-        router.push("/pet-owner/walking-service");
-    }, [router]);
+        router.push(`/pet-owner/walking-service`);
+    }, [router, bookingInfo.dogWalkerId]);
 
     const handleCancelBooking = useCallback(() => {
         if (bookingData?.walkingServiceId) {

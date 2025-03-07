@@ -11,22 +11,55 @@ const publicRoutes = [
     '/favicon.ico',
 ];
 
+// กำหนดเส้นทางที่ผู้ใช้ที่ล็อกอินแล้วไม่ควรเข้าถึง (จะถูกพาไปหน้า role/homepage แทน)
+const redirectIfLoggedIn = [
+
+];
+
 // กำหนดกฎการเข้าถึงตามบทบาท
 const roleBasedAccess = {
-    '/admin-example': ['admin', 'user'],
+    '/dog-walker/walk-description/*': ['dogWalker', 'customer'],
+    '/admin/*': ['admin'],
+    '/pet-owner/*': ['customer'],
+    '/dog-walker/*': ['dogWalker'],
+
+};
+
+// กำหนดหน้า homepage ตามบทบาท
+const roleHomepages = {
+    'admin': '/admin/walker-register',
+    'customer': '/pet-owner/homepage',
+    'dogWalker': '/dog-walker/workpage',
+    // กำหนด default สำหรับบทบาทที่ไม่ได้ระบุ
+    'default': '/'
 };
 
 export async function middleware(request) {
-
     const { pathname } = request.nextUrl;
+
+    // ดึง token จาก cookie
+    const token = request.cookies.get('token')?.value;
+
+    // กรณีมี token (ผู้ใช้ล็อกอินแล้ว) และพยายามเข้าถึงหน้า login หรือ root
+    if (token && redirectIfLoggedIn.includes(pathname)) {
+        try {
+            const user = await verifyTokenDirect(token);
+            if (user) {
+                // รับหน้า homepage ตามบทบาทหรือใช้ค่า default ถ้าไม่มีการกำหนดไว้
+                const homepagePath = roleHomepages[user.role] || roleHomepages.default;
+                const redirectUrl = new URL(homepagePath, request.url);
+                return NextResponse.redirect(redirectUrl);
+            }
+        } catch (error) {
+            console.error("Error verifying token for redirection:", error);
+            // กรณีมีข้อผิดพลาดในการตรวจสอบ token ให้ดำเนินการต่อไปตามปกติ
+        }
+    }
 
     // อนุญาตให้เข้าถึงเส้นทางสาธารณะได้
     if (isPublicRoute(pathname)) {
         return NextResponse.next();
     }
-
-    // ดึง token จาก cookie
-    const token = request.cookies.get('token')?.value;
 
     // ถ้าไม่มี token ให้ redirect ไปยังหน้า login
     if (!token) {
@@ -42,7 +75,6 @@ export async function middleware(request) {
         if (!user) {
             return redirectToLogin(request);
         }
-
 
         // ตรวจสอบสิทธิ์การเข้าถึงตามบทบาท
         for (const [route, roles] of Object.entries(roleBasedAccess)) {
