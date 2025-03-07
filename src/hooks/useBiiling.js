@@ -3,10 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-/**
- * Custom hook สำหรับการจัดการข้อมูลการชำระเงิน
- * @returns {Object} - State และฟังก์ชันสำหรับหน้า Billing
- */
 export const useBilling = () => {
     const router = useRouter();
 
