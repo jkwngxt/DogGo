@@ -106,7 +106,8 @@ export class BookDogWalkerController {
                     userId,
                     status: 100, // awaiting payment
                     total: price,
-                    walkingServiceId: walkingService.id
+                    walkingServiceId: walkingService.id,
+                    deadline: new Date(new Date().getTime() + (1000 * 60 * 10)) // 10 minutes
                 }
             });
 

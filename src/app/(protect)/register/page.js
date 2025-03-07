@@ -146,7 +146,7 @@ const RegisterPage = () => {
 
     // ยกเลิกการลงทะเบียน
     const handleCancel = () => {
-        router.push("/");
+        router.back();
     };
 
     // จัดการปิด success dialog

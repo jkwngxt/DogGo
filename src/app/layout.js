@@ -1,16 +1,17 @@
+// RootLayout.jsx (Server Component)
 import { Geist, Geist_Mono } from "next/font/google";
 import { Noto_Sans_Thai } from "next/font/google";
-
 import "./globals.css";
+import ClientNavigation from "@/components/nav-bar/client-navigation";
 
 const geistSans = Geist({
-    variable: "--font-geist-sans",
-    subsets: ["latin"],
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
-    subsets: ["latin"],
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 const notoSansThai = Noto_Sans_Thai({
@@ -30,9 +31,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${notoSansThai.variable} font-auto antialiased`}
       >
+        <ClientNavigation />
         {children}
       </body>
     </html>
   );
 }
-

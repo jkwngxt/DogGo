@@ -75,7 +75,7 @@ export class FetchWSController {
         }
     }
 
-    async getWSDetail(id) {
+    async getWSDetail(id, user) {
         try {
             const walkingService = await this.prisma.walkingService.findUnique({
                 where: { id: parseInt(id) },
@@ -90,6 +90,32 @@ export class FetchWSController {
                 return {
                     success: false,
                     message: 'Walking service not found'
+                };
+            }
+
+            // check if user can access or not
+            let hasAccess = false;
+            let currentUserRole = null;
+
+            if (user.role === 'admin') {
+                hasAccess = true;
+                currentUserRole = 'admin';
+            } 
+            // ถ้าเป็น customer ต้องตรวจสอบว่าเป็นเจ้าของ service (userId ตรงกับ user.id)
+            else if (user.role === 'customer' && walkingService.userId === user.userId) {
+                hasAccess = true;
+                currentUserRole = 'customer';
+            }
+            // ถ้าเป็น dogWalker ต้องตรวจสอบว่าเป็นผู้รับผิดชอบ service (dogWalkerId ตรงกับ user.id)
+            else if (user.role === 'dogWalker' && walkingService.dogWalkerId === user.userId) {
+                hasAccess = true;
+                currentUserRole = 'dogWalker';
+            }
+
+            if (!hasAccess) {
+                return { 
+                success: false, 
+                message: 'You do not have permission to view this walking service' 
                 };
             }
 
@@ -108,6 +134,8 @@ export class FetchWSController {
             const startHour = START_TIME + walkingService.time[0] - 1;
             const endHour = START_TIME + walkingService.time[walkingService.time.length - 1];
 
+            // const currentUserRole = user?.role;
+
             // Format the response according to the image requirements
             return {
                 success: true,
@@ -121,7 +149,6 @@ export class FetchWSController {
                         name: dog.name,
                         breed: dog.breed
                     })),
-                    userRole: walkingService.dogWalker.role
                 },
                 dw: {
                     name: walkingService.dogWalker.name,
@@ -132,7 +159,8 @@ export class FetchWSController {
                     tel: walkingService.user.tel,
                     zone: walkingService.user.zone,
                     address: walkingService.user.address
-                }
+                },
+                currentUserRole: currentUserRole
             };
         } catch (error) {
             return {
