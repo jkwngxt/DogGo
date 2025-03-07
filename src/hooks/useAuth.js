@@ -42,7 +42,7 @@ export const useAuth = () => {
             switch (data.user.role) {
                 case "dogWalker":
                     if (data.user.status===0) {
-                        router.push("/dog-walker/set-zone"); // edit to real setzone path
+                        router.push(`/dog-walker/setzone/:${data.user.id}`);// edit to real setzone path
                     }
                     else {
                         router.push("/dog-walker/workpage");
