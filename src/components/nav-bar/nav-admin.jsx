@@ -43,7 +43,7 @@ const AdminNav = () => {
         <img
           src="/image/user-placeholder.jpg"
           alt="User profile"
-          className="w-16 h-16 rounded-full object-cover"
+          className="w-12 h-12 rounded-full object-cover"
         />
         <div className="text-white font-bold">DogGo Admin</div>
         <button onClick={logout}>

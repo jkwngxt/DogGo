@@ -46,7 +46,7 @@ const DogWalkerNav = ({ userImage, userName }) => {
       <div className="flex flex-row space-x-4 items-center">
         <img src={userImage} 
         alt="User profile" 
-        className="w-16 h-16 rounded-full object-cover"
+        className="w-12 h-12 rounded-full object-cover"
         onError={(e) => {
           e.target.onerror = null;
           e.target.src = "/image/user-placeholder.jpg";
