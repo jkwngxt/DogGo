@@ -38,15 +38,23 @@ export default function PetOwnerHomePage() {
                 return `${pad(startHour)}:00 - ${pad(endHour)}:00`;
             };
 
-            const formattedServices = data.services.map(service => ({
+            // fetch images 
+            const fetchImage = (userImagePath) => {
+              if (!userImagePath) return "/image/user-placeholder.jpg";
+              return `/api/images/${userImagePath}`;
+            };
+
+            const formattedServices = await Promise.all(
+              data.services.map(async (service) => ({
                 id: service.serviceId,
                 ws_date: formatDate(service.serviceDate), // dd/mm/yy
                 timeRange: formatTimeRange(service.startHour, service.endHour), // hh:mm - hh:mm
                 ws_status: service.status,
                 dw_username: service.walkerName,
                 user_name: service.userName,
-                isReviewed: service.isReview
-            }));
+                isReviewed: service.isReview,
+                pic: await fetchImage(service.userImagePath)
+            })));
 
             setWalkingServices(formattedServices);
         } else {
@@ -103,7 +111,7 @@ export default function PetOwnerHomePage() {
               walkingServices.map((service, index) => (
                 <HistoryDogWalker
                 key={index}
-                userImage={service.pic || "/image/user-placeholder.jpg"}
+                userImage={service.pic}
                 dw_username={service.dw_username}
                 ws_date={service.ws_date}
                 timeRange={service.timeRange}
