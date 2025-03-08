@@ -243,15 +243,32 @@ const PaymentTimerUI = ({ walkingServiceId, showPaymentDialog, setShowPaymentDia
   }, [walkingServiceId, cancelBooking, clearSessionData, setShowPaymentDialog]);
 
   // ฟังก์ชันปิด dialogs
+// แก้ไขฟังก์ชัน handleErrorDialogClose
   const handleErrorDialogClose = useCallback(() => {
     setShowErrorDialog(false);
     clearSessionData();
-    router.push("/pet-owner/homepage");
+
+    // ตรวจสอบว่าอยู่ที่หน้า workspace หรือไม่
+    if (window.location.pathname.includes('/pet-owner/homepage')) {
+      // อยู่ที่หน้า workspace ให้ refresh หน้า
+      window.location.reload();
+    } else {
+      // ไม่ได้อยู่ที่หน้า workspace ให้นำทางไปยัง homepage
+      router.push("/pet-owner/homepage");
+    }
   }, [clearSessionData, router]);
 
   const handleSuccessDialogClose = useCallback(() => {
     setShowSuccessDialog(false);
-    router.push("/pet-owner/homepage");
+
+    // ตรวจสอบว่าอยู่ที่หน้า workspace หรือไม่
+    if (window.location.pathname.includes('/pet-owner/homepage')) {
+      // อยู่ที่หน้า workspace ให้ refresh หน้า
+      window.location.reload();
+    } else {
+      // ไม่ได้อยู่ที่หน้า workspace ให้นำทางไปยัง homepage
+      router.push("/pet-owner/homepage");
+    }
   }, [router]);
 
   // ฟังก์ชันฟอร์แมตเวลา

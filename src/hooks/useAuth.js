@@ -19,6 +19,7 @@ export const useAuth = () => {
 
     const login = async (username, password) => {
         try {
+            console.log("Attempting login with:", username);
             const response = await fetch("/api/user/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
