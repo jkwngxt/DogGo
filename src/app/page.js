@@ -4,7 +4,7 @@ import React from "react";
 import { useRouter } from "next/navigation"; 
 import Image from "next/image";
 import logoSVG from "/public/image/logo.svg"
-import bgImage from "/public/image/first-page.png"
+import bgImage from "/public/image/first-page.jpg"
 import Link from "next/link";
 
 const FirstPage = () => {
