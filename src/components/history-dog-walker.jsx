@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"; // Use next/router for navigation
 import { Card, CardHeader } from "@/components/ui/card";
 import { Button } from "./ui/button";
 import OwnerWalkConfirmation from "./owner-walk-confirmation";
+import ClickPayment from "./click-payment";
 
 const HistoryDogWalker = ({
   userImage,
@@ -18,6 +19,7 @@ const HistoryDogWalker = ({
 }) => {
   const router = useRouter();
   const [status, setStatus] = React.useState(ws_status);
+  const [showPaymentDialog, setShowPaymentDialog] = React.useState(false);
 
   const handleCardClick = () => {
     router.push(`/dog-walker/walk-description/${walkingServiceId}`);
@@ -37,6 +39,15 @@ const HistoryDogWalker = ({
 
   const renderStatusButton = () => {
     switch (status) {
+        case 201: // Awaiting payment
+          return (
+            <div onClick={(e) => e.stopPropagation()}>
+              <ClickPayment
+                walkingServiceId={walkingServiceId}
+              />
+            </div>
+          ); 
+
         case 202: // Awaiting Response
             return <p className="font-bold text-[#FFB000]">อยู่ระหว่างดำเนินการ</p>;
 
