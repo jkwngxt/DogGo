@@ -9,33 +9,50 @@ export async function GET(request, { params }) {
         const pathArray = await params.path;
         const filePath = pathArray.join('/');
 
-        console.log("filePath " + filePath)
+        console.log("filePath " + filePath);
 
         // สร้างเส้นทางเต็มไปยังไฟล์
         // process.cwd() จะทำงานที่นี่เพราะเป็น server-side
         const fullPath = path.join(process.cwd(), 'data', filePath);
 
-        // อ่านไฟล์
-        const fileBuffer = await fs.readFile(fullPath);
+        let fileBuffer;
+        let contentType;
 
-        // กำหนด content type ตามประเภทไฟล์
-        const ext = path.extname(filePath).toLowerCase();
-        let contentType = 'application/octet-stream';
+        try {
+            // พยายามอ่านไฟล์ที่ร้องขอ
+            fileBuffer = await fs.readFile(fullPath);
 
-        switch (ext) {
-            case '.jpg':
-            case '.jpeg':
+            // กำหนด content type ตามประเภทไฟล์
+            const ext = path.extname(filePath).toLowerCase();
+            contentType = 'application/octet-stream';
+
+            switch (ext) {
+                case '.jpg':
+                case '.jpeg':
+                    contentType = 'image/jpeg';
+                    break;
+                case '.png':
+                    contentType = 'image/png';
+                    break;
+                case '.gif':
+                    contentType = 'image/gif';
+                    break;
+                case '.svg':
+                    contentType = 'image/svg+xml';
+                    break;
+            }
+
+        } catch (error) {
+            // ถ้าไม่พบไฟล์ ใช้ภาพ placeholder แทน
+            if (error.code === 'ENOENT') {
+                console.log('Image not found, using placeholder instead');
+                const placeholderPath = path.join(process.cwd(), 'public', 'image', 'user-placeholder.jpg');
+                fileBuffer = await fs.readFile(placeholderPath);
                 contentType = 'image/jpeg';
-                break;
-            case '.png':
-                contentType = 'image/png';
-                break;
-            case '.gif':
-                contentType = 'image/gif';
-                break;
-            case '.svg':
-                contentType = 'image/svg+xml';
-                break;
+            } else {
+                // กรณีเกิดข้อผิดพลาดอื่นๆ
+                throw error;
+            }
         }
 
         // ส่งไฟล์กลับไป
@@ -48,12 +65,7 @@ export async function GET(request, { params }) {
     } catch (error) {
         console.error('Image loading error:', error);
 
-        // ถ้าไม่พบไฟล์
-        if (error.code === 'ENOENT') {
-            return new NextResponse('Image not found', { status: 404 });
-        }
-
-        // กรณีอื่นๆ
+        // กรณีเกิดข้อผิดพลาดอื่นๆ
         return new NextResponse('Internal Server Error', { status: 500 });
     }
 }
