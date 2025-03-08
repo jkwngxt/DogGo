@@ -22,7 +22,6 @@ export default function PetOwnerHomePage() {
         }
 
         const data = await response.json();
-        console.log("Full API Response:", JSON.stringify(data, null, 2));
 
         if (data.success && Array.isArray(data.services)) {
             const formatDate = (dateString) => {
@@ -41,7 +40,7 @@ export default function PetOwnerHomePage() {
             // fetch images 
             const fetchImage = (userImagePath) => {
               if (!userImagePath) return "/image/user-placeholder.jpg";
-              return `/api/images/${userImagePath}`;
+              return `/api/images${userImagePath}`;
             };
 
             const formattedServices = await Promise.all(
@@ -53,7 +52,7 @@ export default function PetOwnerHomePage() {
                 dw_username: service.walkerName,
                 user_name: service.userName,
                 isReviewed: service.isReview,
-                pic: await fetchImage(service.userImagePath)
+                pic: await fetchImage(service.walkerPic)
             })));
 
             setWalkingServices(formattedServices);

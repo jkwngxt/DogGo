@@ -66,9 +66,10 @@ export class FetchWSController {
                     status: service.status,
                     walkerName: service.dogWalker.name,
                     walkerTel: service.dogWalker.tel,
+                    walkerPic: service.dogWalker.pic, // เพิ่มรูปภาพของ dog walker
                     userName: service.user.name,
                     userTel: service.user.tel,
-                    isReview: service.review !== null,
+                    isReview: service.review !== null
                 };
             });
 
@@ -193,6 +194,7 @@ export class FetchWSController {
                 dw: {
                     name: walkingService.dogWalker.name,
                     tel: walkingService.dogWalker.tel,
+                    pic: walkingService.dogWalker.pic // เพิ่มรูปภาพของ dog walker
                 },
                 user: {
                     name: walkingService.user.name,
