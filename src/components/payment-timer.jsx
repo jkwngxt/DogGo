@@ -182,7 +182,6 @@ const PaymentTimerUI = ({ walkingServiceId, showPaymentDialog, setShowPaymentDia
 
     try {
       const paymentConfirmation = {
-        userId: null,
         billingId: paymentDetails.billingId,
         amount: paymentDetails.amount,
         confirmed: true
@@ -247,12 +246,12 @@ const PaymentTimerUI = ({ walkingServiceId, showPaymentDialog, setShowPaymentDia
   const handleErrorDialogClose = useCallback(() => {
     setShowErrorDialog(false);
     clearSessionData();
-    router.push("/pet-owner/walking-service");
+    router.push("/pet-owner/homepage");
   }, [clearSessionData, router]);
 
   const handleSuccessDialogClose = useCallback(() => {
     setShowSuccessDialog(false);
-    router.push("/pet-owner/walking-service");
+    router.push("/pet-owner/homepage");
   }, [router]);
 
   // ฟังก์ชันฟอร์แมตเวลา
