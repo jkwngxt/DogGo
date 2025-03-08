@@ -16,6 +16,9 @@ export class FetchWSController {
                         dogWalker: true,
                         user: true,
                         review: true
+                    },
+                    orderBy: {
+                        date: 'desc' // เรียงจากวันที่ล่าสุด (ใหม่สุด) ไปหาเก่าสุด
                     }
                 });
             } else if (role.toLowerCase() === "customer") {
@@ -25,6 +28,9 @@ export class FetchWSController {
                         dogWalker: true,
                         user: true,
                         review: true
+                    },
+                    orderBy: {
+                        date: 'desc' // เรียงจากวันที่ล่าสุด (ใหม่สุด) ไปหาเก่าสุด
                     }
                 });
             } else {
@@ -100,7 +106,7 @@ export class FetchWSController {
             if (user.role === 'admin') {
                 hasAccess = true;
                 currentUserRole = 'admin';
-            } 
+            }
             // ถ้าเป็น customer ต้องตรวจสอบว่าเป็นเจ้าของ service (userId ตรงกับ user.id)
             else if (user.role === 'customer' && walkingService.userId === user.userId) {
                 hasAccess = true;
@@ -113,9 +119,9 @@ export class FetchWSController {
             }
 
             if (!hasAccess) {
-                return { 
-                success: false, 
-                message: 'You do not have permission to view this walking service' 
+                return {
+                    success: false,
+                    message: 'You do not have permission to view this walking service'
                 };
             }
 
