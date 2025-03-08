@@ -6,23 +6,24 @@ const publicRoutes = [
     '/',
     '/register',
     '/login',  // ควรเพิ่ม login เป็นเส้นทางสาธารณะด้วย
-    '/api/auth', // ควรเพิ่ม API ที่เกี่ยวกับ auth ด้วย
+    '/api/user/login', //  API ที่เกี่ยวกับ login ด้วย
+    '/api/user/register',
     '/_next',   // Next.js static files
     '/favicon.ico',
 ];
 
 // กำหนดเส้นทางที่ผู้ใช้ที่ล็อกอินแล้วไม่ควรเข้าถึง (จะถูกพาไปหน้า role/homepage แทน)
 const redirectIfLoggedIn = [
-
+    '/',
+    '/login',
+    '/register',
 ];
 
 // กำหนดกฎการเข้าถึงตามบทบาท
 const roleBasedAccess = {
-    '/dog-walker/walk-description/*': ['dogWalker', 'customer'],
     '/admin/*': ['admin'],
     '/pet-owner/*': ['customer'],
     '/dog-walker/*': ['dogWalker'],
-
 };
 
 // กำหนดหน้า homepage ตามบทบาท
@@ -63,8 +64,7 @@ export async function middleware(request) {
 
     // ถ้าไม่มี token ให้ redirect ไปยังหน้า login
     if (!token) {
-        // return redirectToLogin(request); จะกลับมาแก้หลังเสร็จ ตอนนี้ต้องเปิดไว้เพื่อเทส
-        return NextResponse.next();
+        return redirectToLogin(request);
     }
 
     // ตรวจสอบความถูกต้องของ token

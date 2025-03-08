@@ -10,7 +10,8 @@ export const useAuth = () => {
     const [id, setId] = useState(null);
 
     useEffect(() => {
-        const role = sessionStorage.getItem("userRole");
+        // เปลี่ยนจาก sessionStorage เป็น localStorage
+        const role = localStorage.getItem("userRole");
         if (role) {
             setUser(role);
         }
@@ -18,35 +19,53 @@ export const useAuth = () => {
 
     const login = async (username, password) => {
         try {
+            console.log("Attempting login with:", username);
             const response = await fetch("/api/user/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),
             });
 
-            const data = await response.json();
+            console.log("Login response status:", response.status);
+            console.log("Response headers:", [...response.headers.entries()]);
+
+            // เช็คว่า response มี body หรือไม่
+            const text = await response.text();
+            console.log("Raw response:", text);
+
+            // แปลง text เป็น JSON ถ้าเป็นไปได้
+            let data;
+            try {
+                data = JSON.parse(text);
+                console.log("Parsed data:", data);
+            } catch (parseError) {
+                console.error("Failed to parse response as JSON:", parseError);
+                return { success: false, message: "Invalid server response format" };
+            }
+
             if (!response.ok) {
                 return { success: false, message: data.message || "Invalid username or password." };
             }
 
-            sessionStorage.setItem("userRole", data.user.role);
+            // เก็บข้อมูลใน localStorage
+            localStorage.setItem("userRole", data.user.role);
             setUser(data.user.role);
 
-            localStorage.setItem("name",data.user.name);
-            setName(data.user.name)
+            localStorage.setItem("name", data.user.name);
+            setName(data.user.name);
 
-            localStorage.setItem("id",data.user.id);
-            setId(data.user.id)
+            localStorage.setItem("id", data.user.id);
+            setId(data.user.id);
 
-            // Dispatch a custom event for auth state change
+            // Dispatch events
             window.dispatchEvent(new Event('authStateChange'));
             window.dispatchEvent(new Event('storage'));
 
             // Redirect ตาม role
             switch (data.user.role) {
                 case "dogWalker":
-                    if (data.user.status===0) {
-                        router.push(`/dog-walker/setzone/:${data.user.id}`);// edit to real setzone path
+                    if (data.user.status === 0) {
+                        router.push(`/dog-walker/setzone/:${data.user.id}`);
                     }
                     else {
                         router.push("/dog-walker/workpage");
@@ -64,9 +83,11 @@ export const useAuth = () => {
 
             return { success: true };
         } catch (err) {
+            console.error("Login error:", err);
             return { success: false, message: "An error occurred. Please try again." };
         }
     };
+
 
     const logout = async () => {
         try {
@@ -77,7 +98,8 @@ export const useAuth = () => {
             });
 
             // ลบข้อมูลใน client-side storage
-            sessionStorage.removeItem("userRole");
+            // เปลี่ยนจาก sessionStorage เป็น localStorage
+            localStorage.removeItem("userRole");
             localStorage.removeItem("name");
             localStorage.removeItem("id");
             setUser(null);
