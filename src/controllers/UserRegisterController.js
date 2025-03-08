@@ -9,9 +9,20 @@ export class UserRegisterController {
     async register(userData) {
         return this.prisma.$transaction(async (tx) => {
             try {
-                // Check if username exists
+                // ตรวจสอบข้อมูลที่จำเป็น
+                const requiredFields = ['username', 'password', 'email', 'name'];
+                for (const field of requiredFields) {
+                    if (!userData[field]) {
+                        return {
+                            success: false,
+                            message: `Missing required field: ${field}`
+                        };
+                    }
+                }
+
+                // ตรวจสอบว่า username ซ้ำหรือไม่
                 const existingUsername = await tx.user.findUnique({
-                    where: {username: userData.username}
+                    where: { username: userData.username }
                 });
 
                 if (existingUsername) {
@@ -21,9 +32,9 @@ export class UserRegisterController {
                     };
                 }
 
-                // Check if email exists
+                // ตรวจสอบว่าอีเมลซ้ำหรือไม่
                 const existingEmail = await tx.user.findUnique({
-                    where: {email: userData.email}
+                    where: { email: userData.email }
                 });
 
                 if (existingEmail) {
@@ -33,19 +44,19 @@ export class UserRegisterController {
                     };
                 }
 
-                // Hash password
+                // เข้ารหัสรหัสผ่าน
                 const hashedPassword = await bcrypt.hash(userData.password, 10);
 
-                // Create new user with dogs
-                await tx.user.create({
+                // สร้างผู้ใช้ใหม่พร้อมกับสุนัข (ถ้ามี)
+                const newUser = await tx.user.create({
                     data: {
                         name: userData.name,
                         username: userData.username,
                         password: hashedPassword,
                         email: userData.email,
-                        tel: userData.tel,
-                        address: userData.address,
-                        zone: userData.zone,
+                        tel: userData.tel || null,
+                        address: userData.address || null,
+                        zone: userData.zone || null,
                         dogs: {
                             create: userData.dogs?.map(dog => ({
                                 name: dog.name,
@@ -54,16 +65,19 @@ export class UserRegisterController {
                         }
                     },
                     include: {
-                        dogs: true // Include dogs in the response
+                        dogs: true // รวมข้อมูลสุนัขในการตอบกลับ
                     }
                 });
+
+                // ส่งคืนผลลัพธ์สำเร็จ
                 return {
                     success: true,
                     message: 'User registered successfully',
+                    userId: newUser.id
                 };
-
             } catch (error) {
-                // The transaction will automatically roll back on error
+                console.error('Error registering user:', error);
+                // ธุรกรรมจะถูกยกเลิกโดยอัตโนมัติเมื่อมีข้อผิดพลาด
                 return {
                     success: false,
                     message: 'Internal server error'

@@ -1,27 +1,22 @@
 import { NextResponse } from 'next/server';
 import { FetchWSController } from "@/controllers/FetchWSController";
-import {authenticateRequest} from "@/utils/jwt";
-import {updateExpiredWalkingServices} from "@/utils/expire-billing";
-
-function serializeBigInt(obj) {
-    return JSON.parse(JSON.stringify(obj, (key, value) => {
-        if (typeof value === 'bigint') {
-            return Number(value);
-        }
-        return value;
-    }));
-}
+import { authenticateRequest } from "@/utils/jwt";
+import { updateExpiredWalkingServices } from "@/utils/expire-billing";
 
 export async function GET(request) {
     try {
+        // ตรวจสอบการยืนยันตัวตน
         const { user, response } = await authenticateRequest(request);
         if (response) return response;
 
-        await updateExpiredWalkingServices()
+        // อัปเดตสถานะการจองที่หมดอายุ
+        await updateExpiredWalkingServices();
 
-        let role = user.role;
-        let id = user.userId
+        // ดึงข้อมูลผู้ใช้จาก token
+        const role = user.role;
+        const id = user.userId;
 
+        // ตรวจสอบข้อมูลที่จำเป็น
         if (!role || !id) {
             return NextResponse.json(
                 { success: false, message: 'Missing required parameters' },
@@ -29,21 +24,26 @@ export async function GET(request) {
             );
         }
 
-        const fetchWSList = new FetchWSController();
-        const result = await fetchWSList.getWSList(role, id);
+        // เรียกใช้ controller
+        const fetchWSController = new FetchWSController();
+        const result = await fetchWSController.getWSList(role, id);
 
+        // ตรวจสอบความสำเร็จ
         if (!result.success) {
-            return NextResponse.json(result, { status: 404 });
+            return NextResponse.json(
+                { success: false, message: result.message },
+                { status: 404 }
+            );
         }
 
-        const serializedResult = serializeBigInt(result);
-        return NextResponse.json(serializedResult, { status: 200 });
-
+        return NextResponse.json(result, { status: 200 });
     } catch (error) {
         console.error('Fetch walking services error:', error);
         return NextResponse.json(
-            { success: false,
-                message: 'Internal server error' },
+            {
+                success: false,
+                message: 'Internal server error'
+            },
             { status: 500 }
         );
     }

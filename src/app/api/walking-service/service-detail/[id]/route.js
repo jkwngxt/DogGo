@@ -1,21 +1,22 @@
 import { NextResponse } from 'next/server';
 import { FetchWSController } from '@/controllers/FetchWSController';
 import { authenticateRequest } from "@/utils/jwt";
-import {updateExpiredWalkingServices} from "@/utils/expire-billing";
-
-const wsController = new FetchWSController();
+import { updateExpiredWalkingServices } from "@/utils/expire-billing";
 
 export async function GET(request, context) {
-    const { user, response } = await authenticateRequest(request);
-    if (response) return response;
-
     try {
-        // Await the params object
-        const params = await context.params;
+        // ตรวจสอบการยืนยันตัวตน
+        const { user, response } = await authenticateRequest(request);
+        if (response) return response;
+
+        // อัปเดตสถานะการจองที่หมดอายุ
+        await updateExpiredWalkingServices();
+
+        // รับพารามิเตอร์จาก URL
+        const params = context.params;
         const id = params.id;
 
-        await updateExpiredWalkingServices()
-
+        // ตรวจสอบว่ามี ID หรือไม่
         if (!id) {
             return NextResponse.json(
                 { success: false, message: 'Service ID is required' },
@@ -23,8 +24,8 @@ export async function GET(request, context) {
             );
         }
 
+        // แปลง ID เป็นตัวเลข
         const serviceId = parseInt(id);
-
         if (isNaN(serviceId)) {
             return NextResponse.json(
                 { success: false, message: 'Invalid service ID, must be a number' },
@@ -32,12 +33,24 @@ export async function GET(request, context) {
             );
         }
 
+        // เรียกใช้ controller
+        const wsController = new FetchWSController();
         const result = await wsController.getWSDetail(serviceId, user);
-        return NextResponse.json(result);
+
+        // ตรวจสอบความสำเร็จ
+        if (!result.success) {
+            return NextResponse.json(
+                { success: false, message: result.message },
+                { status: result.message.includes('not found') ? 404 : 403 }
+            );
+        }
+
+        // ส่งข้อมูลกลับ
+        return NextResponse.json(result, { status: 200 });
     } catch (error) {
         console.error('Error in walking service detail route:', error);
         return NextResponse.json(
-            { success: false, message: error.message || 'An error occurred' },
+            { success: false, message: error.message || 'Internal server error' },
             { status: 500 }
         );
     }

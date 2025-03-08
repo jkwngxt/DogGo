@@ -1,4 +1,4 @@
-import {PrismaClient} from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 export class FetchWSController {
     constructor(prismaInstance = new PrismaClient()) {
@@ -9,6 +9,7 @@ export class FetchWSController {
         try {
             let walkingServices;
 
+            // ค้นหางานบริการตามบทบาทของผู้ใช้
             if (role.toLowerCase() === "dogwalker") {
                 walkingServices = await this.prisma.walkingService.findMany({
                     where: { dogWalkerId: id },
@@ -18,7 +19,7 @@ export class FetchWSController {
                         review: true
                     },
                     orderBy: {
-                        date: 'desc' // Initial sorting by date, will be overridden by custom sort
+                        date: 'desc' // เรียงตามวันที่ล่าสุด (จะถูกแทนที่ด้วยการเรียงลำดับแบบกำหนดเอง)
                     }
                 });
             } else if (role.toLowerCase() === "customer") {
@@ -30,16 +31,17 @@ export class FetchWSController {
                         review: true
                     },
                     orderBy: {
-                        date: 'desc' // Initial sorting by date, will be overridden by custom sort
+                        date: 'desc' // เรียงตามวันที่ล่าสุด (จะถูกแทนที่ด้วยการเรียงลำดับแบบกำหนดเอง)
                     }
                 });
             } else {
                 return {
                     success: false,
-                    message: 'Invalid role. Role must be "dogWalker" or "user"'
+                    message: 'Invalid role. Role must be "dogWalker" or "customer"'
                 };
             }
 
+            // ตรวจสอบว่ามีงานบริการหรือไม่
             if (walkingServices.length === 0) {
                 return {
                     success: true,
@@ -47,13 +49,14 @@ export class FetchWSController {
                 };
             }
 
-            // Calculate start and end times based on time slots
-            const START_TIME = 9;
+            // คำนวณเวลาเริ่มต้นและสิ้นสุดตามช่วงเวลาที่กำหนด
+            const START_TIME = 9; // เวลาเริ่มต้นคือ 9:00
 
+            // แปลงข้อมูลงานบริการให้อยู่ในรูปแบบที่ต้องการ
             const walkingServiceList = walkingServices.map((service) => {
-                // Get the first and last elements from the time array
-                let startHour = START_TIME + service.time[0] - 1;
-                let endHour = START_TIME + service.time[service.time.length - 1];
+                // ดึงค่าแรกและค่าสุดท้ายจากอาร์เรย์เวลา
+                const startHour = START_TIME + service.time[0] - 1;
+                const endHour = START_TIME + service.time[service.time.length - 1];
 
                 return {
                     serviceId: service.id,
@@ -69,29 +72,30 @@ export class FetchWSController {
                 };
             });
 
-            // Custom sort function for status priority
+            // ฟังก์ชั่นกำหนดลำดับความสำคัญของสถานะ
             const getStatusPriority = (status) => {
                 switch (status) {
-                    case 201: return 1;
-                    case 203: return 2;
-                    case 204: return 3;
-                    case 202: return 4;
-                    case 220: return 5;
-                    case 210: return 6;
-                    default: return 7; // All other statuses
+                    case 201: return 1; // รอการชำระเงิน
+                    case 203: return 2; // ยอมรับแล้ว
+                    case 204: return 3; // เสร็จสิ้น
+                    case 202: return 4; // รอการตอบกลับ
+                    case 220: return 5; // ปฏิเสธ
+                    case 210: return 6; // ยกเลิก
+                    default: return 7; // สถานะอื่นๆ
                 }
             };
 
-            // Sort by status priority first, then by date within each status group
+            // เรียงลำดับตามความสำคัญของสถานะก่อน จากนั้นจึงเรียงตามวันที่ในแต่ละกลุ่มสถานะ
             walkingServiceList.sort((a, b) => {
                 const priorityA = getStatusPriority(a.status);
                 const priorityB = getStatusPriority(b.status);
 
+                // เรียงตามลำดับความสำคัญของสถานะ
                 if (priorityA !== priorityB) {
-                    return priorityA - priorityB; // Sort by status priority
+                    return priorityA - priorityB;
                 }
 
-                // If same status, sort by date (newest first)
+                // หากสถานะเดียวกัน เรียงตามวันที่ (ล่าสุดก่อน)
                 return new Date(b.serviceDate) - new Date(a.serviceDate);
             });
 
@@ -100,6 +104,7 @@ export class FetchWSController {
                 services: walkingServiceList
             };
         } catch (error) {
+            console.error("Error fetching walking services:", error);
             return {
                 success: false,
                 message: error.message || 'Failed to fetch walking services'
@@ -109,6 +114,7 @@ export class FetchWSController {
 
     async getWSDetail(id, user) {
         try {
+            // ค้นหางานบริการตาม ID
             const walkingService = await this.prisma.walkingService.findUnique({
                 where: { id: parseInt(id) },
                 include: {
@@ -118,40 +124,44 @@ export class FetchWSController {
                 }
             });
 
+            // ตรวจสอบว่ามีงานบริการหรือไม่
             if (!walkingService) {
                 return {
                     success: false,
-                    message: 'Walking service not found'
+                    message: 'Walking service not found',
+                    status: 404
                 };
             }
 
-            // check if user can access or not
+            // ตรวจสอบสิทธิ์การเข้าถึง
             let hasAccess = false;
             let currentUserRole = null;
 
+            // ตรวจสอบบทบาทและสิทธิ์
             if (user.role === 'admin') {
+                // แอดมินสามารถเข้าถึงได้ทั้งหมด
                 hasAccess = true;
                 currentUserRole = 'admin';
-            }
-            // ถ้าเป็น customer ต้องตรวจสอบว่าเป็นเจ้าของ service (userId ตรงกับ user.id)
-            else if (user.role === 'customer' && walkingService.userId === user.userId) {
+            } else if (user.role === 'customer' && walkingService.userId === user.userId) {
+                // ลูกค้าต้องเป็นเจ้าของงานบริการเท่านั้น
                 hasAccess = true;
                 currentUserRole = 'customer';
-            }
-            // ถ้าเป็น dogWalker ต้องตรวจสอบว่าเป็นผู้รับผิดชอบ service (dogWalkerId ตรงกับ user.id)
-            else if (user.role === 'dogWalker' && walkingService.dogWalkerId === user.userId) {
+            } else if (user.role === 'dogWalker' && walkingService.dogWalkerId === user.userId) {
+                // ผู้พาสุนัขเดินเล่นต้องเป็นผู้รับผิดชอบงานบริการเท่านั้น
                 hasAccess = true;
                 currentUserRole = 'dogWalker';
             }
 
+            // หากไม่มีสิทธิ์เข้าถึง
             if (!hasAccess) {
                 return {
                     success: false,
-                    message: 'You do not have permission to view this walking service'
+                    message: 'You do not have permission to view this walking service',
+                    status: 403
                 };
             }
 
-            // Get dogs information based on ids stored in walking service
+            // ดึงข้อมูลสุนัขที่เกี่ยวข้อง
             const dogIds = walkingService.dogs;
             const dogs = await this.prisma.dog.findMany({
                 where: {
@@ -161,12 +171,12 @@ export class FetchWSController {
                 }
             });
 
-            // Calculate start and end times based on time slots
-            const START_TIME = 9;
+            // คำนวณเวลาเริ่มต้นและสิ้นสุด
+            const START_TIME = 9; // เวลาเริ่มต้นคือ 9:00
             const startHour = START_TIME + walkingService.time[0] - 1;
             const endHour = START_TIME + walkingService.time[walkingService.time.length - 1];
 
-            // Format the response according to the image requirements
+            // จัดรูปแบบข้อมูลตามที่ต้องการ
             return {
                 success: true,
                 service: {
@@ -193,9 +203,11 @@ export class FetchWSController {
                 currentUserRole: currentUserRole
             };
         } catch (error) {
+            console.error("Error fetching walking service details:", error);
             return {
                 success: false,
-                message: error.message || 'Failed to fetch walking service details'
+                message: error.message || 'Failed to fetch walking service details',
+                status: 500
             };
         }
     }
