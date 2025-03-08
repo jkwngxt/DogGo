@@ -24,8 +24,12 @@ const ClickPayment = ({ walkingServiceId }) => {
 
   return (
       <>
-        {/* ปุ่มกดเปิด dialog */}
-        <Button variant="secondary" onClick={() => setShowFirstDialog(true)}>
+        {/* ปุ่มกดเปิด dialog - เปลี่ยนเป็นสีฟ้า */}
+        <Button
+            variant="secondary"
+            onClick={() => setShowFirstDialog(true)}
+            className="bg-[#6498FA] text-white hover:bg-[#5080e0]"
+        >
           ชำระค่าบริการ
         </Button>
 

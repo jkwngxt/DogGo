@@ -18,7 +18,7 @@ export class FetchWSController {
                         review: true
                     },
                     orderBy: {
-                        date: 'desc' // เรียงจากวันที่ล่าสุด (ใหม่สุด) ไปหาเก่าสุด
+                        date: 'desc' // Initial sorting by date, will be overridden by custom sort
                     }
                 });
             } else if (role.toLowerCase() === "customer") {
@@ -30,7 +30,7 @@ export class FetchWSController {
                         review: true
                     },
                     orderBy: {
-                        date: 'desc' // เรียงจากวันที่ล่าสุด (ใหม่สุด) ไปหาเก่าสุด
+                        date: 'desc' // Initial sorting by date, will be overridden by custom sort
                     }
                 });
             } else {
@@ -43,7 +43,7 @@ export class FetchWSController {
             if (walkingServices.length === 0) {
                 return {
                     success: true,
-                    services: [] // เปลี่ยนจาก walkingServices เป็น services เพื่อให้สอดคล้องกับการ return ด้านล่าง
+                    services: []
                 };
             }
 
@@ -67,6 +67,32 @@ export class FetchWSController {
                     userTel: service.user.tel,
                     isReview: service.review !== null,
                 };
+            });
+
+            // Custom sort function for status priority
+            const getStatusPriority = (status) => {
+                switch (status) {
+                    case 201: return 1;
+                    case 203: return 2;
+                    case 204: return 3;
+                    case 202: return 4;
+                    case 220: return 5;
+                    case 210: return 6;
+                    default: return 7; // All other statuses
+                }
+            };
+
+            // Sort by status priority first, then by date within each status group
+            walkingServiceList.sort((a, b) => {
+                const priorityA = getStatusPriority(a.status);
+                const priorityB = getStatusPriority(b.status);
+
+                if (priorityA !== priorityB) {
+                    return priorityA - priorityB; // Sort by status priority
+                }
+
+                // If same status, sort by date (newest first)
+                return new Date(b.serviceDate) - new Date(a.serviceDate);
             });
 
             return {
@@ -139,8 +165,6 @@ export class FetchWSController {
             const START_TIME = 9;
             const startHour = START_TIME + walkingService.time[0] - 1;
             const endHour = START_TIME + walkingService.time[walkingService.time.length - 1];
-
-            // const currentUserRole = user?.role;
 
             // Format the response according to the image requirements
             return {
