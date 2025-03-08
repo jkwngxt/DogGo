@@ -39,7 +39,7 @@ const HistoryDogWalker = ({
 
     const renderStatusButton = () => {
         switch (status) {
-            case 201: // Awaiting payment
+            case 201: // Awaiting payment - Keep blue color (already set in ClickPayment component)
                 return (
                     <div onClick={(e) => e.stopPropagation()}>
                         <ClickPayment
@@ -57,24 +57,25 @@ const HistoryDogWalker = ({
             case 220: // Rejected
                 return <p className="font-bold text-red-500">การรับงานถูกปฏิเสธ</p>;
 
-            case 203: // Accepted -> Show "ได้รับบริการ"
+            case 203: // Accepted -> Show "ได้รับบริการ" with green color
                 return (
                     <div onClick={(e) => e.stopPropagation()}>
                         <OwnerWalkConfirmation
                             walkingServiceId={walkingServiceId}
-                            onStatusUpdate={(id, newStatus) => handleStatusUpdate(id, newStatus)}
+                            onStatusUpdate={() => handleStatusUpdate(walkingServiceId, 204)}
+                            buttonColor="green" // Add this prop to handle in OwnerWalkConfirmation
                         />
                     </div>
                 );
 
-            case 204: // Completed
+            case 204: // Completed - Show review button with yellow-orange star color
                 return isReviewed ? (
                     <p className="font-bold text-[#6498FA]">การบริการเสร็จสิ้น</p>
                 ) : (
                     <Button
                         onClick={handleButtonClick}
                         variant="secondary"
-                        className="bg-[#FFB000] hover:bg-[#e09a00] text-white"
+                        className="bg-[#FFB000] text-white hover:bg-[#F0A000]" // Yellow-orange star color
                     >
                         รีวิว
                     </Button>

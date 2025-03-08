@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import ConfirmationDialogs from "./confirmation-dialogs";
 
-const OwnerWalkConfirmation = ({ walkingServiceId, onStatusUpdate }) => {
+const OwnerWalkConfirmation = ({ walkingServiceId, onStatusUpdate, buttonColor }) => {
   const router = useRouter();
   const [showFirstDialog, setShowFirstDialog] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -54,6 +54,11 @@ const OwnerWalkConfirmation = ({ walkingServiceId, onStatusUpdate }) => {
     router.push("/pet-owner/homepage"); // Navigate after confirmation closes
   };
 
+  // Define button class based on buttonColor prop
+  const buttonClass = buttonColor === "green"
+      ? "bg-[#10B981] text-white hover:bg-[#0D9668]" // Green color for status 203
+      : "";
+
   return (
       <>
         <Dialog open={showFirstDialog} onOpenChange={setShowFirstDialog}>
@@ -61,7 +66,7 @@ const OwnerWalkConfirmation = ({ walkingServiceId, onStatusUpdate }) => {
             <Button
                 variant="secondary"
                 onClick={() => setShowFirstDialog(true)}
-                className="bg-green-500 hover:bg-green-600 text-white"
+                className={buttonClass}
             >
               ได้รับบริการ
             </Button>
