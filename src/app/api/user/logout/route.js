@@ -1,20 +1,20 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { LogoutController } from '@/controllers/LogoutController';
 
 export async function POST() {
     try {
-        // ลบ token cookie
-        const cookieStore = await cookies();
-        cookieStore.delete('token');
+        const logoutController = new LogoutController();
+        const result = await logoutController.logout();
 
-        return NextResponse.json({
-            success: true,
-            message: 'Logged out successfully'
-        });
+        if (!result.success) {
+            return NextResponse.json(result, { status: 500 });
+        }
+
+        return NextResponse.json(result);
     } catch (error) {
         console.error('Logout error:', error);
         return NextResponse.json(
-            { success: false, message: 'Failed to logout' },
+            { success: false, message: 'Internal server error' },
             { status: 500 }
         );
     }
