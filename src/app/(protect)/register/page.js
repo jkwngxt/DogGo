@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import UserForm from "@/components/register/user-form";
 import DogForm from "@/components/register/dog-form";
-import RegistrationDialogs from "@/components/register/registration-dialogs";
+import ConfirmationDialogs from "@/components/confirmation-dialogs";
 import { useRegistration } from "@/hooks/useRegistration";
 
 const RegisterPage = () => {
@@ -20,7 +20,8 @@ const RegisterPage = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
     const [showErrorDialog, setShowErrorDialog] = useState(false);
-    const [errorMessage, setErrorMessage] = useState("");
+    const [dialogMessage, setDialogMessage] = useState("");
+    const [dialogTitle, setDialogTitle] = useState("");
 
     // ใช้ custom hook สำหรับการจัดการข้อมูลการลงทะเบียน
     const {
@@ -133,12 +134,15 @@ const RegisterPage = () => {
             // แสดง success dialog และล้างข้อมูลฟอร์ม
             clearAllData();
             setShowDogErrors(false);
+            setDialogTitle("ลงทะเบียนสำเร็จ");
+            setDialogMessage("การลงทะเบียนเสร็จสมบูรณ์ ระบบกำลังนำท่านไปยังหน้าเข้าสู่ระบบ");
             setShowSuccessDialog(true);
 
         } catch (error) {
             // แสดง error dialog กรณีมี error ที่ไม่เกี่ยวกับการตรวจสอบข้อมูล
+            setDialogTitle("ลงทะเบียนไม่สำเร็จ");
+            setDialogMessage(error.message || "เกิดข้อผิดพลาดในการลงทะเบียน กรุณาลองใหม่อีกครั้ง");
             setShowErrorDialog(true);
-            setErrorMessage(error.message || "เกิดข้อผิดพลาดในการลงทะเบียน");
         } finally {
             setIsLoading(false);
         }
@@ -202,11 +206,12 @@ const RegisterPage = () => {
                 />
             )}
 
-            {/* Dialogs for Success and Error */}
-            <RegistrationDialogs
+            {/* ใช้ ConfirmationDialogs component */}
+            <ConfirmationDialogs
                 showSuccessDialog={showSuccessDialog}
                 showErrorDialog={showErrorDialog}
-                errorMessage={errorMessage}
+                message={dialogMessage}
+                title={dialogTitle}
                 onSuccessClose={handleSuccessDialogClose}
                 onErrorClose={handleErrorDialogClose}
             />
