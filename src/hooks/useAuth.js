@@ -19,35 +19,18 @@ export const useAuth = () => {
 
     const login = async (username, password) => {
         try {
-            console.log("Attempting login with:", username);
             const response = await fetch("/api/user/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password }),
             });
 
-            console.log("Login response status:", response.status);
-            console.log("Response headers:", [...response.headers.entries()]);
-
-            // เช็คว่า response มี body หรือไม่
-            const text = await response.text();
-            console.log("Raw response:", text);
-
-            // แปลง text เป็น JSON ถ้าเป็นไปได้
-            let data;
-            try {
-                data = JSON.parse(text);
-                console.log("Parsed data:", data);
-            } catch (parseError) {
-                console.error("Failed to parse response as JSON:", parseError);
-                return { success: false, message: "Invalid server response format" };
-            }
-
+            const data = await response.json();
             if (!response.ok) {
                 return { success: false, message: data.message || "Invalid username or password." };
             }
 
-            // เก็บข้อมูลใน localStorage
+            // เปลี่ยนจาก sessionStorage เป็น localStorage
             localStorage.setItem("userRole", data.user.role);
             setUser(data.user.role);
 
@@ -57,9 +40,10 @@ export const useAuth = () => {
             localStorage.setItem("id", data.user.id);
             setId(data.user.id);
 
-            // Dispatch events
+            // Dispatch a custom event for auth state change
             window.dispatchEvent(new Event('authStateChange'));
             window.dispatchEvent(new Event('storage'));
+
 
             // Redirect ตาม role
             switch (data.user.role) {
@@ -87,7 +71,6 @@ export const useAuth = () => {
             return { success: false, message: "An error occurred. Please try again." };
         }
     };
-
 
     const logout = async () => {
         try {
