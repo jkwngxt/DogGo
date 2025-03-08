@@ -37,15 +37,15 @@ export function generateAcceptanceEmail(acceptanceDetails) {
     const thText = {
         title: 'คำขอบริการพาสุนัขเดินเล่นได้รับการยอมรับแล้ว! 🎉',
         hello: 'สวัสดีคุณ',
-        accepted: 'ข่าวดี! คำขอบริการพาสุนัขเดินเล่นของคุณได้รับการยอมรับจากผู้เดินสุนัขแล้ว กรุณาตรวจสอบรายละเอียดและอัพเดทเพิ่มเติมที่เว็บไซต์ของเรา',
+        accepted: 'ข่าวดี! คำขอบริการพาสุนัขเดินเล่นของคุณได้รับการยอมรับจาก Dog Walker แล้ว กรุณาตรวจสอบรายละเอียดและอัพเดทเพิ่มเติมที่เว็บไซต์ของเรา',
         details: 'นี่คือรายละเอียดการจองที่ยืนยันแล้ว:',
         serviceDetails: 'ข้อมูลบริการ',
         date: 'วันที่:',
         time: 'เวลา:',
         totalPrice: 'ราคารวม:',
-        dogWalker: 'ผู้เดินสุนัข:',
+        dogWalker: 'Dog Walker:',
         contactInfo: 'ข้อมูลติดต่อ:',
-        dogWalkerInfo: 'ข้อมูลผู้เดินสุนัข',
+        dogWalkerInfo: 'ข้อมูล Dog Walker',
         dogWalkerEmail: 'อีเมล:',
         dogWalkerPhone: 'เบอร์โทร:',
         userInfo: 'ข้อมูลของคุณ',
@@ -321,8 +321,8 @@ export function generateAcceptanceEmail(acceptanceDetails) {
             <div class="detail-row">
                 <div class="detail-label en-lang">${enText.totalPrice}</div>
                 <div class="detail-label th-lang">${thText.totalPrice}</div>
-                <div class="detail-value">${totalPrice} THB</div>
-            </div>
+                <div class="detail-value en-lang">${totalPrice} THB</div>
+                <div class="detail-value th-lang">${totalPrice} บาท</div>            </div>
         </div>
         
         <div class="details">

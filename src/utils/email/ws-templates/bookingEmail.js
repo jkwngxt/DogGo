@@ -301,8 +301,8 @@ export function generateBookingEmail(bookingDetails) {
             <div class="detail-row">
                 <div class="detail-label en-lang">${enText.totalPrice}</div>
                 <div class="detail-label th-lang">${thText.totalPrice}</div>
-                <div class="detail-value">${totalPrice} THB</div>
-            </div>
+                <div class="detail-value en-lang">${totalPrice} THB</div>
+                <div class="detail-value th-lang">${totalPrice} บาท</div>            </div>
         </div>
         
         <div class="details">
