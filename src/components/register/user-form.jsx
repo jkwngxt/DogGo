@@ -15,6 +15,17 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
+const zones = [
+    "เขตคลองเตย", "เขตคลองสามวา", "เขตคลองสาน", "เขตคันนายาว", "เขตจตุจักร",
+    "เขตจอมทอง", "เขตดอนเมือง", "เขตตลิ่งชัน", "เขตทวีวัฒนา", "เขตธนบุรี",
+    "เขตบางกอกน้อย", "เขตบางกอกใหญ่", "เขตบางคอแหลม", "เขตบางซื่อ", "เขตบางนา",
+    "เขตบางบอน", "เขตบางพลัด", "เขตบางขุนเทียน", "เขตบางเขน", "เขตบางแค",
+    "เขตบางกะปิ", "เขตบางรัก", "เขตบึงกุ่ม", "เขตปทุมวัน", "เขตประเวศ", "เขตพระโขนง",
+    "เขตภาษีเจริญ", "เขตมีนบุรี", "เขตยานนาวา", "เขตราษฎร์บูรณะ", "เขตลาดกระบัง",
+    "เขตลาดพร้าว", "เขตวัฒนา", "เขตสายไหม", "เขตสะพานสูง", "เขตสาทร", "เขตสวนหลวง",
+    "เขตหนองจอก", "เขตหนองแขม", "เขตหลักสี่", "เขตทุ่งครุ"
+];
+
 const UserForm = ({
                       userData,
                       errors,
@@ -130,51 +141,12 @@ const UserForm = ({
                                     <SelectValue placeholder="เขตที่อยู่ปัจจุบัน" className="placeholder:text-white text-white" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectGroup>
-                                        <SelectLabel>เขตที่อยู่</SelectLabel>
-                                        <SelectItem value="เขตสายไหม">เขตสายไหม</SelectItem>
-                                        <SelectItem value="เขตจตุจักร">เขตจตุจักร</SelectItem>
-                                        <SelectItem value="เขตหลักสี่">เขตหลักสี่</SelectItem>
-                                        <SelectItem value="เขตดอนเมือง">เขตดอนเมือง</SelectItem>
-                                        <SelectItem value="เขตบางซื่อ">เขตบางซื่อ</SelectItem>
-                                        <SelectItem value="เขตลาดพร้าว">เขตลาดพร้าว</SelectItem>
-                                        <SelectItem value="เขตสะพานสูง">เขตสะพานสูง</SelectItem>
-                                        <SelectItem value="เขตบางเขน">เขตบางเขน</SelectItem>
-                                        <SelectItem value="เขตหนองจอก">เขตหนองจอก</SelectItem>
-                                        <SelectItem value="เขตบางกะปิ">เขตบางกะปิ</SelectItem>
-                                        <SelectItem value="เขตประเวศ">เขตประเวศ</SelectItem>
-                                        <SelectItem value="เขตลาดกระบัง">เขตลาดกระบัง</SelectItem>
-                                        <SelectItem value="เขตบึงกุ่ม">เขตบึงกุ่ม</SelectItem>
-                                        <SelectItem value="เขตคันนายาว">เขตคันนายาว</SelectItem>
-                                        <SelectItem value="เขตมีนบุรี">เขตมีนบุรี</SelectItem>
-                                        <SelectItem value="เขตคลองสามวา">เขตคลองสามวา</SelectItem>
-                                        <SelectItem value="เขตวัฒนา">เขตวัฒนา</SelectItem>
-                                        <SelectItem value="เขตสวนหลวง">เขตสวนหลวง</SelectItem>
-                                        <SelectItem value="เขตพระโขนง">เขตพระโขนง</SelectItem>
-                                        <SelectItem value="เขตสาทร">เขตสาทร</SelectItem>
-                                        <SelectItem value="เขตคลองเตย">เขตคลองเตย</SelectItem>
-                                        <SelectItem value="เขตบางคอแหลม">เขตบางคอแหลม</SelectItem>
-                                        <SelectItem value="เขตปทุมวัน">เขตปทุมวัน</SelectItem>
-                                        <SelectItem value="เขตบางรัก">เขตบางรัก</SelectItem>
-                                        <SelectItem value="เขตยานนาวา">เขตยานนาวา</SelectItem>
-                                        <SelectItem value="เขตบางนา">เขตบางนา</SelectItem>
-                                        <SelectItem value="เขตบางพลัด">เขตบางพลัด</SelectItem>
-                                        <SelectItem value="เขตบางกอกน้อย">เขตบางกอกน้อย</SelectItem>
-                                        <SelectItem value="เขตบางกอกใหญ่">เขตบางกอกใหญ่</SelectItem>
-                                        <SelectItem value="เขตตลิ่งชัน">เขตตลิ่งชัน</SelectItem>
-                                        <SelectItem value="เขตทวีวัฒนา">เขตทวีวัฒนา</SelectItem>
-                                        <SelectItem value="เขตจอมทอง">เขตจอมทอง</SelectItem>
-                                        <SelectItem value="เขตธนบุรี">เขตธนบุรี</SelectItem>
-                                        <SelectItem value="เขตคลองสาน">เขตคลองสาน</SelectItem>
-                                        <SelectItem value="เขตบางขุนเทียน">เขตบางขุนเทียน</SelectItem>
-                                        <SelectItem value="เขตบางแค">เขตบางแค</SelectItem>
-                                        <SelectItem value="เขตหนองแขม">เขตหนองแขม</SelectItem>
-                                        <SelectItem value="เขตภาษีเจริญ">เขตภาษีเจริญ</SelectItem>
-                                        <SelectItem value="เขตบางบอน">เขตบางบอน</SelectItem>
-                                        <SelectItem value="เขตทุ่งครุ">เขตทุ่งครุ</SelectItem>
-                                        <SelectItem value="เขตราษฏร์บูรณะ">เขตราษฏร์บูรณะ</SelectItem>
-                                    </SelectGroup>
-                                </SelectContent>
+                                    {zones.map((zone) => (
+                                      <SelectItem key={zone} value={zone}>
+                                        {zone}
+                                      </SelectItem>
+                                    ))}
+                              </SelectContent>
                             </Select>
                             {errors.zone && (
                                 <p className="text-red-500 text-sm mt-1 error-message">{errors.zone}</p>
