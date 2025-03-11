@@ -62,10 +62,16 @@ export default function WalkingService() {
     setSearchPerformed(true);
 
     try {
-      // เตรียมข้อมูลสำหรับการส่ง API
-      const searchDate = startDate.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+      // แก้ไขการจัดการวันที่เพื่อให้ถูกต้องตามโซนเวลาของไทย
+      // สร้างวันที่ในรูปแบบ YYYY-MM-DD โดยใช้โซนเวลาท้องถิ่น (ไทย)
+      const year = startDate.getFullYear();
+      const month = String(startDate.getMonth() + 1).padStart(2, '0');
+      const day = String(startDate.getDate()).padStart(2, '0');
+      const searchDate = `${year}-${month}-${day}`;
 
-      // บันทึกค่าการค้นหาลงใน sessionStorage
+      // ทดสอบแสดง ISO string แบบเดิมเพื่อเปรียบเทียบ
+      startDate.toISOString().split('T')[0];
+// บันทึกค่าการค้นหาลงใน sessionStorage
       const searchParams = {
         date: searchDate,
         startTimeInt: startHour,
@@ -104,7 +110,6 @@ export default function WalkingService() {
       setIsLoading(false);
     }
   };
-
   const handleDialogClose = () => {
     setShowErrorDialog(false);
   };
