@@ -43,12 +43,12 @@ const PetOwnerNav = ({ userName }) => {
   const { logout } = useAuth();
   return (
     <div className="flex px-10 bg-[#2668E3] justify-between">
-      <img className="w-20 h-20" src="/image/logo.svg" alt="dog go logo" />
+      <img className="w-20 h-20" src="/image/logoInvert.svg" alt="dog go logo" />
       <div className="flex flex-row space-x-4 items-center">
         <img
           src="/image/user-placeholder.jpg"
           alt="User profile"
-          className="w-16 h-16 rounded-full object-cover"
+          className="w-12 h-12 rounded-full object-cover"
         />
         <div className="text-white font-bold">{userName}</div>
         <NavigationMenu>

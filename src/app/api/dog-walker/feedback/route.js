@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { FetchReviewDWController } from "@/controllers/FetchReviewDWController";
+import { FetchFeedbackDWController } from "@/controllers/FetchFeedbackDWController";
 import { authenticateRequest } from "@/utils/jwt";
-import {FetchFeedbackDWController} from "@/controllers/FetchFeedbackDWController";
 
 export async function GET(request) {
     try {
@@ -9,11 +8,14 @@ export async function GET(request) {
         const { user, response } = await authenticateRequest(request);
         if (response) return response;
 
-        let dwId = user.userId;
+        // ใช้ userId ของผู้ใช้ปัจจุบันเป็น dwId
+        const dwId = user.userId;
 
-        const fetchFeedbackDW = new FetchFeedbackDWController()
-        const result = await fetchFeedbackDW.getFeedbackByDwId(dwId)
+        // เรียกใช้ controller
+        const fetchFeedbackDW = new FetchFeedbackDWController();
+        const result = await fetchFeedbackDW.getFeedbackByDwId(dwId);
 
+        // ตรวจสอบผลลัพธ์
         if (!result.success) {
             if (result.message.includes('not found')) {
                 return NextResponse.json(result, { status: 404 });
@@ -21,10 +23,10 @@ export async function GET(request) {
             return NextResponse.json(result, { status: 500 });
         }
 
+        // ส่งผลลัพธ์กลับไป
         return NextResponse.json(result, { status: 200 });
-
     } catch (error) {
-        console.error('Search dog walkers error:', error);
+        console.error('Fetch feedback error:', error);
         return NextResponse.json(
             { success: false, message: 'Internal server error' },
             { status: 500 }

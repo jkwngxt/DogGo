@@ -42,11 +42,11 @@ const DogWalkerNav = ({ userImage, userName }) => {
 
   return (
     <div className="flex px-10 bg-[#2668E3] justify-between">
-      <img className="w-20 h-20" src="/image/logo.svg" alt="dog go logo" />
+      <img className="w-20 h-20" src="/image/logoInvert.svg" alt="dog go logo"/>
       <div className="flex flex-row space-x-4 items-center">
         <img src={userImage} 
         alt="User profile" 
-        className="w-16 h-16 rounded-full object-cover"
+        className="w-12 h-12 rounded-full object-cover"
         onError={(e) => {
           e.target.onerror = null;
           e.target.src = "/image/user-placeholder.jpg";
