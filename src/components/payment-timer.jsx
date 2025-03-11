@@ -260,6 +260,7 @@ const PaymentTimerUI = ({ walkingServiceId, showPaymentDialog, setShowPaymentDia
 
   const handleSuccessDialogClose = useCallback(() => {
     setShowSuccessDialog(false);
+    clearSessionData();
 
     // ตรวจสอบว่าอยู่ที่หน้า workspace หรือไม่
     if (window.location.pathname.includes('/pet-owner/homepage')) {
