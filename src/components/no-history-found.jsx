@@ -1,5 +1,6 @@
 import React from "react";
 import { Card, CardContent } from "./ui/card";
+import { Label } from "@/components/ui/label";
 
 export default function NoHistoryFound({ wantBg = true }) {
     return (
