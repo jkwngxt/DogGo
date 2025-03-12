@@ -73,16 +73,17 @@ export class FetchWSController {
                 };
             });
 
-            // ฟังก์ชั่นกำหนดลำดับความสำคัญของสถานะ
-            const getStatusPriority = (status) => {
+            // ฟังก์ชั่นกำหนดลำดับความสำคัญของสถานะ (พร้อมตรวจสอบสถานะรีวิว)
+            const getStatusPriority = (status, isReviewed) => {
                 switch (status) {
                     case 201: return 1; // รอการชำระเงิน
                     case 203: return 2; // ยอมรับแล้ว
-                    case 204: return 3; // เสร็จสิ้น
+                    case 204:
+                        return isReviewed ? 5 : 3; // เสร็จสิ้น (3: ยังไม่รีวิว, 5: รีวิวแล้ว)
                     case 202: return 4; // รอการตอบกลับ
-                    case 220: return 5; // ปฏิเสธ
-                    case 210: return 6; // ยกเลิก
-                    default: return 7; // สถานะอื่นๆ
+                    case 220: return 6; // ปฏิเสธ
+                    case 210: return 7; // ยกเลิก
+                    default: return 8; // สถานะอื่นๆ
                 }
             };
 
@@ -92,8 +93,8 @@ export class FetchWSController {
 
             // เรียงลำดับตามความสำคัญของสถานะก่อน จากนั้นจึงเรียงตามวันที่ที่ใกล้วันปัจจุบันที่สุดในแต่ละกลุ่มสถานะ
             walkingServiceList.sort((a, b) => {
-                const priorityA = getStatusPriority(a.status);
-                const priorityB = getStatusPriority(b.status);
+                const priorityA = getStatusPriority(a.status, a.isReview);
+                const priorityB = getStatusPriority(b.status, b.isReview);
 
                 // เรียงตามลำดับความสำคัญของสถานะ
                 if (priorityA !== priorityB) {
