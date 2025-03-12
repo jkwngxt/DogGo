@@ -86,7 +86,11 @@ export class FetchWSController {
                 }
             };
 
-            // เรียงลำดับตามความสำคัญของสถานะก่อน จากนั้นจึงเรียงตามวันที่ในแต่ละกลุ่มสถานะ
+            // คำนวณความต่างของวันบริการกับวันปัจจุบัน
+            const now = new Date();
+            now.setHours(0, 0, 0, 0); // ตัดส่วนเวลาออกเพื่อเปรียบเทียบเฉพาะวันที่
+
+            // เรียงลำดับตามความสำคัญของสถานะก่อน จากนั้นจึงเรียงตามวันที่ที่ใกล้วันปัจจุบันที่สุดในแต่ละกลุ่มสถานะ
             walkingServiceList.sort((a, b) => {
                 const priorityA = getStatusPriority(a.status);
                 const priorityB = getStatusPriority(b.status);
@@ -96,8 +100,16 @@ export class FetchWSController {
                     return priorityA - priorityB;
                 }
 
-                // หากสถานะเดียวกัน เรียงตามวันที่ (ล่าสุดก่อน)
-                return new Date(b.serviceDate) - new Date(a.serviceDate);
+                // หากสถานะเดียวกัน เรียงตามวันที่ที่ใกล้ปัจจุบันที่สุด
+                const dateA = new Date(a.serviceDate);
+                const dateB = new Date(b.serviceDate);
+
+                // คำนวณค่าสัมบูรณ์ของจำนวนวันต่างจากวันปัจจุบัน
+                const diffA = Math.abs(dateA - now);
+                const diffB = Math.abs(dateB - now);
+
+                // เรียงจากวันที่ใกล้ปัจจุบันที่สุดไปยังวันที่ห่างออกไป
+                return diffA - diffB;
             });
 
             return {
