@@ -91,7 +91,7 @@ export default function DogWalkerWorkPage() {
   return (
     <div className="min-h-screen bg-yellow-100 p-6">
       <div className="max-w-3xl mx-auto mt-4">
-        <Label className="text-3xl font-semibold">งานของฉัน</Label>
+        <Label className="text-3xl font-semibold">ประวัติการรับงาน</Label>
         {/* Work List using WorkDescription */}
         <div className="mt-4 space-y-2 font-semibold">
         {walkingServices.map((service, index) => (
