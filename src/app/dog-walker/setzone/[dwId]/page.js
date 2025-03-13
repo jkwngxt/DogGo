@@ -57,6 +57,12 @@ const SetZonePage = ({params}) => {
       return;
     }
 
+    // Validate phone number
+    if (!data.tel.startsWith("0")) {
+      setMessage("เบอร์โทรศัพท์ไม่ถูกต้อง");
+      return;
+    }
+
     // Filter out any empty service areas
     const validServiceAreas = data.serviceAreas.filter(area => area.value);
     
