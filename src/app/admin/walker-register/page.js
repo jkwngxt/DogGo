@@ -61,6 +61,18 @@ const SignUpPage = () => {
       setShowErrorDialog(true);
       return;
     }
+
+    if (!validateUsername(username)) {
+      setMessage("Username ต้องขึ้นต้นด้วย 'dw-'");
+      setShowErrorDialog(true);
+      return;
+    }
+
+    if (!selectedFile){
+      setMessage("กรุณาอัพโหลดรูปภาพ");
+      setShowErrorDialog(true);
+      return;
+    }
   
     try {
       setIsLoading(true)
@@ -69,10 +81,7 @@ const SignUpPage = () => {
       formData.append("name", name);
       formData.append("username", username);
       formData.append("email", email);
-      
-      if (selectedFile) {
-        formData.append("pic", selectedFile);
-      } 
+      formData.append("pic", selectedFile);
   
       // Send POST request to API
       const response = await fetch("/api/dog-walker/register", {
@@ -106,9 +115,12 @@ const SignUpPage = () => {
     }
   };
 
-  const handleDialogClose = () => {
-    setShowSuccessDialog(false);
+  const handleErrorDialogClose = () => {
     setShowErrorDialog(false);
+  };
+
+  const handleSuccessDialogClose = () => {
+    setShowSuccessDialog(false);
     window.location.reload();
   };
   return (
@@ -206,8 +218,8 @@ const SignUpPage = () => {
         showSuccessDialog={showSuccessDialog}
         showErrorDialog={showErrorDialog}
         message={message}
-        onSuccessClose={handleDialogClose}
-        onErrorClose={handleDialogClose}
+        onSuccessClose={handleSuccessDialogClose}
+        onErrorClose={handleErrorDialogClose}
       />
     </>
   );
