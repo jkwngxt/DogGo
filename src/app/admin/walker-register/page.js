@@ -34,13 +34,13 @@ const SignUpPage = () => {
     setProfileImage(null);
     setSelectedFile(null);
   };
-  
+
   const handleImageChange = (event) => {
     const file = event.target.files[0];
-  
+
     if (file) {
       setSelectedFile(file); //  Store file in state
-  
+
       // Create an image preview using FileReader
       const reader = new FileReader();
       reader.onload = (e) => setProfileImage(e.target.result);
@@ -64,7 +64,7 @@ const SignUpPage = () => {
       setShowErrorDialog(true);
       return;
     }
-  
+
     if (!validateEmail(email)) {
       setMessage("โปรดป้อนอีเมลที่ถูกต้อง");
       setShowErrorDialog(true);
@@ -77,40 +77,40 @@ const SignUpPage = () => {
       return;
     }
 
-    if (!selectedFile){
+    if (!selectedFile) {
       setMessage("กรุณาอัพโหลดรูปภาพ");
       setShowErrorDialog(true);
       return;
     }
-  
+
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       // Prepare FormData
       const formData = new FormData();
       formData.append("name", name);
       formData.append("username", username);
       formData.append("email", email);
       formData.append("pic", selectedFile);
-  
+
       // Send POST request to API
       const response = await fetch("/api/dog-walker/register", {
         method: "POST",
         body: formData,
       });
-  
+
       // Check for 409 status (Conflict) specifically
       if (response.status === 409) {
         setMessage("ผู้ใช้หรืออีเมลถูกใช้งานแล้ว กรุณากรอกข้อมูลอีกครั้ง");
         setShowErrorDialog(true);
         return;
       }
-  
+
       const data = await response.json();
-      
-      setIsLoading(false)
+
+      setIsLoading(false);
 
       if (data.success) {
-        console.log(data)
+        console.log(data);
         setMessage("บันทึกข้อมูลเข้าระบบเรียบร้อย");
         setShowSuccessDialog(true);
       } else {
@@ -211,24 +211,30 @@ const SignUpPage = () => {
               </div>
             </CardContent>
             <CardFooter className="flex justify-center space-x-4 mt-16">
-              <Button 
-              variant="default" 
-              onClick={handleConfirmClick}
-              disabled={isLoading}>
-               {isLoading ? "กำลังสร้างบัญชี..." : "สร้างบัญชี"}
+              <Button
+                variant="default"
+                onClick={handleConfirmClick}
+                disabled={isLoading}
+              >
+                {isLoading ? "กำลังสร้างบัญชี..." : "สร้างบัญชี"}
               </Button>
 
               {/* Cancel Button */}
-              <Button variant="destructive" onClick={() => setShowConfirm(true)}>
+              <Button
+                variant="destructive"
+                onClick={() => setShowConfirm(true)}
+              >
                 ยกเลิก
               </Button>
 
               {/* Confirmation Modal */}
               {showConfirm && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                  <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-                    <p className="text-center font-medium">ต้องการยกเลิกใช่หรือไม่?</p>
-                    <div className="flex justify-between mt-4">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-xl p-6 max-w-sm w-full text-center shadow-lg">
+                    <p className="text-center font-medium">
+                      ต้องการยกเลิกใช่หรือไม่?
+                    </p>
+                    <div className="flex justify-center gap-4 mt-4">
                       {/* "Yes" Button: Reset Form & Close Modal */}
                       <Button
                         variant="default"
@@ -241,7 +247,10 @@ const SignUpPage = () => {
                       </Button>
 
                       {/* "No" Button: Just Close Modal */}
-                      <Button variant="destructive" onClick={() => setShowConfirm(false)}>
+                      <Button
+                        variant="destructive"
+                        onClick={() => setShowConfirm(false)}
+                      >
                         ไม่ใช่
                       </Button>
                     </div>

@@ -361,12 +361,12 @@ const SetZonePage = ({ params }) => {
 
               {/* Confirmation Modal */}
               {showConfirm && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                  <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-xl p-6 max-w-sm w-full text-center shadow-lg">
                     <p className="text-center font-medium">
                       ต้องการยกเลิกใช่หรือไม่?
                     </p>
-                    <div className="flex justify-between mt-4">
+                    <div className="flex justify-center gap-4 mt-4">
                       {/* "Yes" Button: Reset Form & Close Modal */}
                       <Button
                         variant="default"
