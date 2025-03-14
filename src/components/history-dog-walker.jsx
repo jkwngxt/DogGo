@@ -15,11 +15,61 @@ const HistoryDogWalker = ({
                               ws_status,
                               isReviewed,
                               walkingServiceId,
-                              onStatusUpdate
+                              onStatusUpdate,
+                              serviceDate,
+                              startHour,
+                              endHour
                           }) => {
     const router = useRouter();
     const [status, setStatus] = React.useState(ws_status);
     const [showPaymentDialog, setShowPaymentDialog] = React.useState(false);
+
+    // Function to check service time status (past, current, future)
+    const getServiceTimeStatus = () => {
+        const now = new Date();
+        const serviceDateTime = new Date(serviceDate);
+
+        // Set service start and end times
+        const serviceStartTime = new Date(serviceDateTime);
+        serviceStartTime.setHours(startHour, 0, 0, 0);
+
+        const serviceEndTime = new Date(serviceDateTime);
+        serviceEndTime.setHours(endHour, 0, 0, 0);
+
+        // Log time comparison information with timezone details
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const nowISO = now.toISOString();
+        const nowLocal = now.toString();
+
+        console.log(`--- Time comparison for service ID: ${walkingServiceId} ---`);
+        console.log(`Browser timezone: ${timezone}`);
+        console.log(`Current time (ISO): ${nowISO}`);
+        console.log(`Current time (Local): ${nowLocal}`);
+        console.log(`Current time (TH format): ${now.toLocaleString('th-TH')}`);
+        console.log(`Service date (ISO): ${serviceDateTime.toISOString()}`);
+        console.log(`Service date (Local): ${serviceDateTime.toString()}`);
+        console.log(`Service start time (ISO): ${serviceStartTime.toISOString()}`);
+        console.log(`Service start time (Local): ${serviceStartTime.toString()}`);
+        console.log(`Service end time (ISO): ${serviceEndTime.toISOString()}`);
+        console.log(`Service end time (Local): ${serviceEndTime.toString()}`);
+        console.log(`Service date timezone offset: ${serviceDateTime.getTimezoneOffset()} minutes`);
+        console.log(`Current date timezone offset: ${now.getTimezoneOffset()} minutes`);
+        console.log(`Is service past? ${now > serviceEndTime}`);
+        console.log(`Is service current? ${now >= serviceStartTime && now <= serviceEndTime}`);
+        console.log(`Is service future? ${now < serviceStartTime}`);
+        console.log(`Start hour: ${startHour}, End hour: ${endHour}`);
+        console.log(`Service status: ${status}`);
+        console.log(`-----------------------------------------`);
+
+        // Check if service time is past, current, or future
+        if (now > serviceEndTime) {
+            return "past"; // Service time has passed
+        } else if (now >= serviceStartTime && now <= serviceEndTime) {
+            return "current"; // Currently in service time
+        } else {
+            return "future"; // Service time is in the future
+        }
+    };
 
     const handleCardClick = () => {
         router.push(`/dog-walker/walk-description/${walkingServiceId}`);
@@ -38,6 +88,12 @@ const HistoryDogWalker = ({
     };
 
     const renderStatusButton = () => {
+        // Get time status for status 203 (Accepted)
+        const timeStatus = getServiceTimeStatus();
+
+        // Log the final time status that will determine UI
+        console.log(`Final time status for service ID ${walkingServiceId}: ${timeStatus}`);
+
         switch (status) {
             case 201: // Awaiting payment - Keep blue color (already set in ClickPayment component)
                 return (
@@ -57,16 +113,25 @@ const HistoryDogWalker = ({
             case 220: // Rejected
                 return <p className="font-bold text-red-500">การรับงานถูกปฏิเสธ</p>;
 
-            case 203: // Accepted -> Show "ได้รับบริการ" with green color
-                return (
-                    <div onClick={(e) => e.stopPropagation()}>
-                        <OwnerWalkConfirmation
-                            walkingServiceId={walkingServiceId}
-                            onStatusUpdate={() => handleStatusUpdate(walkingServiceId, 204)}
-                            buttonColor="green" // Add this prop to handle in OwnerWalkConfirmation
-                        />
-                    </div>
-                );
+            case 203: // Accepted -> Show different status based on time
+                if (timeStatus === "past") {
+                    // If service time has passed, show confirmation button
+                    return (
+                        <div onClick={(e) => e.stopPropagation()}>
+                            <OwnerWalkConfirmation
+                                walkingServiceId={walkingServiceId}
+                                onStatusUpdate={() => handleStatusUpdate(walkingServiceId, 204)}
+                                buttonColor="green"
+                            />
+                        </div>
+                    );
+                } else if (timeStatus === "current") {
+                    // If currently in service time
+                    return <p className="font-bold text-[#6498FA]">อยู่ในช่วงให้บริการ</p>;
+                } else {
+                    // If service time is in the future
+                    return <p className="font-bold text-green-500">การจองได้รับการยืนยัน</p>;
+                }
 
             case 204: // Completed - Show review button with yellow-orange star color
                 return isReviewed ? (

@@ -4,7 +4,7 @@ export class LogoutController {
     async logout() {
         try {
             // ลบ token cookie
-            const cookieStore = cookies();
+            const cookieStore = await cookies();
             cookieStore.delete('token');
 
             return {
