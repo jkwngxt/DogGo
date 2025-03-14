@@ -25,7 +25,16 @@ const SignUpPage = () => {
   const [profileImage, setProfileImage] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
+  const handleReset = () => {
+    setUsername("");
+    setEmail("");
+    setName("");
+    setProfileImage(null);
+    setSelectedFile(null);
+  };
+  
   const handleImageChange = (event) => {
     const file = event.target.files[0];
   
@@ -208,7 +217,37 @@ const SignUpPage = () => {
               disabled={isLoading}>
                {isLoading ? "กำลังสร้างบัญชี..." : "สร้างบัญชี"}
               </Button>
-              <Button variant="destructive">ยกเลิก</Button>
+
+              {/* Cancel Button */}
+              <Button variant="destructive" onClick={() => setShowConfirm(true)}>
+                ยกเลิก
+              </Button>
+
+              {/* Confirmation Modal */}
+              {showConfirm && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                  <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+                    <p className="text-center font-medium">ต้องการยกเลิกใช่หรือไม่?</p>
+                    <div className="flex justify-between mt-4">
+                      {/* "Yes" Button: Reset Form & Close Modal */}
+                      <Button
+                        variant="default"
+                        onClick={() => {
+                          handleReset(); // Call the reset function
+                          setShowConfirm(false);
+                        }}
+                      >
+                        ใช่
+                      </Button>
+
+                      {/* "No" Button: Just Close Modal */}
+                      <Button variant="destructive" onClick={() => setShowConfirm(false)}>
+                        ไม่ใช่
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardFooter>
           </Card>
         </div>
