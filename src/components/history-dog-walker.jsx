@@ -41,26 +41,6 @@ const HistoryDogWalker = ({
         const nowISO = now.toISOString();
         const nowLocal = now.toString();
 
-        console.log(`--- Time comparison for service ID: ${walkingServiceId} ---`);
-        console.log(`Browser timezone: ${timezone}`);
-        console.log(`Current time (ISO): ${nowISO}`);
-        console.log(`Current time (Local): ${nowLocal}`);
-        console.log(`Current time (TH format): ${now.toLocaleString('th-TH')}`);
-        console.log(`Service date (ISO): ${serviceDateTime.toISOString()}`);
-        console.log(`Service date (Local): ${serviceDateTime.toString()}`);
-        console.log(`Service start time (ISO): ${serviceStartTime.toISOString()}`);
-        console.log(`Service start time (Local): ${serviceStartTime.toString()}`);
-        console.log(`Service end time (ISO): ${serviceEndTime.toISOString()}`);
-        console.log(`Service end time (Local): ${serviceEndTime.toString()}`);
-        console.log(`Service date timezone offset: ${serviceDateTime.getTimezoneOffset()} minutes`);
-        console.log(`Current date timezone offset: ${now.getTimezoneOffset()} minutes`);
-        console.log(`Is service past? ${now > serviceEndTime}`);
-        console.log(`Is service current? ${now >= serviceStartTime && now <= serviceEndTime}`);
-        console.log(`Is service future? ${now < serviceStartTime}`);
-        console.log(`Start hour: ${startHour}, End hour: ${endHour}`);
-        console.log(`Service status: ${status}`);
-        console.log(`-----------------------------------------`);
-
         // Check if service time is past, current, or future
         if (now > serviceEndTime) {
             return "past"; // Service time has passed
@@ -90,9 +70,6 @@ const HistoryDogWalker = ({
     const renderStatusButton = () => {
         // Get time status for status 203 (Accepted)
         const timeStatus = getServiceTimeStatus();
-
-        // Log the final time status that will determine UI
-        console.log(`Final time status for service ID ${walkingServiceId}: ${timeStatus}`);
 
         switch (status) {
             case 201: // Awaiting payment - Keep blue color (already set in ClickPayment component)
